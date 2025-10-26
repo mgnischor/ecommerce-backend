@@ -1,5 +1,3 @@
-# Git Flow Repository
+# E-Commerce Project (Backend)
 
-This repository is using git-flow with the following branches:
-- main: Production releases
-- develop: Development
+Repository under construction.
