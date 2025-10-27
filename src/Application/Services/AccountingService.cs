@@ -13,7 +13,7 @@ public class AccountingService : IAccountingService
     private readonly IRepository<ChartOfAccountsEntity> _chartOfAccountsRepository;
     private readonly IRepository<JournalEntryEntity> _journalEntryRepository;
     private readonly IRepository<AccountingEntryEntity> _accountingEntryRepository;
-    
+
     // Standard account codes (simplified structure)
     private const string ACCOUNT_INVENTORY = "1.1.03.001"; // Current Assets - Inventory
     private const string ACCOUNT_CMV = "3.1.01.001"; // Cost of Goods Sold
@@ -26,7 +26,8 @@ public class AccountingService : IAccountingService
     public AccountingService(
         IRepository<ChartOfAccountsEntity> chartOfAccountsRepository,
         IRepository<JournalEntryEntity> journalEntryRepository,
-        IRepository<AccountingEntryEntity> accountingEntryRepository)
+        IRepository<AccountingEntryEntity> accountingEntryRepository
+    )
     {
         _chartOfAccountsRepository = chartOfAccountsRepository;
         _journalEntryRepository = journalEntryRepository;
@@ -36,22 +37,25 @@ public class AccountingService : IAccountingService
     public async Task<JournalEntryEntity> RecordPurchaseAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // Debit: Inventory (increases asset)
         // Credit: Suppliers/Cash (increases liability or decreases asset)
-        
+
         var inventoryAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_INVENTORY, 
-            "Inventory", 
-            AccountType.Asset, 
-            cancellationToken);
-        
+            ACCOUNT_INVENTORY,
+            "Inventory",
+            AccountType.Asset,
+            cancellationToken
+        );
+
         var suppliersAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_SUPPLIERS, 
-            "Accounts Payable - Suppliers", 
-            AccountType.Liability, 
-            cancellationToken);
+            ACCOUNT_SUPPLIERS,
+            "Accounts Payable - Suppliers",
+            AccountType.Liability,
+            cancellationToken
+        );
 
         var journalEntry = await CreateJournalEntryAsync(
             "PURCHASE",
@@ -62,7 +66,8 @@ public class AccountingService : IAccountingService
             transaction.Id,
             null,
             createdBy,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Debit entry - Inventory
         await CreateAccountingEntryAsync(
@@ -72,7 +77,8 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Purchase - {transaction.Quantity} units x {transaction.UnitCost:C}",
             transaction.ToLocation,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Credit entry - Suppliers
         await CreateAccountingEntryAsync(
@@ -82,12 +88,13 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Supplier - Invoice {transaction.DocumentNumber}",
             null,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Update account balances
         inventoryAccount.Balance += transaction.TotalCost;
         suppliersAccount.Balance += transaction.TotalCost;
-        
+
         await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
         await _chartOfAccountsRepository.UpdateAsync(suppliersAccount, cancellationToken);
 
@@ -97,22 +104,25 @@ public class AccountingService : IAccountingService
     public async Task<JournalEntryEntity> RecordSaleAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // Debit: COGS (increases expense/cost)
         // Credit: Inventory (decreases asset)
-        
+
         var inventoryAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_INVENTORY, 
-            "Inventory", 
-            AccountType.Asset, 
-            cancellationToken);
-        
+            ACCOUNT_INVENTORY,
+            "Inventory",
+            AccountType.Asset,
+            cancellationToken
+        );
+
         var cmvAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_CMV, 
-            "Cost of Goods Sold", 
-            AccountType.Expense, 
-            cancellationToken);
+            ACCOUNT_CMV,
+            "Cost of Goods Sold",
+            AccountType.Expense,
+            cancellationToken
+        );
 
         var journalEntry = await CreateJournalEntryAsync(
             "COGS",
@@ -123,7 +133,8 @@ public class AccountingService : IAccountingService
             transaction.Id,
             transaction.OrderId,
             createdBy,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Debit entry - COGS
         await CreateAccountingEntryAsync(
@@ -133,7 +144,8 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Sale - {Math.Abs(transaction.Quantity)} units x {transaction.UnitCost:C}",
             transaction.FromLocation,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Credit entry - Inventory
         await CreateAccountingEntryAsync(
@@ -143,12 +155,13 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Inventory withdrawal - Order {transaction.OrderId}",
             transaction.FromLocation,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Update account balances
         cmvAccount.Balance += transaction.TotalCost;
         inventoryAccount.Balance -= transaction.TotalCost;
-        
+
         await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
         await _chartOfAccountsRepository.UpdateAsync(cmvAccount, cancellationToken);
 
@@ -158,22 +171,25 @@ public class AccountingService : IAccountingService
     public async Task<JournalEntryEntity> RecordSaleReturnAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // Debit: Inventory (increases asset)
         // Credit: COGS (decreases expense/cost)
-        
+
         var inventoryAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_INVENTORY, 
-            "Inventory", 
-            AccountType.Asset, 
-            cancellationToken);
-        
+            ACCOUNT_INVENTORY,
+            "Inventory",
+            AccountType.Asset,
+            cancellationToken
+        );
+
         var cmvAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_CMV, 
-            "Cost of Goods Sold", 
-            AccountType.Expense, 
-            cancellationToken);
+            ACCOUNT_CMV,
+            "Cost of Goods Sold",
+            AccountType.Expense,
+            cancellationToken
+        );
 
         var journalEntry = await CreateJournalEntryAsync(
             "SALE_RETURN",
@@ -184,7 +200,8 @@ public class AccountingService : IAccountingService
             transaction.Id,
             transaction.OrderId,
             createdBy,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Debit entry - Inventory
         await CreateAccountingEntryAsync(
@@ -194,7 +211,8 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Return - {transaction.Quantity} units",
             transaction.ToLocation,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Credit entry - COGS
         await CreateAccountingEntryAsync(
@@ -204,12 +222,13 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"COGS reversal - Order {transaction.OrderId}",
             null,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Update account balances
         inventoryAccount.Balance += transaction.TotalCost;
         cmvAccount.Balance -= transaction.TotalCost;
-        
+
         await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
         await _chartOfAccountsRepository.UpdateAsync(cmvAccount, cancellationToken);
 
@@ -219,22 +238,25 @@ public class AccountingService : IAccountingService
     public async Task<JournalEntryEntity> RecordPurchaseReturnAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // Debit: Suppliers (decreases liability)
         // Credit: Inventory (decreases asset)
-        
+
         var inventoryAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_INVENTORY, 
-            "Inventory", 
-            AccountType.Asset, 
-            cancellationToken);
-        
+            ACCOUNT_INVENTORY,
+            "Inventory",
+            AccountType.Asset,
+            cancellationToken
+        );
+
         var suppliersAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_SUPPLIERS, 
-            "Accounts Payable - Suppliers", 
-            AccountType.Liability, 
-            cancellationToken);
+            ACCOUNT_SUPPLIERS,
+            "Accounts Payable - Suppliers",
+            AccountType.Liability,
+            cancellationToken
+        );
 
         var journalEntry = await CreateJournalEntryAsync(
             "PURCHASE_RETURN",
@@ -245,7 +267,8 @@ public class AccountingService : IAccountingService
             transaction.Id,
             null,
             createdBy,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Debit entry - Suppliers
         await CreateAccountingEntryAsync(
@@ -255,7 +278,8 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Return to supplier - Invoice {transaction.DocumentNumber}",
             null,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Credit entry - Inventory
         await CreateAccountingEntryAsync(
@@ -265,12 +289,13 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Return - {Math.Abs(transaction.Quantity)} units",
             transaction.FromLocation,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Update account balances
         suppliersAccount.Balance -= transaction.TotalCost;
         inventoryAccount.Balance -= transaction.TotalCost;
-        
+
         await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
         await _chartOfAccountsRepository.UpdateAsync(suppliersAccount, cancellationToken);
 
@@ -280,27 +305,30 @@ public class AccountingService : IAccountingService
     public async Task<JournalEntryEntity> RecordAdjustmentAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var inventoryAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_INVENTORY, 
-            "Inventory", 
-            AccountType.Asset, 
-            cancellationToken);
+            ACCOUNT_INVENTORY,
+            "Inventory",
+            AccountType.Asset,
+            cancellationToken
+        );
 
         ChartOfAccountsEntity contraAccount;
         EntryType inventoryEntryType;
         EntryType contraEntryType;
-        
+
         if (transaction.Quantity > 0)
         {
             // Positive adjustment (overage)
             // Debit: Inventory, Credit: Other Income
             contraAccount = await GetOrCreateAccountAsync(
-                ACCOUNT_OTHER_INCOME, 
-                "Other Operating Income", 
-                AccountType.Revenue, 
-                cancellationToken);
+                ACCOUNT_OTHER_INCOME,
+                "Other Operating Income",
+                AccountType.Revenue,
+                cancellationToken
+            );
             inventoryEntryType = EntryType.Debit;
             contraEntryType = EntryType.Credit;
         }
@@ -309,10 +337,11 @@ public class AccountingService : IAccountingService
             // Negative adjustment (shortage)
             // Debit: Other Expenses, Credit: Inventory
             contraAccount = await GetOrCreateAccountAsync(
-                ACCOUNT_OTHER_EXPENSES, 
-                "Other Operating Expenses", 
-                AccountType.Expense, 
-                cancellationToken);
+                ACCOUNT_OTHER_EXPENSES,
+                "Other Operating Expenses",
+                AccountType.Expense,
+                cancellationToken
+            );
             inventoryEntryType = EntryType.Credit;
             contraEntryType = EntryType.Debit;
         }
@@ -326,7 +355,8 @@ public class AccountingService : IAccountingService
             transaction.Id,
             null,
             createdBy,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Inventory entry
         await CreateAccountingEntryAsync(
@@ -336,7 +366,8 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Adjustment - {transaction.Quantity} units | {transaction.Notes}",
             transaction.ToLocation,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Contra entry
         await CreateAccountingEntryAsync(
@@ -346,7 +377,8 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Inventory adjustment - {transaction.ProductSku}",
             null,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Update account balances
         if (transaction.Quantity > 0)
@@ -359,7 +391,7 @@ public class AccountingService : IAccountingService
             inventoryAccount.Balance -= transaction.TotalCost;
             contraAccount.Balance += transaction.TotalCost;
         }
-        
+
         await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
         await _chartOfAccountsRepository.UpdateAsync(contraAccount, cancellationToken);
 
@@ -369,22 +401,25 @@ public class AccountingService : IAccountingService
     public async Task<JournalEntryEntity> RecordLossAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // Debit: Inventory Loss (increases expense)
         // Credit: Inventory (decreases asset)
-        
+
         var inventoryAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_INVENTORY, 
-            "Inventory", 
-            AccountType.Asset, 
-            cancellationToken);
-        
+            ACCOUNT_INVENTORY,
+            "Inventory",
+            AccountType.Asset,
+            cancellationToken
+        );
+
         var lossAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_INVENTORY_LOSS, 
-            "Inventory Loss", 
-            AccountType.Expense, 
-            cancellationToken);
+            ACCOUNT_INVENTORY_LOSS,
+            "Inventory Loss",
+            AccountType.Expense,
+            cancellationToken
+        );
 
         var journalEntry = await CreateJournalEntryAsync(
             "LOSS",
@@ -395,7 +430,8 @@ public class AccountingService : IAccountingService
             transaction.Id,
             null,
             createdBy,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Debit entry - Loss
         await CreateAccountingEntryAsync(
@@ -405,7 +441,8 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Loss/shrinkage - {Math.Abs(transaction.Quantity)} units | {transaction.Notes}",
             transaction.FromLocation,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Credit entry - Inventory
         await CreateAccountingEntryAsync(
@@ -415,12 +452,13 @@ public class AccountingService : IAccountingService
             transaction.TotalCost,
             $"Write-off for loss - {transaction.ProductSku}",
             transaction.FromLocation,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Update account balances
         lossAccount.Balance += transaction.TotalCost;
         inventoryAccount.Balance -= transaction.TotalCost;
-        
+
         await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
         await _chartOfAccountsRepository.UpdateAsync(lossAccount, cancellationToken);
 
@@ -431,10 +469,12 @@ public class AccountingService : IAccountingService
         string accountCode,
         string accountName,
         AccountType accountType,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var account = (await _chartOfAccountsRepository.GetAllAsync(cancellationToken))
-            .FirstOrDefault(a => a.AccountCode == accountCode);
+        var account = (
+            await _chartOfAccountsRepository.GetAllAsync(cancellationToken)
+        ).FirstOrDefault(a => a.AccountCode == accountCode);
 
         if (account == null)
         {
@@ -449,7 +489,7 @@ public class AccountingService : IAccountingService
                 Balance = 0,
                 Description = $"Account automatically created by system",
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
             };
 
             await _chartOfAccountsRepository.AddAsync(account, cancellationToken);
@@ -467,9 +507,11 @@ public class AccountingService : IAccountingService
         Guid? inventoryTransactionId,
         Guid? orderId,
         Guid createdBy,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var entryNumber = $"{documentType}-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
+        var entryNumber =
+            $"{documentType}-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
 
         var journalEntry = new JournalEntryEntity
         {
@@ -487,7 +529,7 @@ public class AccountingService : IAccountingService
             PostedAt = DateTime.UtcNow,
             CreatedBy = createdBy,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         await _journalEntryRepository.AddAsync(journalEntry, cancellationToken);
@@ -501,7 +543,8 @@ public class AccountingService : IAccountingService
         decimal amount,
         string? description,
         string? costCenter,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var entry = new AccountingEntryEntity
         {
@@ -512,7 +555,7 @@ public class AccountingService : IAccountingService
             Amount = amount,
             Description = description,
             CostCenter = costCenter,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
         };
 
         await _accountingEntryRepository.AddAsync(entry, cancellationToken);
