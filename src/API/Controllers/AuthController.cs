@@ -132,7 +132,7 @@ public sealed class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public IActionResult GetOptions()
     {
-        Response.Headers.Add("Allow", "POST, GET, OPTIONS");
+        Response.Headers.Append("Allow", "POST, GET, OPTIONS");
         return NoContent();
     }
 }
