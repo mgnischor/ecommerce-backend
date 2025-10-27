@@ -1,6 +1,7 @@
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Infrastructure.Repositories;
 
@@ -11,10 +12,12 @@ namespace ECommerce.Infrastructure.Repositories;
 public sealed class ProductRepository
 {
     private readonly PostgresqlContext _context;
+    private readonly ILogger<ProductRepository> _logger;
 
-    public ProductRepository(PostgresqlContext context)
+    public ProductRepository(PostgresqlContext context, ILogger<ProductRepository> logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<ProductEntity?> GetByIdAsync(
@@ -128,25 +131,64 @@ public sealed class ProductRepository
     )
     {
         if (product == null)
+        {
+            _logger.LogError("Attempt to add null product");
             throw new ArgumentNullException(nameof(product));
+        }
 
-        await _context.Products.AddAsync(product, cancellationToken);
+        try
+        {
+            _logger.LogDebug("Adding new product: {Sku}", product.Sku);
+            await _context.Products.AddAsync(product, cancellationToken);
+            _logger.LogDebug("Product added successfully: {ProductId}", product.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding product: {Sku}", product.Sku);
+            throw;
+        }
     }
 
     public void Update(ProductEntity product)
     {
         if (product == null)
+        {
+            _logger.LogError("Attempt to update null product");
             throw new ArgumentNullException(nameof(product));
+        }
 
-        _context.Products.Update(product);
+        try
+        {
+            _logger.LogDebug("Updating product: {ProductId}", product.Id);
+            _context.Products.Update(product);
+            _logger.LogDebug("Product updated successfully: {ProductId}", product.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating product: {ProductId}", product.Id);
+            throw;
+        }
     }
 
     public void Remove(ProductEntity product)
     {
         if (product == null)
+        {
+            _logger.LogError("Attempt to remove null product");
             throw new ArgumentNullException(nameof(product));
+        }
 
-        _context.Products.Remove(product);
+        try
+        {
+            _logger.LogDebug("Removing product: {ProductId}", product.Id);
+            _context.Products.Remove(product);
+            _logger.LogDebug("Product removed successfully: {ProductId}", product.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing product: {ProductId}", product.Id);
+            throw;
+        }
     }
 
     public async Task<bool> RemoveByIdAsync(
@@ -154,16 +196,29 @@ public sealed class ProductRepository
         CancellationToken cancellationToken = default
     )
     {
-        var product = await _context.Products.FirstOrDefaultAsync(
-            p => p.Id == productId,
-            cancellationToken
-        );
+        try
+        {
+            _logger.LogDebug("Removing product by ID: {ProductId}", productId);
+            var product = await _context.Products.FirstOrDefaultAsync(
+                p => p.Id == productId,
+                cancellationToken
+            );
 
-        if (product == null)
-            return false;
+            if (product == null)
+            {
+                _logger.LogDebug("Product not found for removal: {ProductId}", productId);
+                return false;
+            }
 
-        _context.Products.Remove(product);
-        return true;
+            _context.Products.Remove(product);
+            _logger.LogDebug("Product removed successfully: {ProductId}", productId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing product by ID: {ProductId}", productId);
+            throw;
+        }
     }
 
     public async Task<bool> SoftDeleteAsync(
@@ -171,17 +226,30 @@ public sealed class ProductRepository
         CancellationToken cancellationToken = default
     )
     {
-        var product = await _context.Products.FirstOrDefaultAsync(
-            p => p.Id == productId,
-            cancellationToken
-        );
+        try
+        {
+            _logger.LogDebug("Soft deleting product: {ProductId}", productId);
+            var product = await _context.Products.FirstOrDefaultAsync(
+                p => p.Id == productId,
+                cancellationToken
+            );
 
-        if (product == null)
-            return false;
+            if (product == null)
+            {
+                _logger.LogDebug("Product not found for soft delete: {ProductId}", productId);
+                return false;
+            }
 
-        product.IsDeleted = true;
-        product.UpdatedAt = DateTime.UtcNow;
-        _context.Products.Update(product);
-        return true;
+            product.IsDeleted = true;
+            product.UpdatedAt = DateTime.UtcNow;
+            _context.Products.Update(product);
+            _logger.LogDebug("Product soft deleted successfully: {ProductId}", productId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error soft deleting product: {ProductId}", productId);
+            throw;
+        }
     }
 }
