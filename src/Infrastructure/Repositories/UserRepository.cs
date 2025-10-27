@@ -1,6 +1,7 @@
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Infrastructure.Repositories;
 
@@ -11,10 +12,12 @@ namespace ECommerce.Infrastructure.Repositories;
 public sealed class UserRepository
 {
     private readonly PostgresqlContext _context;
+    private readonly ILogger<UserRepository> _logger;
 
-    public UserRepository(PostgresqlContext context)
+    public UserRepository(PostgresqlContext context, ILogger<UserRepository> logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<UserEntity?> GetByIdAsync(
@@ -22,9 +25,25 @@ public sealed class UserRepository
         CancellationToken cancellationToken = default
     )
     {
-        return await _context
-            .Users.AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        try
+        {
+            _logger.LogDebug("Retrieving user by ID: {UserId}", userId);
+            var user = await _context
+                .Users.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+
+            if (user == null)
+            {
+                _logger.LogDebug("User not found with ID: {UserId}", userId);
+            }
+
+            return user;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving user by ID: {UserId}", userId);
+            throw;
+        }
     }
 
     public async Task<UserEntity?> GetByEmailAsync(
@@ -95,25 +114,64 @@ public sealed class UserRepository
     public async Task AddAsync(UserEntity user, CancellationToken cancellationToken = default)
     {
         if (user == null)
+        {
+            _logger.LogError("Attempt to add null user");
             throw new ArgumentNullException(nameof(user));
+        }
 
-        await _context.Users.AddAsync(user, cancellationToken);
+        try
+        {
+            _logger.LogDebug("Adding new user: {Email}", user.Email);
+            await _context.Users.AddAsync(user, cancellationToken);
+            _logger.LogDebug("User added successfully: {UserId}", user.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding user: {Email}", user.Email);
+            throw;
+        }
     }
 
     public void Update(UserEntity user)
     {
         if (user == null)
+        {
+            _logger.LogError("Attempt to update null user");
             throw new ArgumentNullException(nameof(user));
+        }
 
-        _context.Users.Update(user);
+        try
+        {
+            _logger.LogDebug("Updating user: {UserId}", user.Id);
+            _context.Users.Update(user);
+            _logger.LogDebug("User updated successfully: {UserId}", user.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating user: {UserId}", user.Id);
+            throw;
+        }
     }
 
     public void Remove(UserEntity user)
     {
         if (user == null)
+        {
+            _logger.LogError("Attempt to remove null user");
             throw new ArgumentNullException(nameof(user));
+        }
 
-        _context.Users.Remove(user);
+        try
+        {
+            _logger.LogDebug("Removing user: {UserId}", user.Id);
+            _context.Users.Remove(user);
+            _logger.LogDebug("User removed successfully: {UserId}", user.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing user: {UserId}", user.Id);
+            throw;
+        }
     }
 
     public async Task<bool> RemoveByIdAsync(
