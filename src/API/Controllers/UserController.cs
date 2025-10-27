@@ -16,7 +16,11 @@ public sealed class UserController : ControllerBase
     private readonly PostgresqlContext _context;
     private readonly ILogger<UserController> _logger;
 
-    public UserController(UserRepository userRepository, PostgresqlContext context, ILogger<UserController> logger)
+    public UserController(
+        UserRepository userRepository,
+        PostgresqlContext context,
+        ILogger<UserController> logger
+    )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -39,7 +43,11 @@ public sealed class UserController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        _logger.LogInformation("Getting all users - Page: {PageNumber}, PageSize: {PageSize}", pageNumber, pageSize);
+        _logger.LogInformation(
+            "Getting all users - Page: {PageNumber}, PageSize: {PageSize}",
+            pageNumber,
+            pageSize
+        );
 
         if (pageNumber < 1)
         {
@@ -56,7 +64,11 @@ public sealed class UserController : ControllerBase
         var users = await _userRepository.GetPagedAsync(pageNumber, pageSize, cancellationToken);
         var totalCount = await _userRepository.GetCountAsync(cancellationToken);
 
-        _logger.LogInformation("Retrieved {Count} users out of {TotalCount} total", users.Count, totalCount);
+        _logger.LogInformation(
+            "Retrieved {Count} users out of {TotalCount} total",
+            users.Count,
+            totalCount
+        );
 
         Response.Headers.Append("X-Total-Count", totalCount.ToString());
         Response.Headers.Append("X-Page-Number", pageNumber.ToString());
@@ -118,13 +130,19 @@ public sealed class UserController : ControllerBase
 
         if (await _userRepository.ExistsByEmailAsync(newUser.Email, cancellationToken))
         {
-            _logger.LogWarning("Attempt to create user with duplicate email: {Email}", newUser.Email);
+            _logger.LogWarning(
+                "Attempt to create user with duplicate email: {Email}",
+                newUser.Email
+            );
             return Conflict(new { Message = $"User with email '{newUser.Email}' already exists" });
         }
 
         if (await _userRepository.ExistsByUsernameAsync(newUser.Username, cancellationToken))
         {
-            _logger.LogWarning("Attempt to create user with duplicate username: {Username}", newUser.Username);
+            _logger.LogWarning(
+                "Attempt to create user with duplicate username: {Username}",
+                newUser.Username
+            );
             return Conflict(
                 new { Message = $"User with username '{newUser.Username}' already exists" }
             );
@@ -133,7 +151,11 @@ public sealed class UserController : ControllerBase
         await _userRepository.AddAsync(newUser, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("Successfully created user: {UserId}, Email: {Email}", newUser.Id, newUser.Email);
+        _logger.LogInformation(
+            "Successfully created user: {UserId}, Email: {Email}",
+            newUser.Id,
+            newUser.Email
+        );
 
         return CreatedAtAction(nameof(GetUserById), new { id = newUser.Id }, newUser);
     }
@@ -166,7 +188,11 @@ public sealed class UserController : ControllerBase
 
         if (id != updatedUser.Id)
         {
-            _logger.LogWarning("User ID mismatch in update request. URL ID: {UrlId}, Body ID: {BodyId}", id, updatedUser.Id);
+            _logger.LogWarning(
+                "User ID mismatch in update request. URL ID: {UrlId}, Body ID: {BodyId}",
+                id,
+                updatedUser.Id
+            );
             return BadRequest("ID mismatch");
         }
 
@@ -183,7 +209,11 @@ public sealed class UserController : ControllerBase
         );
         if (emailExists && existingUser.Email != updatedUser.Email)
         {
-            _logger.LogWarning("Attempt to update user {UserId} with duplicate email: {Email}", id, updatedUser.Email);
+            _logger.LogWarning(
+                "Attempt to update user {UserId} with duplicate email: {Email}",
+                id,
+                updatedUser.Email
+            );
             return Conflict(
                 new { Message = $"User with email '{updatedUser.Email}' already exists" }
             );
