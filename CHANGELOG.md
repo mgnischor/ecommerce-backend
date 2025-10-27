@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Product categories and status enums
 -   Migration SQL script generation automation
 
-## [0.0.7] - 2024-10-27
+## [0.0.7] - 2025-10-27
 
 ### Added
 
@@ -88,35 +88,35 @@ CREATE TABLE products (
 );
 ```
 
-## [0.0.6] - 2024-10-27
+## [0.0.6] - 2025-10-27
 
 ### Changed
 
 -   Empty migration (no database changes)
 -   Build version increment only
 
-## [0.0.5] - 2024-10-27
+## [0.0.5] - 2025-10-27
 
 ### Changed
 
 -   Empty migration (no database changes)
 -   Build version increment only
 
-## [0.0.4] - 2024-10-27
+## [0.0.4] - 2025-10-27
 
 ### Changed
 
 -   Empty migration (no database changes)
 -   Build version increment only
 
-## [0.0.3] - 2024-10-27
+## [0.0.3] - 2025-10-27
 
 ### Changed
 
 -   Empty migration (no database changes)
 -   Build version increment only
 
-## [0.0.2] - 2024-10-27
+## [0.0.2] - 2025-10-27
 
 ### Added
 
@@ -169,7 +169,7 @@ CREATE TABLE users (
 );
 ```
 
-## [0.0.1] - 2024-10-27
+## [0.0.1] - 2025-10-27
 
 ### Added
 
