@@ -30,5 +30,9 @@ RUN addgroup -g 1000 appgroup && \
     chown -R appuser:appgroup /app
 COPY --from=build --chown=appuser:appgroup /app/publish .
 USER appuser
-EXPOSE 5049 80
+
+ARG BUILD_DEVELOPMENT=1
+EXPOSE ${BUILD_DEVELOPMENT:+5049}
+EXPOSE ${BUILD_DEVELOPMENT:1:+80}
+
 ENTRYPOINT ["/app/entrypoint.sh"]
