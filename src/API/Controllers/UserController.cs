@@ -171,4 +171,36 @@ public sealed class UserController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Returns available endpoints
+    /// </summary>
+    /// <returns>
+    /// List of available endpoints
+    /// </returns>
+    [HttpGet("endpoints")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult GetEndpoints()
+    {
+        var endpoints = new[]
+        {
+            new { Method = "GET", Path = "/api/users" },
+            new { Method = "POST", Path = "/api/users" },
+            new { Method = "PUT", Path = "/api/users/{id}" },
+            new { Method = "DELETE", Path = "/api/users/{id}" },
+        };
+
+        return Ok(endpoints);
+    }
+
+    /// <summary>
+    /// Returns allowed HTTP methods for this endpoint
+    /// </summary>
+    [HttpOptions]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public IActionResult GetOptions()
+    {
+        Response.Headers.Append("Allow", "GET,POST,PUT,DELETE,OPTIONS");
+        return NoContent();
+    }
 }
