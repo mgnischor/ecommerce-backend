@@ -1,6 +1,7 @@
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Application.Services;
 
@@ -11,16 +12,21 @@ public class InventoryTransactionService : IInventoryTransactionService
 {
     private readonly IRepository<InventoryTransactionEntity> _transactionRepository;
     private readonly IAccountingService _accountingService;
+    private readonly ILogger<InventoryTransactionService> _logger;
     private static int _transactionCounter = 0;
     private static readonly object _lock = new object();
 
     public InventoryTransactionService(
         IRepository<InventoryTransactionEntity> transactionRepository,
-        IAccountingService accountingService
+        IAccountingService accountingService,
+        ILogger<InventoryTransactionService> logger
     )
     {
-        _transactionRepository = transactionRepository;
-        _accountingService = accountingService;
+        _transactionRepository =
+            transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
+        _accountingService =
+            accountingService ?? throw new ArgumentNullException(nameof(accountingService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<InventoryTransactionEntity> RecordTransactionAsync(
@@ -130,11 +136,22 @@ public class InventoryTransactionService : IInventoryTransactionService
         catch (Exception ex)
         {
             // Log error but don't fail inventory transaction
-            // In production, use proper logging framework
-            Console.WriteLine($"Error creating accounting entry: {ex.Message}");
+            _logger.LogError(
+                ex,
+                "Error creating accounting entry for transaction: TransactionType={TransactionType}, ProductId={ProductId}",
+                transactionType,
+                productId
+            );
             transaction.Notes = $"{transaction.Notes} | Accounting error: {ex.Message}";
             await _transactionRepository.UpdateAsync(transaction, cancellationToken);
         }
+
+        _logger.LogInformation(
+            "Inventory transaction recorded successfully: TransactionNumber={TransactionNumber}, ProductId={ProductId}, Quantity={Quantity}",
+            transaction.TransactionNumber,
+            productId,
+            quantity
+        );
 
         return transaction;
     }
