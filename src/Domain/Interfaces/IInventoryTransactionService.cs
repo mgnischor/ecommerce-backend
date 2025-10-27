@@ -24,20 +24,23 @@ public interface IInventoryTransactionService
         Guid? orderId = null,
         string? documentNumber = null,
         string? notes = null,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Gets transaction history for a product
     /// </summary>
     Task<IEnumerable<InventoryTransactionEntity>> GetProductTransactionsAsync(
         Guid productId,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Gets transactions for a specific period
     /// </summary>
     Task<IEnumerable<InventoryTransactionEntity>> GetTransactionsByPeriodAsync(
         DateTime startDate,
         DateTime endDate,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }
