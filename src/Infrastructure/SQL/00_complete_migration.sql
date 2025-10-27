@@ -715,5 +715,13 @@ BEGIN
     VALUES ('20251027174620_Migration_v0_0_10', '9.0.10');
     END IF;
 END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027182346_Migration_v0_0_11') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20251027182346_Migration_v0_0_11', '9.0.10');
+    END IF;
+END $EF$;
 COMMIT;
 
