@@ -1,6 +1,7 @@
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Application.Services;
 
@@ -13,6 +14,7 @@ public class AccountingService : IAccountingService
     private readonly IRepository<ChartOfAccountsEntity> _chartOfAccountsRepository;
     private readonly IRepository<JournalEntryEntity> _journalEntryRepository;
     private readonly IRepository<AccountingEntryEntity> _accountingEntryRepository;
+    private readonly ILogger<AccountingService> _logger;
 
     // Standard account codes (simplified structure)
     private const string ACCOUNT_INVENTORY = "1.1.03.001"; // Current Assets - Inventory
@@ -26,12 +28,20 @@ public class AccountingService : IAccountingService
     public AccountingService(
         IRepository<ChartOfAccountsEntity> chartOfAccountsRepository,
         IRepository<JournalEntryEntity> journalEntryRepository,
-        IRepository<AccountingEntryEntity> accountingEntryRepository
+        IRepository<AccountingEntryEntity> accountingEntryRepository,
+        ILogger<AccountingService> logger
     )
     {
-        _chartOfAccountsRepository = chartOfAccountsRepository;
-        _journalEntryRepository = journalEntryRepository;
-        _accountingEntryRepository = accountingEntryRepository;
+        _chartOfAccountsRepository =
+            chartOfAccountsRepository
+            ?? throw new ArgumentNullException(nameof(chartOfAccountsRepository));
+        _journalEntryRepository =
+            journalEntryRepository
+            ?? throw new ArgumentNullException(nameof(journalEntryRepository));
+        _accountingEntryRepository =
+            accountingEntryRepository
+            ?? throw new ArgumentNullException(nameof(accountingEntryRepository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<JournalEntryEntity> RecordPurchaseAsync(
@@ -40,65 +50,90 @@ public class AccountingService : IAccountingService
         CancellationToken cancellationToken = default
     )
     {
-        // Debit: Inventory (increases asset)
-        // Credit: Suppliers/Cash (increases liability or decreases asset)
-
-        var inventoryAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_INVENTORY,
-            "Inventory",
-            AccountType.Asset,
-            cancellationToken
-        );
-
-        var suppliersAccount = await GetOrCreateAccountAsync(
-            ACCOUNT_SUPPLIERS,
-            "Accounts Payable - Suppliers",
-            AccountType.Liability,
-            cancellationToken
-        );
-
-        var journalEntry = await CreateJournalEntryAsync(
-            "PURCHASE",
-            transaction.DocumentNumber ?? transaction.TransactionNumber,
-            $"Purchase of goods - {transaction.ProductName} ({transaction.ProductSku})",
-            transaction.TotalCost,
+        _logger.LogInformation(
+            "Recording purchase transaction: ProductId={ProductId}, Quantity={Quantity}, TotalCost={TotalCost}",
             transaction.ProductId,
-            transaction.Id,
-            null,
-            createdBy,
-            cancellationToken
+            transaction.Quantity,
+            transaction.TotalCost
         );
 
-        // Debit entry - Inventory
-        await CreateAccountingEntryAsync(
-            journalEntry.Id,
-            inventoryAccount.Id,
-            EntryType.Debit,
-            transaction.TotalCost,
-            $"Purchase - {transaction.Quantity} units x {transaction.UnitCost:C}",
-            transaction.ToLocation,
-            cancellationToken
-        );
+        try
+        {
+            // Debit: Inventory (increases asset)
+            // Credit: Suppliers/Cash (increases liability or decreases asset)
 
-        // Credit entry - Suppliers
-        await CreateAccountingEntryAsync(
-            journalEntry.Id,
-            suppliersAccount.Id,
-            EntryType.Credit,
-            transaction.TotalCost,
-            $"Supplier - Invoice {transaction.DocumentNumber}",
-            null,
-            cancellationToken
-        );
+            var inventoryAccount = await GetOrCreateAccountAsync(
+                ACCOUNT_INVENTORY,
+                "Inventory",
+                AccountType.Asset,
+                cancellationToken
+            );
 
-        // Update account balances
-        inventoryAccount.Balance += transaction.TotalCost;
-        suppliersAccount.Balance += transaction.TotalCost;
+            var suppliersAccount = await GetOrCreateAccountAsync(
+                ACCOUNT_SUPPLIERS,
+                "Accounts Payable - Suppliers",
+                AccountType.Liability,
+                cancellationToken
+            );
 
-        await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
-        await _chartOfAccountsRepository.UpdateAsync(suppliersAccount, cancellationToken);
+            var journalEntry = await CreateJournalEntryAsync(
+                "PURCHASE",
+                transaction.DocumentNumber ?? transaction.TransactionNumber,
+                $"Purchase of goods - {transaction.ProductName} ({transaction.ProductSku})",
+                transaction.TotalCost,
+                transaction.ProductId,
+                transaction.Id,
+                null,
+                createdBy,
+                cancellationToken
+            );
 
-        return journalEntry;
+            // Debit entry - Inventory
+            await CreateAccountingEntryAsync(
+                journalEntry.Id,
+                inventoryAccount.Id,
+                EntryType.Debit,
+                transaction.TotalCost,
+                $"Purchase - {transaction.Quantity} units x {transaction.UnitCost:C}",
+                transaction.ToLocation,
+                cancellationToken
+            );
+
+            // Credit entry - Suppliers
+            await CreateAccountingEntryAsync(
+                journalEntry.Id,
+                suppliersAccount.Id,
+                EntryType.Credit,
+                transaction.TotalCost,
+                $"Supplier - Invoice {transaction.DocumentNumber}",
+                null,
+                cancellationToken
+            );
+
+            // Update account balances
+            inventoryAccount.Balance += transaction.TotalCost;
+            suppliersAccount.Balance += transaction.TotalCost;
+
+            await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
+            await _chartOfAccountsRepository.UpdateAsync(suppliersAccount, cancellationToken);
+
+            _logger.LogInformation(
+                "Purchase transaction recorded successfully: JournalEntryId={JournalEntryId}, EntryNumber={EntryNumber}",
+                journalEntry.Id,
+                journalEntry.EntryNumber
+            );
+
+            return journalEntry;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error recording purchase transaction: ProductId={ProductId}",
+                transaction.ProductId
+            );
+            throw;
+        }
     }
 
     public async Task<JournalEntryEntity> RecordSaleAsync(
@@ -472,12 +507,21 @@ public class AccountingService : IAccountingService
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogDebug("Getting or creating account: Code={AccountCode}", accountCode);
+
         var account = (
             await _chartOfAccountsRepository.GetAllAsync(cancellationToken)
         ).FirstOrDefault(a => a.AccountCode == accountCode);
 
         if (account == null)
         {
+            _logger.LogInformation(
+                "Creating new account: Code={AccountCode}, Name={AccountName}, Type={AccountType}",
+                accountCode,
+                accountName,
+                accountType
+            );
+
             account = new ChartOfAccountsEntity
             {
                 Id = Guid.NewGuid(),
