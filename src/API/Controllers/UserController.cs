@@ -1,6 +1,7 @@
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using ECommerce.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
@@ -8,6 +9,7 @@ namespace ECommerce.API.Controllers;
 [ApiController]
 [Route("api/v1/users")]
 [Produces("application/json")]
+[Authorize]
 public sealed class UserController : ControllerBase
 {
     private readonly UserRepository _userRepository;
