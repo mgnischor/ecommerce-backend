@@ -1,7 +1,7 @@
+using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Application.Services;
 
@@ -14,7 +14,7 @@ public class AccountingService : IAccountingService
     private readonly IChartOfAccountsRepository _chartOfAccountsRepository;
     private readonly IJournalEntryRepository _journalEntryRepository;
     private readonly IAccountingEntryRepository _accountingEntryRepository;
-    private readonly ILogger<AccountingService> _logger;
+    private readonly ILoggingService _logger;
 
     // Standard account codes (simplified structure)
     private const string ACCOUNT_INVENTORY = "1.1.03.001"; // Current Assets - Inventory
@@ -29,7 +29,7 @@ public class AccountingService : IAccountingService
         IChartOfAccountsRepository chartOfAccountsRepository,
         IJournalEntryRepository journalEntryRepository,
         IAccountingEntryRepository accountingEntryRepository,
-        ILogger<AccountingService> logger
+        ILoggingService logger
     )
     {
         _chartOfAccountsRepository =
