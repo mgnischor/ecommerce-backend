@@ -1,4 +1,5 @@
 using System.Text;
+using ECommerce.API.Extensions;
 using ECommerce.API.Middlewares;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
@@ -12,6 +13,9 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure OpenTelemetry Observability (Tracing, Metrics, Logging)
+builder.AddOpenTelemetryObservability();
 
 // Configure Logging
 builder.Logging.ClearProviders();
