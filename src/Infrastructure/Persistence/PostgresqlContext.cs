@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Infrastructure.Persistence;
 
-class PostgresqlContext : DbContext
+public class PostgresqlContext : DbContext
 {
     public PostgresqlContext(DbContextOptions<PostgresqlContext> options)
         : base(options) { }
