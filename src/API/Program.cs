@@ -2,6 +2,8 @@ using System.Text;
 using ECommerce.API.Middlewares;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
+using ECommerce.Domain.Entities;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
 using ECommerce.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -34,6 +36,19 @@ builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<ProductRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+
+// Register generic repositories for accounting entities
+builder.Services.AddScoped<IRepository<ChartOfAccountsEntity>, Repository<ChartOfAccountsEntity>>();
+builder.Services.AddScoped<IRepository<JournalEntryEntity>, Repository<JournalEntryEntity>>();
+builder.Services.AddScoped<IRepository<AccountingEntryEntity>, Repository<AccountingEntryEntity>>();
+builder.Services.AddScoped<
+    IRepository<InventoryTransactionEntity>,
+    Repository<InventoryTransactionEntity>
+>();
+
+// Register accounting services
+builder.Services.AddScoped<IAccountingService, AccountingService>();
+builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();
 
 // Configure JWT Authentication
 var jwtSecretKey =
@@ -88,6 +103,7 @@ using (var scope = app.Services.CreateScope())
     {
         logger.LogInformation("Starting database seeding");
         await DatabaseSeeder.SeedAdminUserAsync(context, passwordService);
+        await DatabaseSeeder.SeedChartOfAccountsAsync(context);
         logger.LogInformation("Database seeding completed successfully");
     }
     catch (Exception ex)
