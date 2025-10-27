@@ -14,11 +14,4 @@ public class PostgresqlContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PostgresqlContext).Assembly);
     }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseNpgsql(
-            "Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce"
-        );
-    }
 }
