@@ -184,10 +184,12 @@ public sealed class UserController : ControllerBase
     {
         var endpoints = new[]
         {
-            new { Method = "GET", Path = "/api/users" },
-            new { Method = "POST", Path = "/api/users" },
-            new { Method = "PUT", Path = "/api/users/{id}" },
-            new { Method = "DELETE", Path = "/api/users/{id}" },
+            new { Method = "GET", Path = "/api/v1/users" },
+            new { Method = "POST", Path = "/api/v1/users" },
+            new { Method = "DELETE", Path = "/api/v1/users" },
+            new { Method = "GET", Path = "/api/v1/users/{id}" },
+            new { Method = "PUT", Path = "/api/v1/users/{id}" },
+            new { Method = "DELETE", Path = "/api/v1/users/{id}" },
         };
 
         return Ok(endpoints);
