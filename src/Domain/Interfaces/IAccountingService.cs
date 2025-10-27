@@ -16,8 +16,9 @@ public interface IAccountingService
     Task<JournalEntryEntity> RecordPurchaseAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Creates accounting entry for inventory withdrawal (sale - COGS)
     /// Debit: Cost of Goods Sold (Expense/Cost)
@@ -26,8 +27,9 @@ public interface IAccountingService
     Task<JournalEntryEntity> RecordSaleAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Creates accounting entry for sales return
     /// Debit: Inventory (Asset)
@@ -36,8 +38,9 @@ public interface IAccountingService
     Task<JournalEntryEntity> RecordSaleReturnAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Creates accounting entry for purchase return
     /// Debit: Suppliers/Cash (Liability/Asset)
@@ -46,8 +49,9 @@ public interface IAccountingService
     Task<JournalEntryEntity> RecordPurchaseReturnAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Creates accounting entry for inventory adjustment
     /// Positive - Debit: Inventory, Credit: Other Income
@@ -56,8 +60,9 @@ public interface IAccountingService
     Task<JournalEntryEntity> RecordAdjustmentAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Creates accounting entry for inventory loss/shrinkage
     /// Debit: Inventory Loss (Expense)
@@ -66,8 +71,9 @@ public interface IAccountingService
     Task<JournalEntryEntity> RecordLossAsync(
         InventoryTransactionEntity transaction,
         Guid createdBy,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Gets or creates an accounting account by code
     /// </summary>
@@ -75,5 +81,6 @@ public interface IAccountingService
         string accountCode,
         string accountName,
         AccountType accountType,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }
