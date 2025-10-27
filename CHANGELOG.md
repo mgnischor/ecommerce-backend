@@ -9,9 +9,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
--   Product management system with comprehensive CRUD operations
--   Product categories and status enums
--   Migration SQL script generation automation
+### Changed
+
+### Fixed
+
+## [0.0.8] - 2025-10-27
+
+### Added
+
+-   **Comprehensive Logging System**: Complete logging infrastructure across the entire application
+    -   `ILoggingService` interface in `Application/Interfaces` for centralized logging operations
+    -   `LoggingService<T>` implementation in `Application/Services` using Microsoft.Extensions.Logging
+    -   Support for all log levels: Debug, Information, Warning, Error, Critical
+-   **Global Exception Handling Middleware**:
+    -   `ExceptionHandlingMiddleware` in `API/Middlewares` for catching all unhandled exceptions
+    -   Automatic logging of exceptions with contextual information (HTTP path, method, status code)
+    -   Standardized error responses using ProblemDetails (RFC 7807)
+    -   Intelligent exception-to-HTTP status code mapping:
+        -   ArgumentNullException / ArgumentException / InvalidOperationException → 400 Bad Request
+        -   UnauthorizedAccessException → 401 Unauthorized
+        -   KeyNotFoundException → 404 Not Found
+        -   Other exceptions → 500 Internal Server Error
+-   **Logging in Controllers**:
+    -   `AuthController`: Login attempts, authentication successes and failures, invalid credentials warnings
+    -   `UserController`: All CRUD operations, validation errors, duplicate resource warnings, resource not found warnings
+    -   `ProductController`: All CRUD operations, soft deletes, validation errors, SKU conflicts, resource not found warnings
+-   **Logging in Application Services**:
+    -   `JwtService`: Token generation operations, configuration initialization, critical configuration errors
+    -   `PasswordService`: Password hashing operations, password verification, validation warnings
+-   **Logging in Repositories**:
+    -   `UserRepository`: Database CRUD operations, query operations, error logging for persistence failures
+    -   `ProductRepository`: Database CRUD operations, soft delete operations, error logging for persistence failures
+-   **Logging Configuration**:
+    -   Console and Debug logging providers configured in `Program.cs`
+    -   Environment-specific log levels (Debug for Development, Information for Production)
+    -   Structured logging configuration in `appsettings.json` and `appsettings.Development.json`
+    -   Timestamp formatting: "yyyy-MM-dd HH:mm:ss"
+    -   Scope inclusion enabled for better traceability
+    -   Namespace-specific log level configuration:
+        -   Production: ECommerce._ → Information, Microsoft._ → Warning
+        -   Development: ECommerce._ → Debug, Microsoft._ → Information
+
+### Changed
+
+-   Updated `Program.cs` to include comprehensive logging configuration and exception handling middleware
+-   Enhanced all API controllers to inject `ILogger<T>` for request/response logging
+-   Updated all application services to include error and warning logging
+-   Enhanced all repositories with debug and error logging for database operations
+-   Improved error handling with contextual information throughout the application
 
 ## [0.0.7] - 2025-10-27
 
@@ -193,6 +238,7 @@ CREATE TABLE users (
 
 ## Version History
 
+-   **0.0.8** - Comprehensive Logging System
 -   **0.0.7** - Product Management System
 -   **0.0.6** - Build version increment
 -   **0.0.5** - Build version increment
@@ -201,7 +247,8 @@ CREATE TABLE users (
 -   **0.0.2** - User Management & Authentication
 -   **0.0.1** - Initial Setup
 
-[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.7...HEAD
+[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.8...HEAD
+[0.0.8]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.4...v0.0.5
