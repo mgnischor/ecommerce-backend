@@ -15,7 +15,11 @@ public sealed class ProductController : ControllerBase
     private readonly PostgresqlContext _context;
     private readonly ILogger<ProductController> _logger;
 
-    public ProductController(ProductRepository productRepository, PostgresqlContext context, ILogger<ProductController> logger)
+    public ProductController(
+        ProductRepository productRepository,
+        PostgresqlContext context,
+        ILogger<ProductController> logger
+    )
     {
         _productRepository =
             productRepository ?? throw new ArgumentNullException(nameof(productRepository));
@@ -39,7 +43,11 @@ public sealed class ProductController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        _logger.LogInformation("Getting all products - Page: {PageNumber}, PageSize: {PageSize}", pageNumber, pageSize);
+        _logger.LogInformation(
+            "Getting all products - Page: {PageNumber}, PageSize: {PageSize}",
+            pageNumber,
+            pageSize
+        );
 
         if (pageNumber < 1)
         {
@@ -60,7 +68,11 @@ public sealed class ProductController : ControllerBase
         );
         var totalCount = await _productRepository.GetCountAsync(cancellationToken);
 
-        _logger.LogInformation("Retrieved {Count} products out of {TotalCount} total", products.Count, totalCount);
+        _logger.LogInformation(
+            "Retrieved {Count} products out of {TotalCount} total",
+            products.Count,
+            totalCount
+        );
 
         Response.Headers.Append("X-Total-Count", totalCount.ToString());
         Response.Headers.Append("X-Page-Number", pageNumber.ToString());
@@ -207,8 +219,13 @@ public sealed class ProductController : ControllerBase
 
         if (await _productRepository.ExistsBySkuAsync(newProduct.Sku, cancellationToken))
         {
-            _logger.LogWarning("Attempt to create product with duplicate SKU: {Sku}", newProduct.Sku);
-            return Conflict(new { Message = $"Product with SKU '{newProduct.Sku}' already exists" });
+            _logger.LogWarning(
+                "Attempt to create product with duplicate SKU: {Sku}",
+                newProduct.Sku
+            );
+            return Conflict(
+                new { Message = $"Product with SKU '{newProduct.Sku}' already exists" }
+            );
         }
 
         newProduct.CreatedAt = DateTime.UtcNow;
@@ -217,7 +234,11 @@ public sealed class ProductController : ControllerBase
         await _productRepository.AddAsync(newProduct, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("Successfully created product: {ProductId}, SKU: {Sku}", newProduct.Id, newProduct.Sku);
+        _logger.LogInformation(
+            "Successfully created product: {ProductId}, SKU: {Sku}",
+            newProduct.Id,
+            newProduct.Sku
+        );
 
         return CreatedAtAction(nameof(GetProductById), new { id = newProduct.Id }, newProduct);
     }
@@ -251,7 +272,11 @@ public sealed class ProductController : ControllerBase
 
         if (id != updatedProduct.Id)
         {
-            _logger.LogWarning("Product ID mismatch in update request. URL ID: {UrlId}, Body ID: {BodyId}", id, updatedProduct.Id);
+            _logger.LogWarning(
+                "Product ID mismatch in update request. URL ID: {UrlId}, Body ID: {BodyId}",
+                id,
+                updatedProduct.Id
+            );
             return BadRequest("ID mismatch");
         }
 
@@ -268,7 +293,11 @@ public sealed class ProductController : ControllerBase
         );
         if (skuExists && existingProduct.Sku != updatedProduct.Sku)
         {
-            _logger.LogWarning("Attempt to update product {ProductId} with duplicate SKU: {Sku}", id, updatedProduct.Sku);
+            _logger.LogWarning(
+                "Attempt to update product {ProductId} with duplicate SKU: {Sku}",
+                id,
+                updatedProduct.Sku
+            );
             return Conflict(
                 new { Message = $"Product with SKU '{updatedProduct.Sku}' already exists" }
             );
