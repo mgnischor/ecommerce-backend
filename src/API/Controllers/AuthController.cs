@@ -76,4 +76,28 @@ public sealed class AuthController : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpGet("endpoints")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult GetEndpoints()
+    {
+        var endpoints = new[]
+        {
+            new { Method = "POST", Path = "/api/v1/login" },
+            new { Method = "GET", Path = "/api/v1/endpoints" }
+        };
+
+        return Ok(endpoints);
+    }
+
+    /// <summary>
+    /// Returns allowed HTTP methods for this endpoint
+    /// </summary>
+    [HttpOptions]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public IActionResult GetOptions()
+    {
+        Response.Headers.Add("Allow", "POST, GET, OPTIONS");
+        return NoContent();
+    }
 }
