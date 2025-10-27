@@ -55,7 +55,10 @@ public sealed class ExceptionHandlingMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = statusCode;
 
-        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        };
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(problemDetails, options));
     }
