@@ -1,0 +1,79 @@
+using ECommerce.API.DTOs;
+using ECommerce.Application.Interfaces;
+using ECommerce.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ECommerce.API.Controllers;
+
+[ApiController]
+[Route("api/v1")]
+[Produces("application/json")]
+public sealed class AuthController : ControllerBase
+{
+    private readonly UserRepository _userRepository;
+    private readonly IJwtService _jwtService;
+    private readonly IPasswordService _passwordService;
+
+    public AuthController(
+        UserRepository userRepository,
+        IJwtService jwtService,
+        IPasswordService passwordService
+    )
+    {
+        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+        _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
+        _passwordService =
+            passwordService ?? throw new ArgumentNullException(nameof(passwordService));
+    }
+
+    /// <summary>
+    /// Authenticates a user and returns a JWT token
+    /// </summary>
+    /// <param name="loginRequest">Login credentials</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Login response with JWT token</returns>
+    [HttpPost("login")]
+    [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<LoginResponseDto>> Login(
+        [FromBody] LoginRequestDto loginRequest,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (loginRequest == null)
+            return BadRequest(new { Message = "Login request is required" });
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        // Find user by email
+        var user = await _userRepository.GetByEmailAsync(loginRequest.Email, cancellationToken);
+
+        if (user == null)
+            return Unauthorized(new { Message = "Invalid email or password" });
+
+        // Verify password
+        if (!_passwordService.VerifyPassword(loginRequest.Password, user.PasswordHash))
+            return Unauthorized(new { Message = "Invalid email or password" });
+
+        // Check if user is active
+        if (!user.IsActive || user.IsBanned || user.IsDeleted)
+            return Unauthorized(new { Message = "User account is not active" });
+
+        // Generate JWT token
+        var token = _jwtService.GenerateToken(user);
+
+        var response = new LoginResponseDto
+        {
+            Token = token,
+            ExpiresIn = _jwtService.GetTokenExpirationSeconds(),
+            TokenType = "Bearer",
+            UserId = user.Id,
+            Email = user.Email,
+            AccessLevel = user.AccessLevel.ToString(),
+        };
+
+        return Ok(response);
+    }
+}
