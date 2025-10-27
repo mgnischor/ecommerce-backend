@@ -16,7 +16,8 @@ public class InventoryTransactionService : IInventoryTransactionService
 
     public InventoryTransactionService(
         IRepository<InventoryTransactionEntity> transactionRepository,
-        IAccountingService accountingService)
+        IAccountingService accountingService
+    )
     {
         _transactionRepository = transactionRepository;
         _accountingService = accountingService;
@@ -35,7 +36,8 @@ public class InventoryTransactionService : IInventoryTransactionService
         Guid? orderId = null,
         string? documentNumber = null,
         string? notes = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // Create inventory transaction
         var transaction = new InventoryTransactionEntity
@@ -56,7 +58,7 @@ public class InventoryTransactionService : IInventoryTransactionService
             DocumentNumber = documentNumber,
             Notes = notes,
             CreatedBy = createdBy,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
         };
 
         // Save transaction
@@ -69,30 +71,54 @@ public class InventoryTransactionService : IInventoryTransactionService
         {
             journalEntry = transactionType switch
             {
-                InventoryTransactionType.Purchase => 
-                    await _accountingService.RecordPurchaseAsync(transaction, createdBy, cancellationToken),
-                
-                InventoryTransactionType.Sale or InventoryTransactionType.Fulfillment => 
-                    await _accountingService.RecordSaleAsync(transaction, createdBy, cancellationToken),
-                
-                InventoryTransactionType.SaleReturn => 
-                    await _accountingService.RecordSaleReturnAsync(transaction, createdBy, cancellationToken),
-                
-                InventoryTransactionType.PurchaseReturn => 
-                    await _accountingService.RecordPurchaseReturnAsync(transaction, createdBy, cancellationToken),
-                
-                InventoryTransactionType.Adjustment => 
-                    await _accountingService.RecordAdjustmentAsync(transaction, createdBy, cancellationToken),
-                
-                InventoryTransactionType.Loss => 
-                    await _accountingService.RecordLossAsync(transaction, createdBy, cancellationToken),
-                
+                InventoryTransactionType.Purchase => await _accountingService.RecordPurchaseAsync(
+                    transaction,
+                    createdBy,
+                    cancellationToken
+                ),
+
+                InventoryTransactionType.Sale or InventoryTransactionType.Fulfillment =>
+                    await _accountingService.RecordSaleAsync(
+                        transaction,
+                        createdBy,
+                        cancellationToken
+                    ),
+
+                InventoryTransactionType.SaleReturn =>
+                    await _accountingService.RecordSaleReturnAsync(
+                        transaction,
+                        createdBy,
+                        cancellationToken
+                    ),
+
+                InventoryTransactionType.PurchaseReturn =>
+                    await _accountingService.RecordPurchaseReturnAsync(
+                        transaction,
+                        createdBy,
+                        cancellationToken
+                    ),
+
+                InventoryTransactionType.Adjustment =>
+                    await _accountingService.RecordAdjustmentAsync(
+                        transaction,
+                        createdBy,
+                        cancellationToken
+                    ),
+
+                InventoryTransactionType.Loss => await _accountingService.RecordLossAsync(
+                    transaction,
+                    createdBy,
+                    cancellationToken
+                ),
+
                 // Reservation and release don't generate immediate accounting entries
-                InventoryTransactionType.Reservation or 
-                InventoryTransactionType.ReservationRelease or 
-                InventoryTransactionType.Transfer => null,
-                
-                _ => throw new InvalidOperationException($"Unsupported transaction type: {transactionType}")
+                InventoryTransactionType.Reservation
+                or InventoryTransactionType.ReservationRelease
+                or InventoryTransactionType.Transfer => null,
+
+                _ => throw new InvalidOperationException(
+                    $"Unsupported transaction type: {transactionType}"
+                ),
             };
 
             if (journalEntry != null)
@@ -115,7 +141,8 @@ public class InventoryTransactionService : IInventoryTransactionService
 
     public async Task<IEnumerable<InventoryTransactionEntity>> GetProductTransactionsAsync(
         Guid productId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var allTransactions = await _transactionRepository.GetAllAsync(cancellationToken);
         return allTransactions
@@ -127,7 +154,8 @@ public class InventoryTransactionService : IInventoryTransactionService
     public async Task<IEnumerable<InventoryTransactionEntity>> GetTransactionsByPeriodAsync(
         DateTime startDate,
         DateTime endDate,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var allTransactions = await _transactionRepository.GetAllAsync(cancellationToken);
         return allTransactions
@@ -153,7 +181,7 @@ public class InventoryTransactionService : IInventoryTransactionService
                 InventoryTransactionType.Reservation => "RES",
                 InventoryTransactionType.ReservationRelease => "REL",
                 InventoryTransactionType.Fulfillment => "FULL",
-                _ => "TRANS"
+                _ => "TRANS",
             };
 
             return $"{prefix}-{DateTime.UtcNow:yyyyMMdd}-{_transactionCounter:D6}";
