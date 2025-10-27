@@ -28,9 +28,14 @@ else
     builder.Logging.SetMinimumLevel(LogLevel.Information);
 }
 
-builder.Services.AddDbContext<PostgresqlContext>(options =>
-    options.UseNpgsql("Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce")
-);
+// Get connection string from configuration
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "Connection string 'DefaultConnection' is not configured"
+    );
+
+builder.Services.AddDbContext<PostgresqlContext>(options => options.UseNpgsql(connectionString));
 
 // Register specialized repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -46,6 +51,10 @@ builder.Services.AddScoped<ICouponRepository, CouponRepository>();
 builder.Services.AddScoped<IChartOfAccountsRepository, ChartOfAccountsRepository>();
 builder.Services.AddScoped<IJournalEntryRepository, JournalEntryRepository>();
 builder.Services.AddScoped<IAccountingEntryRepository, AccountingEntryRepository>();
+builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
+
+// Register logging service
+builder.Services.AddScoped(typeof(ILoggingService), typeof(LoggingService<>));
 
 // Register services
 builder.Services.AddScoped<IJwtService, JwtService>();
