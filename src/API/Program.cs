@@ -15,6 +15,7 @@ builder.Services.AddDbContext<PostgresqlContext>(options =>
 );
 
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<ProductRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 
