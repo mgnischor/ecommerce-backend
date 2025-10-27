@@ -31,11 +31,6 @@ public sealed class ChartOfAccountsResponseDto
     public Guid? ParentAccountId { get; set; }
 
     /// <summary>
-    /// Account level in hierarchy
-    /// </summary>
-    public int Level { get; set; }
-
-    /// <summary>
     /// Whether the account is analytic (can receive entries)
     /// </summary>
     public bool IsAnalytic { get; set; }
