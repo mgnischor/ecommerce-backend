@@ -11,9 +11,9 @@ namespace ECommerce.Application.Services;
 /// </summary>
 public class AccountingService : IAccountingService
 {
-    private readonly IRepository<ChartOfAccountsEntity> _chartOfAccountsRepository;
-    private readonly IRepository<JournalEntryEntity> _journalEntryRepository;
-    private readonly IRepository<AccountingEntryEntity> _accountingEntryRepository;
+    private readonly IChartOfAccountsRepository _chartOfAccountsRepository;
+    private readonly IJournalEntryRepository _journalEntryRepository;
+    private readonly IAccountingEntryRepository _accountingEntryRepository;
     private readonly ILogger<AccountingService> _logger;
 
     // Standard account codes (simplified structure)
@@ -26,9 +26,9 @@ public class AccountingService : IAccountingService
     private const string ACCOUNT_OTHER_EXPENSES = "3.2.01.002"; // Other Expenses
 
     public AccountingService(
-        IRepository<ChartOfAccountsEntity> chartOfAccountsRepository,
-        IRepository<JournalEntryEntity> journalEntryRepository,
-        IRepository<AccountingEntryEntity> accountingEntryRepository,
+        IChartOfAccountsRepository chartOfAccountsRepository,
+        IJournalEntryRepository journalEntryRepository,
+        IAccountingEntryRepository accountingEntryRepository,
         ILogger<AccountingService> logger
     )
     {
@@ -114,8 +114,9 @@ public class AccountingService : IAccountingService
             inventoryAccount.Balance += transaction.TotalCost;
             suppliersAccount.Balance += transaction.TotalCost;
 
-            await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
-            await _chartOfAccountsRepository.UpdateAsync(suppliersAccount, cancellationToken);
+            _chartOfAccountsRepository.Update(inventoryAccount);
+            _chartOfAccountsRepository.Update(suppliersAccount);
+            await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation(
                 "Purchase transaction recorded successfully: JournalEntryId={JournalEntryId}, EntryNumber={EntryNumber}",
@@ -197,8 +198,9 @@ public class AccountingService : IAccountingService
         cmvAccount.Balance += transaction.TotalCost;
         inventoryAccount.Balance -= transaction.TotalCost;
 
-        await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
-        await _chartOfAccountsRepository.UpdateAsync(cmvAccount, cancellationToken);
+        _chartOfAccountsRepository.Update(inventoryAccount);
+        _chartOfAccountsRepository.Update(cmvAccount);
+        await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
 
         return journalEntry;
     }
@@ -264,8 +266,9 @@ public class AccountingService : IAccountingService
         inventoryAccount.Balance += transaction.TotalCost;
         cmvAccount.Balance -= transaction.TotalCost;
 
-        await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
-        await _chartOfAccountsRepository.UpdateAsync(cmvAccount, cancellationToken);
+        _chartOfAccountsRepository.Update(inventoryAccount);
+        _chartOfAccountsRepository.Update(cmvAccount);
+        await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
 
         return journalEntry;
     }
@@ -331,8 +334,9 @@ public class AccountingService : IAccountingService
         suppliersAccount.Balance -= transaction.TotalCost;
         inventoryAccount.Balance -= transaction.TotalCost;
 
-        await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
-        await _chartOfAccountsRepository.UpdateAsync(suppliersAccount, cancellationToken);
+        _chartOfAccountsRepository.Update(inventoryAccount);
+        _chartOfAccountsRepository.Update(suppliersAccount);
+        await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
 
         return journalEntry;
     }
@@ -427,8 +431,9 @@ public class AccountingService : IAccountingService
             contraAccount.Balance += transaction.TotalCost;
         }
 
-        await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
-        await _chartOfAccountsRepository.UpdateAsync(contraAccount, cancellationToken);
+        _chartOfAccountsRepository.Update(inventoryAccount);
+        _chartOfAccountsRepository.Update(contraAccount);
+        await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
 
         return journalEntry;
     }
@@ -494,8 +499,9 @@ public class AccountingService : IAccountingService
         lossAccount.Balance += transaction.TotalCost;
         inventoryAccount.Balance -= transaction.TotalCost;
 
-        await _chartOfAccountsRepository.UpdateAsync(inventoryAccount, cancellationToken);
-        await _chartOfAccountsRepository.UpdateAsync(lossAccount, cancellationToken);
+        _chartOfAccountsRepository.Update(inventoryAccount);
+        _chartOfAccountsRepository.Update(lossAccount);
+        await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
 
         return journalEntry;
     }
@@ -509,9 +515,10 @@ public class AccountingService : IAccountingService
     {
         _logger.LogDebug("Getting or creating account: Code={AccountCode}", accountCode);
 
-        var account = (
-            await _chartOfAccountsRepository.GetAllAsync(cancellationToken)
-        ).FirstOrDefault(a => a.AccountCode == accountCode);
+        var account = await _chartOfAccountsRepository.GetByCodeAsync(
+            accountCode,
+            cancellationToken
+        );
 
         if (account == null)
         {
