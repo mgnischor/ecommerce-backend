@@ -1,8 +1,8 @@
+using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Infrastructure.Repositories;
 
@@ -12,12 +12,9 @@ namespace ECommerce.Infrastructure.Repositories;
 public sealed class AccountingEntryRepository : IAccountingEntryRepository
 {
     private readonly PostgresqlContext _context;
-    private readonly ILogger<AccountingEntryRepository> _logger;
+    private readonly ILoggingService _logger;
 
-    public AccountingEntryRepository(
-        PostgresqlContext context,
-        ILogger<AccountingEntryRepository> logger
-    )
+    public AccountingEntryRepository(PostgresqlContext context, ILoggingService logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
