@@ -16,11 +16,11 @@ internal sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEnt
 
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
+
         builder
             .Property(u => u.CreatedBy)
             .HasColumnName("created_by")
-            .HasMaxLength(100)
-            .HasDefaultValue("ce06e1a8-f688-44b6-b616-4badf09d9153");
+            .HasDefaultValue(Guid.Parse("ce06e1a8-f688-44b6-b616-4badf09d9153"));
 
         builder
             .Property(u => u.Username)
