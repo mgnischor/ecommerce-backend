@@ -82,7 +82,7 @@ try {
 }
 Write-Host ""
 
-Write-Host "[5/6] Building project..." -ForegroundColor Yellow
+Write-Host "[5/7] Building project..." -ForegroundColor Yellow
 Write-Host "Building Release configuration..." -ForegroundColor Cyan
 dotnet build -c Release --no-incremental
 if ($LASTEXITCODE -ne 0) {
@@ -98,7 +98,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host ""
 
-Write-Host "[6/6] Publishing project..." -ForegroundColor Yellow
+Write-Host "[6/7] Publishing project..." -ForegroundColor Yellow
 Write-Host "Publishing Release configuration..." -ForegroundColor Cyan
 dotnet publish -c Release --no-build
 if ($LASTEXITCODE -ne 0) {
@@ -113,6 +113,23 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 Write-Host ""
+
+Write-Host "[7/7] Applying database migrations..." -ForegroundColor Yellow
+Write-Host "Updating database with latest migrations..." -ForegroundColor Cyan
+dotnet ef database update `
+    --project ecommerce-backend.csproj `
+    --context PostgresqlContext
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host ""
+    Write-Host "WARNING: Failed to apply database migrations" -ForegroundColor Yellow
+    Write-Host "The build was successful but database update failed." -ForegroundColor Yellow
+    Write-Host "Please check your database connection and run: dotnet ef database update" -ForegroundColor White
+    Write-Host ""
+} else {
+    Write-Host "Database updated successfully!" -ForegroundColor Green
+    Write-Host ""
+}
 
 Write-Host "====================================" -ForegroundColor Green
 Write-Host " Build completed successfully!" -ForegroundColor Green
