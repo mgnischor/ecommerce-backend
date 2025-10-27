@@ -1,10 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <Nullable>enable</Nullable>
+        <AssemblyName>ECommerce.Backend</AssemblyName>
+        <AssemblyVersion>0.0.1</AssemblyVersion>
+        <Authors>Miguel Nischor</Authors>
+        <Company>Miguel Nischor</Company>
+        <Copyright>Copyright © 2025 Miguel Nischor</Copyright>
+        <Description>A backend API for an e-commerce platform built with ASP.NET Core.</Description>
+        <FileVersion>0.0.1</FileVersion>
         <ImplicitUsings>enable</ImplicitUsings>
+        <InformationalVersion>0.0.1</InformationalVersion>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <Nullable>enable</Nullable>
+        <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+        <Product>E-Commerce Backend API</Product>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/mgnischor/ecommerce-backend</RepositoryUrl>
         <RootNamespace>ECommerce</RootNamespace>
+        <TargetFramework>net9.0</TargetFramework>
+        <Version>0.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
