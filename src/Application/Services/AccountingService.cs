@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
@@ -15,6 +16,12 @@ public class AccountingService : IAccountingService
     private readonly IJournalEntryRepository _journalEntryRepository;
     private readonly IAccountingEntryRepository _accountingEntryRepository;
     private readonly ILoggingService _logger;
+
+    // OpenTelemetry activity source for custom tracing
+    private static readonly ActivitySource ActivitySource = new(
+        "ECommerce.Application.Accounting",
+        "1.0.0"
+    );
 
     // Standard account codes (simplified structure)
     private const string ACCOUNT_INVENTORY = "1.1.03.001"; // Current Assets - Inventory
@@ -50,6 +57,14 @@ public class AccountingService : IAccountingService
         CancellationToken cancellationToken = default
     )
     {
+        using var activity = ActivitySource.StartActivity("RecordPurchase", ActivityKind.Internal);
+        activity?.SetTag("transaction.id", transaction.Id);
+        activity?.SetTag("product.id", transaction.ProductId);
+        activity?.SetTag("product.sku", transaction.ProductSku);
+        activity?.SetTag("transaction.quantity", transaction.Quantity);
+        activity?.SetTag("transaction.total_cost", transaction.TotalCost);
+        activity?.SetTag("transaction.type", transaction.TransactionType.ToString());
+
         _logger.LogInformation(
             "Recording purchase transaction: ProductId={ProductId}, Quantity={Quantity}, TotalCost={TotalCost}",
             transaction.ProductId,
