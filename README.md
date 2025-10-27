@@ -17,6 +17,12 @@ A robust backend API for an e-commerce platform built with ASP.NET Core, followi
 -   **OpenAPI Documentation**: Interactive API documentation with Scalar
 -   **Docker Support**: Containerized deployment ready
 -   **Migration Support**: Database schema versioning with EF Core migrations
+-   **📊 Accounting System**: Integrated accounting system following Brazilian standards (NBC TG)
+    -   Automatic journal entries for all inventory transactions
+    -   Chart of accounts management
+    -   Double-entry bookkeeping
+    -   Full audit trail and traceability
+    -   Support for purchases, sales, returns, adjustments, and losses
 
 ## 🛠 Tech Stack
 
@@ -130,6 +136,11 @@ When running in development mode, access the interactive API documentation at:
 
 -   **Scalar UI**: `https://localhost:5049/docs`
 -   **OpenAPI JSON**: `https://localhost:5049/openapi/v1.json`
+
+### Additional Documentation
+
+-   **[Accounting System](docs/ACCOUNTING_SYSTEM.md)** - Detailed documentation about the integrated accounting system
+-   **[Accounting Integration Guide](docs/ACCOUNTING_INTEGRATION_GUIDE.md)** - How to use the accounting features in your code
 
 ## 🏗 Building and Deployment
 
