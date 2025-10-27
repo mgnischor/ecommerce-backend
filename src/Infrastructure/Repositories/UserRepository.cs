@@ -1,4 +1,5 @@
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,7 @@ namespace ECommerce.Infrastructure.Repositories;
 /// Repository for managing UserEntity data access.
 /// Provides methods for CRUD operations and querying user data.
 /// </summary>
-public sealed class UserRepository
+public sealed class UserRepository : IUserRepository
 {
     private readonly PostgresqlContext _context;
     private readonly ILogger<UserRepository> _logger;
