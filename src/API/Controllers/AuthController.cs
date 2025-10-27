@@ -1,6 +1,6 @@
 using ECommerce.API.DTOs;
 using ECommerce.Application.Interfaces;
-using ECommerce.Infrastructure.Repositories;
+using ECommerce.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
@@ -10,13 +10,13 @@ namespace ECommerce.API.Controllers;
 [Produces("application/json")]
 public sealed class AuthController : ControllerBase
 {
-    private readonly UserRepository _userRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IJwtService _jwtService;
     private readonly IPasswordService _passwordService;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
-        UserRepository userRepository,
+        IUserRepository userRepository,
         IJwtService jwtService,
         IPasswordService passwordService,
         ILogger<AuthController> logger
