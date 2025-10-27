@@ -32,21 +32,24 @@ builder.Services.AddDbContext<PostgresqlContext>(options =>
     options.UseNpgsql("Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce")
 );
 
-builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<ProductRepository>();
+// Register specialized repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
+builder.Services.AddScoped<ICouponRepository, CouponRepository>();
+builder.Services.AddScoped<IChartOfAccountsRepository, ChartOfAccountsRepository>();
+builder.Services.AddScoped<IJournalEntryRepository, JournalEntryRepository>();
+builder.Services.AddScoped<IAccountingEntryRepository, AccountingEntryRepository>();
+
+// Register services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-
-// Register generic repositories for accounting entities
-builder.Services.AddScoped<IRepository<ChartOfAccountsEntity>, Repository<ChartOfAccountsEntity>>();
-builder.Services.AddScoped<IRepository<JournalEntryEntity>, Repository<JournalEntryEntity>>();
-builder.Services.AddScoped<IRepository<AccountingEntryEntity>, Repository<AccountingEntryEntity>>();
-builder.Services.AddScoped<
-    IRepository<InventoryTransactionEntity>,
-    Repository<InventoryTransactionEntity>
->();
-
-// Register accounting services
 builder.Services.AddScoped<IAccountingService, AccountingService>();
 builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();
 
