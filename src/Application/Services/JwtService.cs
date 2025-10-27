@@ -57,7 +57,11 @@ public sealed class JwtService : IJwtService
 
         try
         {
-            _logger.LogDebug("Generating JWT token for user: {UserId}, Email: {Email}", user.Id, user.Email);
+            _logger.LogDebug(
+                "Generating JWT token for user: {UserId}, Email: {Email}",
+                user.Id,
+                user.Email
+            );
 
             var claims = new[]
             {
