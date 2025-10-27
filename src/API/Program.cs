@@ -1,6 +1,15 @@
+using ECommerce.Infrastructure.Persistence;
+using ECommerce.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<PostgresqlContext>(options =>
+    options.UseNpgsql("Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce")
+);
+
+builder.Services.AddScoped<UserRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
