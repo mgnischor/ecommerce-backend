@@ -82,7 +82,7 @@ try {
 }
 Write-Host ""
 
-Write-Host "[5/7] Building project..." -ForegroundColor Yellow
+Write-Host "[5/8] Building project..." -ForegroundColor Yellow
 Write-Host "Building Release configuration..." -ForegroundColor Cyan
 dotnet build -c Release --no-incremental
 if ($LASTEXITCODE -ne 0) {
@@ -98,7 +98,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host ""
 
-Write-Host "[6/7] Publishing project..." -ForegroundColor Yellow
+Write-Host "[6/8] Publishing project..." -ForegroundColor Yellow
 Write-Host "Publishing Release configuration..." -ForegroundColor Cyan
 dotnet publish -c Release --no-build
 if ($LASTEXITCODE -ne 0) {
@@ -114,7 +114,24 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host ""
 
-Write-Host "[7/7] Applying database migrations..." -ForegroundColor Yellow
+Write-Host "[7/8] Exporting migration SQL scripts..." -ForegroundColor Yellow
+Write-Host "Running migration script generator..." -ForegroundColor Cyan
+
+$migrationScriptPath = Join-Path $PSScriptRoot "migration-script.ps1"
+if (Test-Path $migrationScriptPath) {
+    try {
+        & $migrationScriptPath
+        Write-Host "Migration SQL scripts exported successfully!" -ForegroundColor Green
+    } catch {
+        Write-Host "WARNING: Failed to export migration SQL scripts" -ForegroundColor Yellow
+        Write-Host "Error: $_" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "WARNING: migration-script.ps1 not found at $migrationScriptPath" -ForegroundColor Yellow
+}
+Write-Host ""
+
+Write-Host "[8/8] Applying database migrations..." -ForegroundColor Yellow
 Write-Host "Updating database with latest migrations..." -ForegroundColor Cyan
 dotnet ef database update `
     --project ecommerce-backend.csproj `
