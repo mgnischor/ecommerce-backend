@@ -9,6 +9,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+-   **Entity Framework Core Design-Time Support**: Enhanced EF Core tooling integration
+    -   Created `PostgresqlContextFactory` implementing `IDesignTimeDbContextFactory<PostgresqlContext>`
+    -   Enables EF Core migrations and scaffolding commands to work properly
+    -   Automatic configuration loading from `appsettings.json` and `appsettings.Development.json`
+    -   Smart path resolution for different working directory scenarios
+    -   Moved connection string from hardcoded value to configuration in `Program.cs`
+    -   Ensures consistency between runtime and design-time database configurations
+
+### Fixed
+
+## [0.0.10] - 2025-10-27
+
+### Added
+
+-   **Complete E-Commerce Domain Entities**: Comprehensive database schema for e-commerce operations
+    -   **Orders Management**:
+        -   `OrderEntity` with order tracking, status management, and multi-address support
+        -   `OrderItemEntity` for line items with pricing, discounts, and tax calculations
+        -   Order statuses: Pending, Processing, Shipped, Delivered, Cancelled, Returned, Refunded
+        -   Payment methods: CreditCard, DebitCard, PayPal, BankTransfer, Cash, Pix
+        -   Shipping methods: Standard, Express, Overnight, Pickup
+    -   **Cart System**:
+        -   `CartEntity` with session support and coupon integration
+        -   `CartItemEntity` for cart line items
+        -   Cart expiration and discount tracking
+    -   **Category Management**:
+        -   `CategoryEntity` with hierarchical structure support
+        -   SEO optimization (slug, meta tags)
+        -   Display order and soft delete capabilities
+    -   **Inventory Tracking**:
+        -   `InventoryEntity` with multi-location support
+        -   Stock tracking: in stock, reserved, available
+        -   Reorder level and quantity management
+        -   Last stock received and inventory count timestamps
+    -   **Payment Processing**:
+        -   `PaymentEntity` with transaction tracking
+        -   Payment statuses: Pending, Authorized, Captured, Failed, Refunded, Cancelled
+        -   Support for multiple payment providers
+        -   Refund management with reasons
+    -   **Product Reviews**:
+        -   `ReviewEntity` with rating system (1-5 stars)
+        -   Verified purchase badges
+        -   Approval and flagging system
+        -   Helpful/not helpful voting
+        -   Admin response capability
+    -   **Wishlist System**:
+        -   `WishlistEntity` with public/private lists
+        -   `WishlistItemEntity` with priority and notes
+        -   Multiple wishlists per customer
+    -   **Address Management**:
+        -   `AddressEntity` for shipping and billing addresses
+        -   Full address details with phone number
+        -   Default address designation
+    -   **Coupon System**:
+        -   `CouponEntity` with percentage and fixed amount discounts
+        -   Usage limits (total and per customer)
+        -   Product and category applicability
+        -   Validity period management
+        -   Minimum order amount and maximum discount constraints
+
+### Database Schema
+
+-   10 new tables created: `Orders`, `OrderItems`, `Carts`, `CartItems`, `Categories`, `Inventories`, `Payments`, `Reviews`, `Wishlists`, `WishlistItems`, `Addresses`, `Coupons`
+-   Comprehensive entity relationships and foreign keys
+-   Soft delete support across all entities
+-   Audit trail with created/updated timestamps
+
+## [0.0.9] - 2025-10-27
+
+### Added
+
 -   **📊 Integrated Accounting System**: Complete accounting system following Brazilian standards (NBC TG)
     -   **Chart of Accounts** (Plano de Contas):
         -   `ChartOfAccountsEntity` with hierarchical account structure
@@ -70,6 +143,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   **Multi-Location**: Support for multiple warehouse locations
 -   **Document References**: Links to invoices, orders, and fiscal documents
 -   **Reconciliation Ready**: Easy reconciliation between physical and accounting inventory
+
+### Database Schema
+
+-   4 new tables created: `ChartOfAccounts`, `JournalEntries`, `AccountingEntries`, `InventoryTransactions`
+-   **ChartOfAccounts Table**:
+    -   Hierarchical account structure with parent-child relationships
+    -   Unique account codes with indexing
+    -   Balance tracking with 18,2 decimal precision
+    -   Support for analytic and synthetic accounts
+-   **JournalEntries Table**:
+    -   Unique entry numbers for audit trail
+    -   Document type and number tracking
+    -   Post/unpost functionality with timestamps
+    -   Links to orders, products, and inventory transactions
+-   **AccountingEntries Table**:
+    -   Individual debit/credit entries
+    -   Cost center support for management accounting
+    -   Foreign keys with cascade and restrict behaviors
+-   **InventoryTransactions Table**:
+    -   10 transaction types with unique transaction numbers
+    -   Multi-location support (from/to locations)
+    -   Automatic cost calculation (unit cost × quantity)
+    -   Links to products, orders, and journal entries
+-   Comprehensive indexes for performance optimization
+-   Full referential integrity with proper foreign key constraints
 
 ### Changed
 
@@ -300,6 +398,8 @@ CREATE TABLE users (
 
 ## Version History
 
+-   **0.0.10** - Complete E-Commerce Domain Entities
+-   **0.0.9** - Integrated Accounting System
 -   **0.0.8** - Comprehensive Logging System
 -   **0.0.7** - Product Management System
 -   **0.0.6** - Build version increment
@@ -309,7 +409,9 @@ CREATE TABLE users (
 -   **0.0.2** - User Management & Authentication
 -   **0.0.1** - Initial Setup
 
-[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.8...HEAD
+[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.10...HEAD
+[0.0.10]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.9...v0.0.10
+[0.0.9]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.5...v0.0.6
