@@ -63,28 +63,41 @@ public sealed class AuthController : ControllerBase
 
         if (user == null)
         {
-            _logger.LogWarning("Login failed: User not found for email: {Email}", loginRequest.Email);
+            _logger.LogWarning(
+                "Login failed: User not found for email: {Email}",
+                loginRequest.Email
+            );
             return Unauthorized(new { Message = "Invalid email or password" });
         }
 
         // Verify password
         if (!_passwordService.VerifyPassword(loginRequest.Password, user.PasswordHash))
         {
-            _logger.LogWarning("Login failed: Invalid password for email: {Email}", loginRequest.Email);
+            _logger.LogWarning(
+                "Login failed: Invalid password for email: {Email}",
+                loginRequest.Email
+            );
             return Unauthorized(new { Message = "Invalid email or password" });
         }
 
         // Check if user is active
         if (!user.IsActive || user.IsBanned || user.IsDeleted)
         {
-            _logger.LogWarning("Login failed: User account is not active for email: {Email}", loginRequest.Email);
+            _logger.LogWarning(
+                "Login failed: User account is not active for email: {Email}",
+                loginRequest.Email
+            );
             return Unauthorized(new { Message = "User account is not active" });
         }
 
         // Generate JWT token
         var token = _jwtService.GenerateToken(user);
 
-        _logger.LogInformation("Login successful for user: {Email}, UserId: {UserId}", user.Email, user.Id);
+        _logger.LogInformation(
+            "Login successful for user: {Email}, UserId: {UserId}",
+            user.Email,
+            user.Id
+        );
 
         var response = new LoginResponseDto
         {
@@ -106,7 +119,7 @@ public sealed class AuthController : ControllerBase
         var endpoints = new[]
         {
             new { Method = "POST", Path = "/api/v1/login" },
-            new { Method = "GET", Path = "/api/v1/endpoints" }
+            new { Method = "GET", Path = "/api/v1/endpoints" },
         };
 
         return Ok(endpoints);
