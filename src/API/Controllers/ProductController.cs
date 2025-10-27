@@ -1,6 +1,6 @@
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
-using ECommerce.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,12 +11,12 @@ namespace ECommerce.API.Controllers;
 [Produces("application/json")]
 public sealed class ProductController : ControllerBase
 {
-    private readonly ProductRepository _productRepository;
+    private readonly IProductRepository _productRepository;
     private readonly PostgresqlContext _context;
     private readonly ILogger<ProductController> _logger;
 
     public ProductController(
-        ProductRepository productRepository,
+        IProductRepository productRepository,
         PostgresqlContext context,
         ILogger<ProductController> logger
     )
