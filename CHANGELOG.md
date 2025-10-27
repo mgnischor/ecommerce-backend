@@ -9,6 +9,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+-   **📊 Integrated Accounting System**: Complete accounting system following Brazilian standards (NBC TG)
+    -   **Chart of Accounts** (Plano de Contas):
+        -   `ChartOfAccountsEntity` with hierarchical account structure
+        -   Support for 5 account types: Asset, Liability, Equity, Revenue, Expense
+        -   Analytic and synthetic accounts
+        -   Real-time balance tracking
+        -   SQL initialization script with standard accounts for e-commerce
+    -   **Journal Entries** (Lançamentos Contábeis):
+        -   `JournalEntryEntity` for double-entry bookkeeping
+        -   `AccountingEntryEntity` for individual debits and credits
+        -   Automatic journal entry generation for all inventory transactions
+        -   Post/unpost functionality for accounting period control
+        -   Support for cost centers
+    -   **Inventory Transactions** (Movimentações de Estoque):
+        -   `InventoryTransactionEntity` with full traceability
+        -   10 transaction types: Purchase, Sale, SaleReturn, PurchaseReturn, Adjustment, Transfer, Loss, Reservation, ReservationRelease, Fulfillment
+        -   Automatic cost calculation (unit cost × quantity)
+        -   Document number tracking for fiscal compliance
+        -   Links to products, orders, and journal entries
+    -   **Accounting Service** (`IAccountingService`):
+        -   `RecordPurchaseAsync()` - Debit: Inventory, Credit: Suppliers
+        -   `RecordSaleAsync()` - Debit: CMV, Credit: Inventory
+        -   `RecordSaleReturnAsync()` - Debit: Inventory, Credit: CMV
+        -   `RecordPurchaseReturnAsync()` - Debit: Suppliers, Credit: Inventory
+        -   `RecordAdjustmentAsync()` - Handles positive/negative adjustments
+        -   `RecordLossAsync()` - Debit: Loss Expense, Credit: Inventory
+        -   Automatic account creation with standard chart of accounts
+        -   Real-time balance updates
+    -   **Inventory Transaction Service** (`IInventoryTransactionService`):
+        -   `RecordTransactionAsync()` - Records transaction and generates accounting entry
+        -   `GetProductTransactionsAsync()` - Historical transactions per product
+        -   `GetTransactionsByPeriodAsync()` - Period-based reports
+        -   Sequential transaction numbering with prefixes
+        -   Automatic cost center assignment
+    -   **Entity Framework Configurations**:
+        -   `ChartOfAccountsConfiguration` with indexes and constraints
+        -   `JournalEntryConfiguration` with proper relationships
+        -   `AccountingEntryConfiguration` with cascade/restrict delete behaviors
+        -   `InventoryTransactionConfiguration` with full referential integrity
+        -   Updated `PostgresqlContext` with new DbSets
+    -   **Enumerations**:
+        -   `AccountType` - Asset, Liability, Equity, Revenue, Expense
+        -   `EntryType` - Debit, Credit
+        -   `InventoryTransactionType` - All transaction types
+    -   **Documentation**:
+        -   `ACCOUNTING_SYSTEM.md` - Complete system overview, principles, and examples
+        -   `ACCOUNTING_INTEGRATION_GUIDE.md` - Integration guide with code examples
+        -   SQL initialization script with standard Brazilian chart of accounts
+        -   Updated README.md with accounting features
+
+### Features
+
+-   **Double-Entry Bookkeeping**: Every transaction creates balanced debits and credits
+-   **Compliance**: Follows NBC TG 16 (Inventory), NBC TG 26 (Financial Statements), Lei 6.404/76
+-   **Audit Trail**: Complete traceability with user, timestamp, and document references
+-   **Automatic Journal Entries**: No manual accounting entries needed
+-   **Flexible Chart of Accounts**: Hierarchical structure with custom accounts support
+-   **Cost Tracking**: Unit cost and total cost calculation for all transactions
+-   **Multi-Location**: Support for multiple warehouse locations
+-   **Document References**: Links to invoices, orders, and fiscal documents
+-   **Reconciliation Ready**: Easy reconciliation between physical and accounting inventory
+
 ### Changed
 
 ### Fixed
