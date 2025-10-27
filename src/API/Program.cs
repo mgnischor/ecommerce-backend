@@ -58,7 +58,7 @@ builder.Services.AddScoped<IAccountingEntryRepository, AccountingEntryRepository
 builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
 
 // Register logging service
-builder.Services.AddScoped(typeof(ILoggingService), typeof(LoggingService<>));
+builder.Services.AddScoped<ILoggingService, LoggingService>();
 
 // Register services
 builder.Services.AddScoped<IJwtService, JwtService>();
