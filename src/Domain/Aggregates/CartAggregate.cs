@@ -53,7 +53,7 @@ public sealed class CartAggregate
             CustomerId = customerId,
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         return new CartAggregate(cart);
@@ -75,7 +75,7 @@ public sealed class CartAggregate
             IsActive = true,
             ExpiresAt = DateTime.UtcNow.AddDays(7), // Anonymous carts expire after 7 days
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         return new CartAggregate(cart);
@@ -126,7 +126,7 @@ public sealed class CartAggregate
                 Quantity = quantity,
                 UnitPrice = unitPrice,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
             };
 
             _items.Add(item);
@@ -193,10 +193,16 @@ public sealed class CartAggregate
             throw new ArgumentException("Coupon code cannot be empty", nameof(couponCode));
 
         if (discountAmount < 0)
-            throw new ArgumentException("Discount amount cannot be negative", nameof(discountAmount));
+            throw new ArgumentException(
+                "Discount amount cannot be negative",
+                nameof(discountAmount)
+            );
 
         if (discountAmount > SubTotal)
-            throw new ArgumentException("Discount amount cannot exceed subtotal", nameof(discountAmount));
+            throw new ArgumentException(
+                "Discount amount cannot exceed subtotal",
+                nameof(discountAmount)
+            );
 
         Cart.CouponCode = couponCode;
         Cart.DiscountAmount = discountAmount;
@@ -229,7 +235,7 @@ public sealed class CartAggregate
         foreach (var anonymousItem in anonymousCart.Items)
         {
             var existingItem = _items.FirstOrDefault(i => i.ProductId == anonymousItem.ProductId);
-            
+
             if (existingItem != null)
             {
                 // Add quantities together
@@ -247,7 +253,7 @@ public sealed class CartAggregate
                     Quantity = anonymousItem.Quantity,
                     UnitPrice = anonymousItem.UnitPrice,
                     CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.UtcNow,
                 };
 
                 _items.Add(newItem);
