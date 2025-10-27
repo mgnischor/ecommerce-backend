@@ -63,7 +63,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo.
 
-echo [5/5] Building project...
+echo [5/7] Building project...
 echo Building Release configuration...
 dotnet build -c Release --no-incremental
 if %ERRORLEVEL% NEQ 0 (
@@ -79,7 +79,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo.
 
-echo [6/6] Publishing project...
+echo [6/7] Publishing project...
 echo Publishing Release configuration...
 dotnet publish -c Release --no-build
 if %ERRORLEVEL% NEQ 0 (
@@ -94,6 +94,23 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 echo.
+
+echo [7/7] Applying database migrations...
+echo Updating database with latest migrations...
+dotnet ef database update ^
+    --project ecommerce-backend.csproj ^
+    --context PostgresqlContext
+
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo WARNING: Failed to apply database migrations
+    echo The build was successful but database update failed.
+    echo Please check your database connection and run: dotnet ef database update
+    echo.
+) else (
+    echo Database updated successfully!
+    echo.
+)
 
 echo ====================================
 echo  Build completed successfully!
