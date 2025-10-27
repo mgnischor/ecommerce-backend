@@ -28,9 +28,10 @@ public sealed class ProductAggregate
     /// <summary>
     /// Average rating based on approved reviews
     /// </summary>
-    public decimal AverageRating => _reviews.Any(r => r.IsApproved) 
-        ? (decimal)_reviews.Where(r => r.IsApproved).Average(r => r.Rating) 
-        : 0;
+    public decimal AverageRating =>
+        _reviews.Any(r => r.IsApproved)
+            ? (decimal)_reviews.Where(r => r.IsApproved).Average(r => r.Rating)
+            : 0;
 
     /// <summary>
     /// Total approved reviews count
@@ -56,25 +57,32 @@ public sealed class ProductAggregate
     /// Loads an existing product with related data
     /// </summary>
     public static ProductAggregate Load(
-        ProductEntity product, 
+        ProductEntity product,
         IEnumerable<ReviewEntity>? reviews = null,
-        IEnumerable<InventoryEntity>? inventory = null)
+        IEnumerable<InventoryEntity>? inventory = null
+    )
     {
         var aggregate = new ProductAggregate(product);
-        
+
         if (reviews != null)
             aggregate._reviews.AddRange(reviews);
-        
+
         if (inventory != null)
             aggregate._inventoryLocations.AddRange(inventory);
-        
+
         return aggregate;
     }
 
     /// <summary>
     /// Adds a review to the product
     /// </summary>
-    public void AddReview(Guid customerId, int rating, string title, string comment, Guid? orderId = null)
+    public void AddReview(
+        Guid customerId,
+        int rating,
+        string title,
+        string comment,
+        Guid? orderId = null
+    )
     {
         if (rating < 1 || rating > 5)
             throw new ArgumentException("Rating must be between 1 and 5", nameof(rating));
@@ -97,7 +105,7 @@ public sealed class ProductAggregate
             IsVerifiedPurchase = orderId.HasValue,
             IsApproved = false, // Reviews need approval
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _reviews.Add(review);
@@ -136,7 +144,12 @@ public sealed class ProductAggregate
     /// <summary>
     /// Adds inventory for a location
     /// </summary>
-    public void AddInventoryLocation(string location, int quantity, int reorderLevel = 10, int reorderQuantity = 50)
+    public void AddInventoryLocation(
+        string location,
+        int quantity,
+        int reorderLevel = 10,
+        int reorderQuantity = 50
+    )
     {
         if (string.IsNullOrWhiteSpace(location))
             throw new ArgumentException("Location is required", nameof(location));
@@ -146,7 +159,9 @@ public sealed class ProductAggregate
 
         var existingLocation = _inventoryLocations.FirstOrDefault(i => i.Location == location);
         if (existingLocation != null)
-            throw new InvalidOperationException($"Inventory already exists for location {location}");
+            throw new InvalidOperationException(
+                $"Inventory already exists for location {location}"
+            );
 
         var inventory = new InventoryEntity
         {
@@ -159,7 +174,7 @@ public sealed class ProductAggregate
             ReorderLevel = reorderLevel,
             ReorderQuantity = reorderQuantity,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _inventoryLocations.Add(inventory);
@@ -176,14 +191,16 @@ public sealed class ProductAggregate
 
         var newQuantity = inventory.QuantityInStock + quantityChange;
         if (newQuantity < 0)
-            throw new InvalidOperationException($"Insufficient stock. Available: {inventory.QuantityInStock}, Requested: {Math.Abs(quantityChange)}");
+            throw new InvalidOperationException(
+                $"Insufficient stock. Available: {inventory.QuantityInStock}, Requested: {Math.Abs(quantityChange)}"
+            );
 
         inventory.QuantityInStock = newQuantity;
         inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
-        
+
         if (quantityChange > 0)
             inventory.LastStockReceived = DateTime.UtcNow;
-        
+
         inventory.UpdatedAt = DateTime.UtcNow;
 
         UpdateProductStockStatus();
@@ -202,7 +219,9 @@ public sealed class ProductAggregate
             throw new InvalidOperationException($"Inventory not found for location {location}");
 
         if (inventory.QuantityAvailable < quantity)
-            throw new InvalidOperationException($"Insufficient stock. Available: {inventory.QuantityAvailable}, Requested: {quantity}");
+            throw new InvalidOperationException(
+                $"Insufficient stock. Available: {inventory.QuantityAvailable}, Requested: {quantity}"
+            );
 
         inventory.QuantityReserved += quantity;
         inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
@@ -224,7 +243,9 @@ public sealed class ProductAggregate
             throw new InvalidOperationException($"Inventory not found for location {location}");
 
         if (inventory.QuantityReserved < quantity)
-            throw new InvalidOperationException($"Cannot release more than reserved. Reserved: {inventory.QuantityReserved}, Requested: {quantity}");
+            throw new InvalidOperationException(
+                $"Cannot release more than reserved. Reserved: {inventory.QuantityReserved}, Requested: {quantity}"
+            );
 
         inventory.QuantityReserved -= quantity;
         inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
@@ -246,7 +267,9 @@ public sealed class ProductAggregate
             throw new InvalidOperationException($"Inventory not found for location {location}");
 
         if (inventory.QuantityReserved < quantity)
-            throw new InvalidOperationException($"Cannot fulfill more than reserved. Reserved: {inventory.QuantityReserved}, Requested: {quantity}");
+            throw new InvalidOperationException(
+                $"Cannot fulfill more than reserved. Reserved: {inventory.QuantityReserved}, Requested: {quantity}"
+            );
 
         inventory.QuantityInStock -= quantity;
         inventory.QuantityReserved -= quantity;
@@ -265,7 +288,10 @@ public sealed class ProductAggregate
             throw new ArgumentException("Discount price cannot be negative", nameof(discountPrice));
 
         if (discountPrice >= Product.Price)
-            throw new ArgumentException("Discount price must be less than regular price", nameof(discountPrice));
+            throw new ArgumentException(
+                "Discount price must be less than regular price",
+                nameof(discountPrice)
+            );
 
         Product.DiscountPrice = discountPrice;
         Product.IsOnSale = true;
@@ -324,7 +350,7 @@ public sealed class ProductAggregate
     private void UpdateProductStockStatus()
     {
         Product.StockQuantity = TotalAvailableStock;
-        
+
         if (!IsInStock && Product.IsActive)
         {
             Product.IsActive = false; // Auto-deactivate if out of stock
