@@ -52,7 +52,7 @@ public sealed class OrderAggregate
             OrderNumber = orderNumber,
             Status = OrderStatus.Pending,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         return new OrderAggregate(order);
@@ -61,10 +61,19 @@ public sealed class OrderAggregate
     /// <summary>
     /// Adds an item to the order
     /// </summary>
-    public void AddItem(Guid productId, string productName, string productSku, int quantity, decimal unitPrice, string? imageUrl = null)
+    public void AddItem(
+        Guid productId,
+        string productName,
+        string productSku,
+        int quantity,
+        decimal unitPrice,
+        string? imageUrl = null
+    )
     {
         if (Order.Status != OrderStatus.Pending)
-            throw new InvalidOperationException($"Cannot add items to order with status {Order.Status}");
+            throw new InvalidOperationException(
+                $"Cannot add items to order with status {Order.Status}"
+            );
 
         if (quantity <= 0)
             throw new ArgumentException("Quantity must be greater than zero", nameof(quantity));
@@ -73,12 +82,15 @@ public sealed class OrderAggregate
             throw new ArgumentException("Unit price cannot be negative", nameof(unitPrice));
 
         var existingItem = _items.FirstOrDefault(i => i.ProductId == productId);
-        
+
         if (existingItem != null)
         {
             // Update existing item quantity
             existingItem.Quantity += quantity;
-            existingItem.TotalPrice = existingItem.Quantity * existingItem.UnitPrice - existingItem.DiscountAmount + existingItem.TaxAmount;
+            existingItem.TotalPrice =
+                existingItem.Quantity * existingItem.UnitPrice
+                - existingItem.DiscountAmount
+                + existingItem.TaxAmount;
             existingItem.UpdatedAt = DateTime.UtcNow;
         }
         else
@@ -96,7 +108,7 @@ public sealed class OrderAggregate
                 ProductImageUrl = imageUrl,
                 TotalPrice = quantity * unitPrice,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
             };
 
             _items.Add(item);
@@ -111,7 +123,9 @@ public sealed class OrderAggregate
     public void RemoveItem(Guid productId)
     {
         if (Order.Status != OrderStatus.Pending)
-            throw new InvalidOperationException($"Cannot remove items from order with status {Order.Status}");
+            throw new InvalidOperationException(
+                $"Cannot remove items from order with status {Order.Status}"
+            );
 
         var item = _items.FirstOrDefault(i => i.ProductId == productId);
         if (item != null)
@@ -127,7 +141,9 @@ public sealed class OrderAggregate
     public void UpdateItemQuantity(Guid productId, int newQuantity)
     {
         if (Order.Status != OrderStatus.Pending)
-            throw new InvalidOperationException($"Cannot update items in order with status {Order.Status}");
+            throw new InvalidOperationException(
+                $"Cannot update items in order with status {Order.Status}"
+            );
 
         if (newQuantity <= 0)
             throw new ArgumentException("Quantity must be greater than zero", nameof(newQuantity));
@@ -153,7 +169,10 @@ public sealed class OrderAggregate
             throw new InvalidOperationException($"Product {productId} not found in order");
 
         if (discountAmount < 0)
-            throw new ArgumentException("Discount amount cannot be negative", nameof(discountAmount));
+            throw new ArgumentException(
+                "Discount amount cannot be negative",
+                nameof(discountAmount)
+            );
 
         item.DiscountAmount = discountAmount;
         item.TotalPrice = item.Quantity * item.UnitPrice - item.DiscountAmount + item.TaxAmount;
@@ -171,7 +190,10 @@ public sealed class OrderAggregate
             throw new ArgumentException("Coupon code cannot be empty", nameof(couponCode));
 
         if (discountAmount < 0)
-            throw new ArgumentException("Discount amount cannot be negative", nameof(discountAmount));
+            throw new ArgumentException(
+                "Discount amount cannot be negative",
+                nameof(discountAmount)
+            );
 
         Order.CouponCode = couponCode;
         Order.DiscountAmount = discountAmount;
@@ -236,7 +258,9 @@ public sealed class OrderAggregate
             throw new InvalidOperationException("Cannot confirm order with no items");
 
         if (Order.ShippingAddressId == null)
-            throw new InvalidOperationException("Shipping address must be set before confirming order");
+            throw new InvalidOperationException(
+                "Shipping address must be set before confirming order"
+            );
 
         Order.Status = OrderStatus.Confirmed;
         Order.UpdatedAt = DateTime.UtcNow;
@@ -333,7 +357,8 @@ public sealed class OrderAggregate
     private void RecalculateTotals()
     {
         Order.SubTotal = _items.Sum(i => i.TotalPrice);
-        Order.TotalAmount = Order.SubTotal + Order.TaxAmount + Order.ShippingCost - Order.DiscountAmount;
+        Order.TotalAmount =
+            Order.SubTotal + Order.TaxAmount + Order.ShippingCost - Order.DiscountAmount;
         Order.UpdatedAt = DateTime.UtcNow;
     }
 
