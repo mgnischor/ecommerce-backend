@@ -14,13 +14,13 @@ namespace ECommerce.Application.Services;
 public sealed class JwtService : IJwtService
 {
     private readonly IConfiguration _configuration;
-    private readonly ILogger<JwtService> _logger;
+    private readonly ILoggingService _logger;
     private readonly string _secretKey;
     private readonly string _issuer;
     private readonly string _audience;
     private readonly int _expirationMinutes;
 
-    public JwtService(IConfiguration configuration, ILogger<JwtService> logger)
+    public JwtService(IConfiguration configuration, ILoggingService logger)
     {
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
