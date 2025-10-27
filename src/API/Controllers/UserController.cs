@@ -1,6 +1,6 @@
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
-using ECommerce.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +12,12 @@ namespace ECommerce.API.Controllers;
 [Authorize]
 public sealed class UserController : ControllerBase
 {
-    private readonly UserRepository _userRepository;
+    private readonly IUserRepository _userRepository;
     private readonly PostgresqlContext _context;
     private readonly ILogger<UserController> _logger;
 
     public UserController(
-        UserRepository userRepository,
+        IUserRepository userRepository,
         PostgresqlContext context,
         ILogger<UserController> logger
     )
