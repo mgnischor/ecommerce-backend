@@ -13,17 +13,20 @@ public sealed class AuthController : ControllerBase
     private readonly UserRepository _userRepository;
     private readonly IJwtService _jwtService;
     private readonly IPasswordService _passwordService;
+    private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         UserRepository userRepository,
         IJwtService jwtService,
-        IPasswordService passwordService
+        IPasswordService passwordService,
+        ILogger<AuthController> logger
     )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
         _passwordService =
             passwordService ?? throw new ArgumentNullException(nameof(passwordService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <summary>
@@ -41,28 +44,47 @@ public sealed class AuthController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Login attempt for email: {Email}", loginRequest?.Email ?? "null");
+
         if (loginRequest == null)
+        {
+            _logger.LogWarning("Login request is null");
             return BadRequest(new { Message = "Login request is required" });
+        }
 
         if (!ModelState.IsValid)
+        {
+            _logger.LogWarning("Invalid model state for login request");
             return BadRequest(ModelState);
+        }
 
         // Find user by email
         var user = await _userRepository.GetByEmailAsync(loginRequest.Email, cancellationToken);
 
         if (user == null)
+        {
+            _logger.LogWarning("Login failed: User not found for email: {Email}", loginRequest.Email);
             return Unauthorized(new { Message = "Invalid email or password" });
+        }
 
         // Verify password
         if (!_passwordService.VerifyPassword(loginRequest.Password, user.PasswordHash))
+        {
+            _logger.LogWarning("Login failed: Invalid password for email: {Email}", loginRequest.Email);
             return Unauthorized(new { Message = "Invalid email or password" });
+        }
 
         // Check if user is active
         if (!user.IsActive || user.IsBanned || user.IsDeleted)
+        {
+            _logger.LogWarning("Login failed: User account is not active for email: {Email}", loginRequest.Email);
             return Unauthorized(new { Message = "User account is not active" });
+        }
 
         // Generate JWT token
         var token = _jwtService.GenerateToken(user);
+
+        _logger.LogInformation("Login successful for user: {Email}, UserId: {UserId}", user.Email, user.Id);
 
         var response = new LoginResponseDto
         {
