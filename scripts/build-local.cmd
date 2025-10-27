@@ -63,7 +63,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo.
 
-echo [5/7] Building project...
+echo [5/8] Building project...
 echo Building Release configuration...
 dotnet build -c Release --no-incremental
 if %ERRORLEVEL% NEQ 0 (
@@ -79,7 +79,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo.
 
-echo [6/7] Publishing project...
+echo [6/8] Publishing project...
 echo Publishing Release configuration...
 dotnet publish -c Release --no-build
 if %ERRORLEVEL% NEQ 0 (
@@ -95,7 +95,17 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo.
 
-echo [7/7] Applying database migrations...
+echo [7/8] Exporting migration SQL scripts...
+echo Running migration script generator...
+if exist "%~dp0migration-script.cmd" (
+    call "%~dp0migration-script.cmd" --no-pause
+    echo Migration SQL scripts exported successfully!
+) else (
+    echo WARNING: migration-script.cmd not found
+)
+echo.
+
+echo [8/8] Applying database migrations...
 echo Updating database with latest migrations...
 dotnet ef database update ^
     --project ecommerce-backend.csproj ^
