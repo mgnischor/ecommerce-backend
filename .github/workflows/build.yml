@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore ecommerce-backend.sln
+
+      - name: Build
+        run: dotnet build ecommerce-backend.sln --configuration ${{ matrix.configuration }} --no-restore
+
+      - name: Publish
+        run: dotnet publish ecommerce-backend.sln --configuration ${{ matrix.configuration }} --no-build --output ./publish/${{ matrix.configuration }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.configuration }}
+          path: ./publish/${{ matrix.configuration }}
+          retention-days: 7
