@@ -17,7 +17,12 @@ A robust backend API for an e-commerce platform built with ASP.NET Core, followi
 -   **OpenAPI Documentation**: Interactive API documentation with Scalar
 -   **Docker Support**: Containerized deployment ready
 -   **Migration Support**: Database schema versioning with EF Core migrations
--   **📊 Accounting System**: Integrated accounting system following Brazilian standards (NBC TG)
+-   **� OpenTelemetry Integration**: Full observability with distributed tracing and metrics
+    -   Automatic instrumentation for HTTP requests, database queries, and exceptions
+    -   Custom tracing support for business operations
+    -   OTLP export to Jaeger, Grafana Tempo, or other backends
+    -   Runtime metrics (GC, thread pool, etc.)
+-   **�📊 Accounting System**: Integrated accounting system following Brazilian standards (NBC TG)
     -   Automatic journal entries for all inventory transactions
     -   Chart of accounts management
     -   Double-entry bookkeeping
@@ -32,6 +37,7 @@ A robust backend API for an e-commerce platform built with ASP.NET Core, followi
 -   **ORM**: Entity Framework Core 9.0
 -   **Authentication**: JWT Bearer Tokens
 -   **API Documentation**: OpenAPI/Swagger with Scalar
+-   **Observability**: OpenTelemetry with OTLP exporter
 -   **Containerization**: Docker
 
 ## 📋 Prerequisites
@@ -108,7 +114,7 @@ The application uses the following configuration settings:
 dotnet run --project ecommerce-backend.csproj
 ```
 
-The API will be available at `https://localhost:5050` (HTTPS) and `http://localhost:5049` (HTTP).
+The API will be available at `http://localhost:5049`.
 
 ### Using Docker
 
@@ -116,7 +122,7 @@ The API will be available at `https://localhost:5050` (HTTPS) and `http://localh
 # Build the Docker image
 docker build -t ecommerce-backend .
 
-# Run the container
+# Run the container (Production mode on port 80)
 docker run -p 80:80 ecommerce-backend
 ```
 
@@ -130,15 +136,34 @@ dotnet ef migrations add MigrationName
 dotnet ef database update
 ```
 
+### With OpenTelemetry and Jaeger
+
+Run with full observability stack:
+
+```powershell
+# Start all services (API, PostgreSQL, Jaeger)
+docker-compose up -d
+
+# Access API documentation
+# http://localhost/docs
+
+# Access Jaeger UI for distributed tracing
+# http://localhost:16686
+```
+
+For more details, see [Running with Jaeger](docs/RUNNING_WITH_JAEGER.md).
+
 ## 📚 API Documentation
 
 When running in development mode, access the interactive API documentation at:
 
--   **Scalar UI**: `https://localhost:5049/docs`
--   **OpenAPI JSON**: `https://localhost:5049/openapi/v1.json`
+-   **Scalar UI**: `http://localhost:5049/docs`
+-   **OpenAPI JSON**: `http://localhost:5049/openapi/v1.json`
 
 ### Additional Documentation
 
+-   **[OpenTelemetry Guide](docs/OPENTELEMETRY_GUIDE.md)** - Complete guide for distributed tracing and observability
+-   **[Running with Jaeger](docs/RUNNING_WITH_JAEGER.md)** - How to run the application with Jaeger for tracing
 -   **[Accounting System](docs/ACCOUNTING_SYSTEM.md)** - Detailed documentation about the integrated accounting system
 -   **[Accounting Integration Guide](docs/ACCOUNTING_INTEGRATION_GUIDE.md)** - How to use the accounting features in your code
 
