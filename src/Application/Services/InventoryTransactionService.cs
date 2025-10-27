@@ -1,7 +1,7 @@
+using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Application.Services;
 
@@ -10,16 +10,16 @@ namespace ECommerce.Application.Services;
 /// </summary>
 public class InventoryTransactionService : IInventoryTransactionService
 {
-    private readonly IRepository<InventoryTransactionEntity> _transactionRepository;
+    private readonly IInventoryTransactionRepository _transactionRepository;
     private readonly IAccountingService _accountingService;
-    private readonly ILogger<InventoryTransactionService> _logger;
+    private readonly ILoggingService _logger;
     private static int _transactionCounter = 0;
     private static readonly object _lock = new object();
 
     public InventoryTransactionService(
-        IRepository<InventoryTransactionEntity> transactionRepository,
+        IInventoryTransactionRepository transactionRepository,
         IAccountingService accountingService,
-        ILogger<InventoryTransactionService> logger
+        ILoggingService logger
     )
     {
         _transactionRepository =
@@ -161,11 +161,7 @@ public class InventoryTransactionService : IInventoryTransactionService
         CancellationToken cancellationToken = default
     )
     {
-        var allTransactions = await _transactionRepository.GetAllAsync(cancellationToken);
-        return allTransactions
-            .Where(t => t.ProductId == productId)
-            .OrderByDescending(t => t.TransactionDate)
-            .ToList();
+        return await _transactionRepository.GetByProductIdAsync(productId, cancellationToken);
     }
 
     public async Task<IEnumerable<InventoryTransactionEntity>> GetTransactionsByPeriodAsync(
@@ -174,11 +170,7 @@ public class InventoryTransactionService : IInventoryTransactionService
         CancellationToken cancellationToken = default
     )
     {
-        var allTransactions = await _transactionRepository.GetAllAsync(cancellationToken);
-        return allTransactions
-            .Where(t => t.TransactionDate >= startDate && t.TransactionDate <= endDate)
-            .OrderByDescending(t => t.TransactionDate)
-            .ToList();
+        return await _transactionRepository.GetByPeriodAsync(startDate, endDate, cancellationToken);
     }
 
     private static string GenerateTransactionNumber(InventoryTransactionType type)
