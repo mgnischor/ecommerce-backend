@@ -1,4 +1,5 @@
 using System.Text;
+using ECommerce.API.Middlewares;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Infrastructure.Persistence;
@@ -9,6 +10,21 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+// Configure logging levels
+if (builder.Environment.IsDevelopment())
+{
+    builder.Logging.SetMinimumLevel(LogLevel.Debug);
+}
+else
+{
+    builder.Logging.SetMinimumLevel(LogLevel.Information);
+}
 
 builder.Services.AddDbContext<PostgresqlContext>(options =>
     options.UseNpgsql("Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce")
@@ -58,12 +74,27 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+// Use global exception handling middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 // Seed database with admin user
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<PostgresqlContext>();
     var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
-    await DatabaseSeeder.SeedAdminUserAsync(context, passwordService);
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        logger.LogInformation("Starting database seeding");
+        await DatabaseSeeder.SeedAdminUserAsync(context, passwordService);
+        logger.LogInformation("Database seeding completed successfully");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while seeding the database");
+        throw;
+    }
 }
 
 if (app.Environment.IsDevelopment())
