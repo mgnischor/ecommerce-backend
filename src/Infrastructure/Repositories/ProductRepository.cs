@@ -1,4 +1,5 @@
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,7 @@ namespace ECommerce.Infrastructure.Repositories;
 /// Repository for managing ProductEntity data access.
 /// Provides methods for CRUD operations and querying product data.
 /// </summary>
-public sealed class ProductRepository
+public sealed class ProductRepository : IProductRepository
 {
     private readonly PostgresqlContext _context;
     private readonly ILogger<ProductRepository> _logger;
@@ -125,10 +126,7 @@ public sealed class ProductRepository
         return await _context.Products.AnyAsync(p => p.Sku == sku, cancellationToken);
     }
 
-    public async Task AddAsync(
-        ProductEntity product,
-        CancellationToken cancellationToken = default
-    )
+    public async Task AddAsync(ProductEntity product, CancellationToken cancellationToken = default)
     {
         if (product == null)
         {
