@@ -15,9 +15,9 @@ public sealed class PasswordService : IPasswordService
 
     private const char Delimiter = ';';
 
-    private readonly ILogger<PasswordService> _logger;
+    private readonly ILoggingService _logger;
 
-    public PasswordService(ILogger<PasswordService> logger)
+    public PasswordService(ILoggingService logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
