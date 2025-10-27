@@ -16,13 +16,13 @@ RUN if [ "$BUILD_DEVELOPMENT" = "1" ]; then \
         echo 'export ASPNETCORE_ENVIRONMENT=Development' >> /app/entrypoint.sh && \
         echo 'export ASPNETCORE_URLS=http://+:5049' >> /app/entrypoint.sh && \
         echo 'export ASPNETCORE_HTTP_PORTS=5049' >> /app/entrypoint.sh && \
-        echo 'exec dotnet ecommerce-backend.dll' >> /app/entrypoint.sh; \
+        echo 'exec dotnet ECommerce.Backend.dll' >> /app/entrypoint.sh; \
     else \
         echo '#!/bin/sh' > /app/entrypoint.sh && \
         echo 'export ASPNETCORE_ENVIRONMENT=Production' >> /app/entrypoint.sh && \
         echo 'export ASPNETCORE_URLS=http://+:80' >> /app/entrypoint.sh && \
         echo 'export ASPNETCORE_HTTP_PORTS=80' >> /app/entrypoint.sh && \
-        echo 'exec dotnet ecommerce-backend.dll' >> /app/entrypoint.sh; \
+        echo 'exec dotnet ECommerce.Backend.dll' >> /app/entrypoint.sh; \
     fi && \
     chmod +x /app/entrypoint.sh
 RUN addgroup -g 1000 appgroup && \
