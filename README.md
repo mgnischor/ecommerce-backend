@@ -1,653 +1,875 @@
-# E-Commerce Backend API# E-Commerce Backend API
+# E-Commerce Backend API
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+<div align="center">
 
-[![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/)[![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?logo=postgresql)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE.md)
+[![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-Enabled-FF6F00?logo=opentelemetry)](https://opentelemetry.io/)
 
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
+A production-ready, enterprise-grade e-commerce backend API built with ASP.NET Core 9, featuring clean architecture, double-entry accounting, and comprehensive observability.
 
-[![Version](https://img.shields.io/badge/Version-0.0.11-green.svg)](https://github.com/mgnischor/ecommerce-backend)[![Version](https://img.shields.io/badge/Version-0.0.11-green.svg)](https://github.com/mgnischor/ecommerce-backend)
+[Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [Documentation](#-documentation) • [API Reference](#-api-reference)
 
-A robust backend API for an e-commerce platform built with ASP.NET Core 9.0, following Clean Architecture principles. This project provides a comprehensive solution for online retail applications with advanced features including user authentication, product management, inventory tracking, accounting system, and full observability.A robust backend API for an e-commerce platform built with ASP.NET Core 9.0, following Clean Architecture principles. This project provides a comprehensive solution for online retail applications with advanced features including user authentication, product management, inventory tracking, accounting system, and full observability.
-
-> **Note:** This repository is currently under active development. Features and APIs may change.> **Note:** This repository is currently under active development. Features and APIs may change.
-
-## 🚀 Features## 🚀 Features
-
-### Core Functionality- **Clean Architecture**: Organized into Domain, Application, Infrastructure, and API layers
-
--   **Clean Architecture**: Organized into Domain, Application, Infrastructure, and API layers- **JWT Authentication**: Secure user authentication and authorization
-
--   **RESTful API**: Well-structured endpoints following REST best practices- **PostgreSQL Database**: Reliable data persistence with Entity Framework Core
-
--   **OpenAPI Documentation**: Interactive API documentation with Scalar UI- **RESTful API**: Well-structured endpoints for e-commerce operations
-
--   **Docker Support**: Complete containerization with Docker Compose- **OpenAPI Documentation**: Interactive API documentation with Scalar
-
--   **Migration Support**: Database schema versioning with EF Core migrations- **Docker Support**: Containerized deployment ready
-
--   **Migration Support**: Database schema versioning with EF Core migrations
-
-### Authentication & Security- **� OpenTelemetry Integration**: Full observability with distributed tracing and metrics
-
--   **JWT Authentication**: Secure user authentication and authorization - Automatic instrumentation for HTTP requests, database queries, and exceptions
-
--   **Role-Based Access Control**: Multiple access levels (Guest, Customer, Company, Admin, Manager, Developer) - Custom tracing support for business operations
-
--   **Password Security**: Bcrypt password hashing with industry-standard practices - OTLP export to Jaeger, Grafana Tempo, or other backends
-    -   Runtime metrics (GC, thread pool, etc.)
-
-### User Management- **�📊 Accounting System**: Integrated accounting system following Brazilian standards (NBC TG)
-
--   **Complete CRUD Operations**: Create, read, update, and delete users - Automatic journal entries for all inventory transactions
-
--   **User Profiles**: Comprehensive user information including address, favorites, and groups - Chart of accounts management
-
--   **Email Verification**: Support for email verification workflow - Double-entry bookkeeping
-
--   **User Status Management**: Active, banned, and soft delete capabilities - Full audit trail and traceability
-    -   Support for purchases, sales, returns, adjustments, and losses
-
-### Product Management
-
--   **Product Catalog**: Full product information with SKU, pricing, and descriptions## 🛠 Tech Stack
-
--   **Category System**: 18 predefined categories (Electronics, Clothing, Books, Home & Garden, etc.)
-
--   **Inventory Tracking**: Stock quantity, minimum stock levels, and max order quantity- **Framework**: ASP.NET Core 9.0
-
--   **Product Status**: Draft, Active, Inactive, OutOfStock, Discontinued- **Language**: C# 12
-
--   **Featured Products**: Mark products as featured or on sale- **Database**: PostgreSQL
-
--   **Multiple Images & Tags**: Support for product image arrays and tagging- **ORM**: Entity Framework Core 9.0
-
--   **Search & Filters**: Search by name, category, SKU, featured status, and sale status- **Authentication**: JWT Bearer Tokens
-
--   **Soft Delete**: Safe product deletion without losing historical data- **API Documentation**: OpenAPI/Swagger with Scalar
-
--   **Observability**: OpenTelemetry with OTLP exporter
-
-### E-Commerce Domain- **Containerization**: Docker
-
--   **Orders Management**: Complete order lifecycle with status tracking
-
--   **Shopping Cart**: Session-based cart with coupon support## 📋 Prerequisites
-
--   **Payment Processing**: Multiple payment methods (Credit Card, PayPal, Pix, etc.) and transaction tracking
-
--   **Product Reviews**: Customer reviews with 1-5 star rating system and verificationBefore running this application, make sure you have the following installed:
-
--   **Wishlist System**: Multiple wishlists per customer with priorities and notes
-
--   **Address Management**: Shipping and billing address support- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
-
--   **Coupon System**: Percentage and fixed amount discounts with usage limits- [PostgreSQL](https://www.postgresql.org/download/) (version 15 or higher)
-
--   [Docker](https://www.docker.com/) (optional, for containerized deployment)
-
-### Inventory & Transactions
-
--   **Multi-Location Inventory**: Track stock across multiple warehouse locations## 🔧 Installation
-
--   **Transaction Types**: Purchase, Sale, Returns (Sale/Purchase), Adjustments, Transfers, Losses, Reservations, Fulfillment
-
--   **Stock Movements**: Complete audit trail of all inventory changes1. **Clone the repository:**
-
--   **Automatic Cost Calculation**: Unit cost and total cost tracking per transaction
-
--   **Document Tracking**: Link transactions to invoices and fiscal documents ```bash
-
-    git clone https://github.com/mgnischor/ecommerce-backend.git
-
-### 📊 Accounting System cd ecommerce-backend
-
--   **Chart of Accounts**: Hierarchical account structure following Brazilian standards (NBC TG) ```
-
--   **Double-Entry Bookkeeping**: Automatic journal entries for all inventory transactions
-
--   **Account Types**: Assets, Liabilities, Equity, Revenue, Expenses2. **Restore dependencies:**
-
--   **Journal Entries**: Complete audit trail with post/unpost functionality
-
--   **Cost Tracking**: Automatic COGS (Cost of Goods Sold) calculations ```bash
-
--   **Inventory Integration**: Seamless accounting entries for all inventory movements dotnet restore
-
--   **Compliance**: Follows NBC TG 16 (Inventory), NBC TG 26 (Financial Statements), Lei 6.404/76 ```
-
--   **Real-Time Balances**: Automatic balance updates for all affected accounts
-
-3. **Set up the database:**
-
-### 🔭 Observability & Monitoring
-
--   **OpenTelemetry Integration**: Full distributed tracing and metrics - Create a PostgreSQL database named `ecommerce`
-
-    -   Automatic instrumentation for HTTP requests and database queries - Update the connection string in `appsettings.json` or set environment variables
-
-    -   Custom tracing support for business operations
-
-    -   OTLP export to Jaeger, Grafana Tempo, or other backends4. **Configure JWT settings:**
-
-    -   Runtime metrics (GC, thread pool, memory, etc.) Update the JWT configuration in `appsettings.json`:
-
--   **Comprehensive Logging**: Structured logging throughout the application ```json
-
-    -   Request/response logging in all controllers {
-
-    -   Error and warning logging in services and repositories "Jwt": {
-
-    -   Database operation logging "SecretKey": "3zNarwviomHljbSBbFRvx42GNTw3lkCRS0PUg58Lf43GtMFZ2H",
-
-    -   Environment-specific log levels (Debug for Development, Info for Production) "Issuer": "your-issuer",
-
-                "Audience": "your-audience"
-
-### Data Persistence }
-
--   **PostgreSQL Database**: Reliable data persistence with Entity Framework Core 9.0 }
-
--   **16 Database Tables**: Complete schema for e-commerce operations ```
-
--   **Soft Delete**: Safe deletion across all entities
-
--   **Audit Trail**: Created/Updated timestamps and user tracking on all entities## ⚙️ Configuration
-
--   **Indexes & Constraints**: Optimized database performance with proper indexing
-
-The application uses the following configuration settings:
-
-## 🛠 Tech Stack
-
-### Database
-
--   **Framework**: ASP.NET Core 9.0
-
--   **Language**: C# 12```json
-
--   **Database**: PostgreSQL 15+{
-
--   **ORM**: Entity Framework Core 9.0 "ConnectionStrings": {
-
--   **Authentication**: JWT Bearer Tokens "DefaultConnection": "Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce"
-
--   **API Documentation**: OpenAPI/Swagger with Scalar UI (v2.9.0) }
-
--   **Observability**: OpenTelemetry (v1.13.1) with OTLP exporter}
-
--   **Containerization**: Docker & Docker Compose```
-
--   **Version**: 0.0.11
-
-### JWT Authentication
-
-## 📋 Prerequisites
-
-```json
-
-Before running this application, make sure you have the following installed:{
-
-    "Jwt": {
-
--   [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)        "SecretKey": "3zNarwviomHljbSBbFRvx42GNTw3lkCRS0PUg58Lf43GtMFZ2H",
-
--   [PostgreSQL](https://www.postgresql.org/download/) (version 15 or higher)        "Issuer": "ECommerce.Backend",
-
--   [Docker](https://www.docker.com/) (optional, for containerized deployment)        "Audience": "ECommerce.Client"
-
-    }
-
-## 🔧 Installation}
-
-```
-
-1. **Clone the repository:**
-
-## 🚀 Running the Application
-
-    ```bash
-
-    git clone https://github.com/mgnischor/ecommerce-backend.git### Development Mode
-
-    cd ecommerce-backend
-
-    ``````bash
-
-dotnet run --project ecommerce-backend.csproj
-
-2. **Restore dependencies:**```
-
-    ```bashThe API will be available at `http://localhost:5049`.
-
-    dotnet restore
-
-    ```### Using Docker
-
-    ```
-
-3. **Set up the database:**```bash
-
-# Build the Docker image
-
-    - Create a PostgreSQL database named `ecommerce`docker build -t ecommerce-backend .
-
-    - Update the connection string in `appsettings.json` or set environment variables
-
-# Run the container (Production mode on port 80)
-
-4. **Configure JWT settings:**docker run -p 80:80 ecommerce-backend
-
-    ````
-
-    Update the JWT configuration in `appsettings.json`:
-
-    ### Database Migrations
-
-     ```json
-
-     {```bash
-
-         "Jwt": {# Add a new migration
-
-             "SecretKey": "your-secret-key-at-least-32-characters-long",dotnet ef migrations add MigrationName
-
-             "Issuer": "ECommerce.Backend",
-
-             "Audience": "ECommerce.Client"# Update the database
-
-         }dotnet ef database update
-
-     }```
-
-    ````
-
-### With OpenTelemetry and Jaeger
-
-5. **Run database migrations:**
-
-Run with full observability stack:
-
-    ```bash
-
-    dotnet ef database update```powershell
-
-    ```# Start all services (API, PostgreSQL, Jaeger)
-
-docker-compose up -d
-
-## ⚙️ Configuration
-
-# Access API documentation
-
-The application uses the following configuration settings:# http://localhost/docs
-
-### Database# Access Jaeger UI for distributed tracing
-
-# http://localhost:16686
-
-`json`
-
-{
-
-    "ConnectionStrings": {For more details, see [Running with Jaeger](docs/RUNNING_WITH_JAEGER.md).
-
-        "DefaultConnection": "Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce"
-
-    }## 📚 API Documentation
-
-}
-
-```````When running in development mode, access the interactive API documentation at:
-
-
-
-### JWT Authentication-   **Scalar UI**: `http://localhost:5049/docs`
-
--   **OpenAPI JSON**: `http://localhost:5049/openapi/v1.json`
-
-```json
-
-{### Additional Documentation
-
-    "Jwt": {
-
-        "SecretKey": "3zNarwviomHljbSBbFRvx42GNTw3lkCRS0PUg58Lf43GtMFZ2H",-   **[OpenTelemetry Guide](docs/OPENTELEMETRY_GUIDE.md)** - Complete guide for distributed tracing and observability
-
-        "Issuer": "ECommerce.Backend",-   **[Running with Jaeger](docs/RUNNING_WITH_JAEGER.md)** - How to run the application with Jaeger for tracing
-
-        "Audience": "ECommerce.Client"-   **[Accounting System](docs/ACCOUNTING_SYSTEM.md)** - Detailed documentation about the integrated accounting system
-
-    }-   **[Accounting Integration Guide](docs/ACCOUNTING_INTEGRATION_GUIDE.md)** - How to use the accounting features in your code
-
-}
-
-```## 🏗 Building and Deployment
-
-
-
-### OpenTelemetry (Optional)### Local Build
-
-
-
-```jsonUse the provided PowerShell script:
-
-{
-
-    "OpenTelemetry": {```powershell
-
-        "ServiceName": "ECommerce.Backend",.\scripts\build-local.ps1
-
-        "ServiceVersion": "0.0.11",```
-
-        "OtlpEndpoint": "http://localhost:4317"
-
-    }### Docker Build
-
-}
-
-``````bash
-
-.\scripts\build-docker.cmd
-
-## 🚀 Running the Application```
-
-
-
-### Development Mode## 🤝 Contributing
-
-
-
-```bash1. Fork the repository
-
-dotnet run --project ecommerce-backend.csproj2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-
-```3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-
-4. Push to the branch (`git push origin feature/amazing-feature`)
-
-The API will be available at `http://localhost:5049`.5. Open a Pull Request
-
-
-
-### Using Docker Compose (Recommended)## 📄 License
-
-
-
-Run with full stack (API, PostgreSQL, Jaeger):This project is licensed under the GNU General Public License v3.0 - see the [LICENSE.md](LICENSE.md) file for details.
-
-
-
-```powershell## 👤 Author
-
-# Start all services
-
-docker-compose up -d**Miguel Nischor**
-
-
-
-# View logs-   GitHub: [@mgnischor](https://github.com/mgnischor)
-
-docker-compose logs -f
-
-## 📞 Support
-
-# Stop all services
-
-docker-compose downIf you have any questions or need help, please open an issue on GitHub.
-
-```````
+</div>
 
 ---
 
-Access points:
+## 📋 Table of Contents
 
--   **API Documentation**: `http://localhost/docs`**Repository**: [https://github.com/mgnischor/ecommerce-backend](https://github.com/mgnischor/ecommerce-backend)
+-   [Overview](#-overview)
+-   [Features](#-features)
+-   [Architecture](#-architecture)
+-   [Tech Stack](#-tech-stack)
+-   [Quick Start](#-quick-start)
+    -   [Prerequisites](#prerequisites)
+    -   [Local Development](#local-development)
+    -   [Docker Compose](#docker-compose)
+-   [Configuration](#-configuration)
+-   [Database Management](#-database-management)
+-   [API Reference](#-api-reference)
+-   [Observability](#-observability)
+-   [Testing](#-testing)
+-   [Documentation](#-documentation)
+-   [Security](#-security)
+-   [Contributing](#-contributing)
+-   [License](#-license)
 
--   **Jaeger UI**: `http://localhost:16686`
--   **API**: `http://localhost`
+---
 
-### Production Build
+## 🎯 Overview
 
-```bash
-# Build for production
-dotnet build -c Release
+The **E-Commerce Backend API** is a robust, scalable solution designed for modern e-commerce platforms. Built with clean architecture principles, it provides a solid foundation for managing products, orders, inventory, and customer data while maintaining full accounting traceability through double-entry bookkeeping.
 
-# Run in production mode
-dotnet run -c Release
+### Key Highlights
+
+✅ **Clean Architecture** - Layered design with clear separation of concerns (API, Application, Domain, Infrastructure)  
+✅ **Domain-Driven Design** - Rich domain model with aggregates, value objects, policies, specifications, and domain events  
+✅ **Automated Accounting** - Double-entry bookkeeping system compliant with Brazilian GAAP (NBC TG)  
+✅ **Enterprise Observability** - Full OpenTelemetry integration for distributed tracing and metrics  
+✅ **Production Ready** - Docker support, health checks, graceful shutdown, structured logging  
+✅ **Developer Experience** - Interactive API documentation with Scalar UI, automated database seeding  
+✅ **Security First** - JWT authentication, role-based authorization, password hashing with BCrypt
+
+---
+
+## ✨ Features
+
+### Core Functionality
+
+-   **Authentication & Authorization**
+
+    -   JWT-based authentication with configurable expiration
+    -   Role-based access control (Admin, Manager, Customer)
+    -   Password hashing using BCrypt
+    -   Token refresh and validation
+
+-   **Product Management**
+
+    -   Full CRUD operations with pagination
+    -   Advanced search and filtering (category, price, rating)
+    -   Featured products and sales management
+    -   SKU-based inventory tracking
+    -   Product specifications with value objects
+
+-   **Inventory & Accounting**
+
+    -   Real-time inventory tracking across multiple locations
+    -   Automatic double-entry accounting for all inventory movements
+    -   Transaction types: Purchase, Sale, Return, Adjustment, Loss, Transfer
+    -   Full audit trail with traceability
+    -   Chart of accounts seeded with 40+ predefined accounts
+    -   Financial reports support (COGS, Trial Balance, Income Statement)
+
+-   **Business Rules Engine**
+
+    -   Pricing policies with discount validation
+    -   Stock management with low-stock alerts
+    -   Order validation and lifecycle management
+    -   Coupon validation with usage limits
+    -   Review moderation policies
+    -   Fraud detection scoring
+
+-   **Domain-Driven Design**
+    -   Value Objects: Money, Discount, EmailAddress, SKU
+    -   Policies: Pricing, Stock Management, Order Validation, Coupon Validation
+    -   Specifications: Product and Order filtering criteria
+    -   Domain Services: Discount Calculation, Order Lifecycle, Product Pricing, Fraud Detection
+    -   Domain Events: Order Placed, Stock Alert, Product Price Changed, etc.
+
+---
+
+## 🏗️ Architecture
+
+The solution follows **Clean Architecture** principles with four distinct layers:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                       Presentation Layer                     │
+│                         (src/API)                            │
+│  • Controllers (Auth, Products, Users, Accounting)          │
+│  • Middlewares (Exception Handling)                         │
+│  • OpenAPI/Scalar Documentation                             │
+│  • OpenTelemetry Configuration                              │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────────────┐
+│                     Application Layer                        │
+│                    (src/Application)                         │
+│  • Application Services (JWT, Password, Accounting)         │
+│  • DTOs (Data Transfer Objects)                             │
+│  • Interfaces (Service Contracts)                           │
+│  • Mappings (AutoMapper profiles)                           │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────────────┐
+│                       Domain Layer                           │
+│                      (src/Domain)                            │
+│  • Entities & Aggregates (User, Product, Order, etc.)      │
+│  • Value Objects (Money, Discount, Email, SKU)              │
+│  • Domain Services (Pricing, Order Lifecycle, Fraud)        │
+│  • Policies (Pricing, Stock, Order, Coupon, Review)         │
+│  • Specifications (Product, Order filtering)                │
+│  • Domain Events (OrderPlaced, StockAlert, etc.)            │
+│  • Domain Exceptions (Business rule violations)             │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────────────┐
+│                   Infrastructure Layer                       │
+│                   (src/Infrastructure)                       │
+│  • DbContext (PostgresqlContext - EF Core)                  │
+│  • Entity Configurations (Fluent API)                       │
+│  • Repositories (Generic + Specialized)                     │
+│  • Migrations (Code-First Database)                         │
+│  • Database Seeders (Admin User, Chart of Accounts)         │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Database Migrations
+### Dependency Flow
 
-```bash
-# Add a new migration
-dotnet ef migrations add MigrationName
+-   **API** → Application → Domain ← Infrastructure
+-   Dependencies flow inward; Domain has no external dependencies
+-   Infrastructure implements interfaces defined in Domain/Application
 
-# Update the database
+### Key Design Patterns
+
+-   **Repository Pattern** - Data access abstraction
+-   **Unit of Work** - EF Core DbContext
+-   **Specification Pattern** - Reusable query criteria
+-   **Domain Events** - Decoupled business logic
+-   **Value Objects** - Immutable, self-validating domain concepts
+-   **Aggregate Root** - Consistency boundaries
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend Framework
+
+-   **ASP.NET Core 9.0** - High-performance web framework
+-   **C# 12** - Latest language features
+
+### Data & Persistence
+
+-   **PostgreSQL 16** - Robust relational database
+-   **Entity Framework Core 9.0** - ORM with code-first migrations
+-   **Npgsql 9.0** - PostgreSQL provider for EF Core
+
+### Authentication & Security
+
+-   **JWT Bearer Authentication** - Stateless authentication
+-   **BCrypt** - Password hashing
+-   **Role-Based Authorization** - Fine-grained access control
+
+### API Documentation
+
+-   **Microsoft.AspNetCore.OpenApi** - OpenAPI 3.0 specification
+-   **Scalar.AspNetCore 2.9** - Modern, interactive API documentation UI
+
+### Observability & Monitoring
+
+-   **OpenTelemetry 1.13** - Distributed tracing and metrics
+-   **OpenTelemetry.Instrumentation.AspNetCore** - HTTP request tracing
+-   **OpenTelemetry.Instrumentation.EntityFrameworkCore** - Database query tracing
+-   **OpenTelemetry.Instrumentation.Http** - HTTP client tracing
+-   **OpenTelemetry.Instrumentation.Runtime** - .NET runtime metrics
+-   **OpenTelemetry.Exporter.OpenTelemetryProtocol** - OTLP/gRPC exporter
+-   **Jaeger** - Distributed tracing UI (Docker image)
+
+### Containerization & Orchestration
+
+-   **Docker** - Application containerization
+-   **Docker Compose** - Multi-container orchestration
+-   **Alpine Linux** - Minimal base images for security and size
+
+### Development Tools
+
+-   **.NET CLI** - Command-line interface for .NET
+-   **EF Core CLI** - Database migrations and scaffolding
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+-   [.NET SDK 9.0+](https://dotnet.microsoft.com/download)
+-   [Docker Desktop](https://www.docker.com/products/docker-desktop) (for containerized development)
+-   [PostgreSQL 16+](https://www.postgresql.org/download/) (optional, if running without Docker)
+-   [Git](https://git-scm.com/downloads)
+
+### Local Development
+
+#### 1. Clone the Repository
+
+```powershell
+git clone https://github.com/mgnischor/ecommerce-backend.git
+cd ecommerce-backend
+```
+
+#### 2. Start PostgreSQL (Docker)
+
+```powershell
+docker run --name ecommerce-postgres -e POSTGRES_USER=ecommerce -e POSTGRES_PASSWORD=ecommerce -e POSTGRES_DB=ecommerce_dev -p 5432:5432 -d postgres:16-alpine
+```
+
+#### 3. Restore Dependencies
+
+```powershell
+dotnet restore
+```
+
+#### 4. Apply Database Migrations
+
+```powershell
 dotnet ef database update
+```
 
-# Generate SQL script
-dotnet ef migrations script
+#### 5. Run the Application
 
-# Revert last migration
+```powershell
+dotnet run
+```
+
+The API will be available at:
+
+-   **HTTPS**: `https://localhost:5049`
+-   **HTTP**: `http://localhost:5048`
+-   **API Docs**: `https://localhost:5049/docs`
+
+#### 6. Default Credentials
+
+On first run, an admin user is automatically seeded:
+
+-   **Email**: `admin@ecommerce.com.br`
+-   **Password**: `admin`
+
+> ⚠️ **Important**: Change these credentials immediately in production!
+
+### Docker Compose
+
+#### Development Mode (with Jaeger)
+
+```powershell
+docker-compose -f docker-compose.dev.yml up -d
+```
+
+**Services:**
+
+-   API: `http://localhost:5049`
+-   API Docs: `http://localhost:5049/docs`
+-   PostgreSQL: `localhost:5432`
+-   Jaeger UI: `http://localhost:16686`
+
+#### Production Mode
+
+```powershell
+docker-compose up -d
+```
+
+**Services:**
+
+-   API: `http://localhost`
+-   PostgreSQL: `localhost:5432`
+-   Jaeger UI: `http://localhost:16686`
+
+#### Stop Services
+
+```powershell
+# Development
+docker-compose -f docker-compose.dev.yml down
+
+# Production
+docker-compose down
+
+# Remove volumes (database data)
+docker-compose down -v
+```
+
+---
+
+## ⚙️ Configuration
+
+---
+
+## ⚙️ Configuration
+
+### Application Settings
+
+Configuration is managed through `appsettings.json` and `appsettings.Development.json`. Settings can be overridden via environment variables using the double-underscore syntax.
+
+#### Connection Strings
+
+```json
+{
+    "ConnectionStrings": {
+        "DefaultConnection": "Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432"
+    }
+}
+```
+
+**Environment Variable:**
+
+```powershell
+$env:ConnectionStrings__DefaultConnection = "Host=localhost;Database=ecommerce_dev;Username=ecommerce;Password=ecommerce;Port=5432"
+```
+
+#### JWT Configuration
+
+```json
+{
+    "Jwt": {
+        "SecretKey": "your-secret-key-min-32-chars",
+        "Issuer": "ECommerceBackend",
+        "Audience": "ECommerceClient",
+        "ExpirationMinutes": "60"
+    }
+}
+```
+
+**Environment Variables:**
+
+```powershell
+$env:Jwt__SecretKey = "your-strong-secret-key-here"
+$env:Jwt__Issuer = "ECommerceBackend"
+$env:Jwt__Audience = "ECommerceClient"
+$env:Jwt__ExpirationMinutes = "60"
+```
+
+#### OpenTelemetry Configuration
+
+```json
+{
+    "OpenTelemetry": {
+        "ServiceName": "ECommerce.Backend",
+        "ServiceVersion": "0.0.10",
+        "EnableConsoleExporter": false,
+        "OtlpEndpoint": ""
+    }
+}
+```
+
+**Environment Variables:**
+
+```powershell
+$env:OpenTelemetry__ServiceName = "ECommerce.Backend"
+$env:OpenTelemetry__ServiceVersion = "0.0.10"
+$env:OpenTelemetry__EnableConsoleExporter = "true"
+$env:OpenTelemetry__OtlpEndpoint = "http://localhost:4317"
+```
+
+#### Logging Configuration
+
+```json
+{
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning",
+            "Microsoft.EntityFrameworkCore": "Warning"
+        }
+    }
+}
+```
+
+---
+
+## 💾 Database Management
+
+### Migrations
+
+The project uses **Entity Framework Core Code-First Migrations** for database schema management.
+
+#### Apply Latest Migrations
+
+```powershell
+dotnet ef database update
+```
+
+#### Create a New Migration
+
+```powershell
+dotnet ef migrations add <MigrationName> --output-dir src/Infrastructure/Migrations --context PostgresqlContext
+```
+
+#### Generate SQL Script
+
+```powershell
+dotnet ef migrations script --output migrations.sql
+```
+
+#### Remove Last Migration
+
+```powershell
 dotnet ef migrations remove
 ```
 
-## 📚 API Endpoints
+### Database Seeding
+
+The application automatically seeds the database on first run:
+
+1. **Admin User**
+
+    - Email: `admin@ecommerce.com.br`
+    - Password: `admin`
+    - Role: Admin
+
+2. **Chart of Accounts** (40+ accounts)
+    - Assets (Cash, Bank, Inventory, Receivables)
+    - Liabilities (Payables, Loans, Taxes)
+    - Equity (Capital, Retained Earnings)
+    - Revenue (Sales, Services, Other Income)
+    - Expenses (COGS, Operating, Financial)
+
+Seeding logic: `src/Infrastructure/Persistence/DatabaseSeeder.cs`
+
+### Helper Scripts
+
+PowerShell scripts are available in the `scripts/` directory:
+
+-   **`build-local.ps1`** - Complete build pipeline (version bump, migration, build, publish, SQL export)
+-   **`migration-script.ps1`** - Export migration SQL scripts
+-   **`update-version.ps1`** - Bump project version
+
+---
+
+## 📡 API Reference
+
+### Base URL
+
+-   **Development**: `https://localhost:5049/api/v1`
+-   **Docker (Dev)**: `http://localhost:5049/api/v1`
+-   **Docker (Prod)**: `http://localhost/api/v1`
+
+### Authentication Endpoints
+
+#### Login
+
+```http
+POST /api/v1/login
+Content-Type: application/json
+
+{
+  "email": "admin@ecommerce.com.br",
+  "password": "admin"
+}
+```
+
+**Response:**
+
+```json
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expiresIn": 3600,
+    "tokenType": "Bearer",
+    "userId": "...",
+    "email": "admin@ecommerce.com.br",
+    "accessLevel": "Admin"
+}
+```
+
+### Product Endpoints
+
+| Method | Endpoint                             | Description                   | Auth          |
+| ------ | ------------------------------------ | ----------------------------- | ------------- |
+| GET    | `/products`                          | List all products (paginated) | No            |
+| GET    | `/products/{id}`                     | Get product by ID             | No            |
+| GET    | `/products/sku/{sku}`                | Get product by SKU            | No            |
+| GET    | `/products/category/{id}`            | Get products by category      | No            |
+| GET    | `/products/featured`                 | Get featured products         | No            |
+| GET    | `/products/on-sale`                  | Get products on sale          | No            |
+| GET    | `/products/search?searchTerm={term}` | Search products               | No            |
+| POST   | `/products`                          | Create product                | Admin/Manager |
+| PUT    | `/products/{id}`                     | Update product                | Admin/Manager |
+| PATCH  | `/products/{id}/soft-delete`         | Soft delete product           | Admin/Manager |
+| DELETE | `/products/{id}`                     | Hard delete product           | Admin         |
+
+### User Endpoints
+
+| Method | Endpoint      | Description                | Auth |
+| ------ | ------------- | -------------------------- | ---- |
+| GET    | `/users`      | List all users (paginated) | Yes  |
+| GET    | `/users/{id}` | Get user by ID             | Yes  |
+| POST   | `/users`      | Create user                | Yes  |
+| PUT    | `/users/{id}` | Update user                | Yes  |
+| DELETE | `/users/{id}` | Delete user                | Yes  |
+
+### Inventory Transaction Endpoints
+
+| Method | Endpoint                                                 | Description                | Auth |
+| ------ | -------------------------------------------------------- | -------------------------- | ---- |
+| POST   | `/inventory-transactions`                                | Record transaction         | Yes  |
+| GET    | `/inventory-transactions/{id}`                           | Get transaction by ID      | Yes  |
+| GET    | `/inventory-transactions/product/{id}`                   | Get product transactions   | Yes  |
+| GET    | `/inventory-transactions/period?startDate={}&endDate={}` | Get transactions by period | Yes  |
+
+### Accounting Endpoints
+
+| Method | Endpoint                                   | Description                      | Auth |
+| ------ | ------------------------------------------ | -------------------------------- | ---- |
+| GET    | `/accounting/chart-of-accounts`            | List all accounts                | Yes  |
+| GET    | `/accounting/chart-of-accounts/{id}`       | Get account by ID                | Yes  |
+| GET    | `/accounting/journal-entries`              | List journal entries (paginated) | Yes  |
+| GET    | `/accounting/journal-entries/{id}`         | Get journal entry by ID          | Yes  |
+| GET    | `/accounting/journal-entries/product/{id}` | Get entries by product           | Yes  |
 
 ### Authentication
 
--   `POST /api/v1/login` - Authenticate user and get JWT token
--   `GET /api/v1/endpoints` - List available endpoints
--   `OPTIONS /api/v1` - Get allowed HTTP methods
+Protected endpoints require a JWT token in the `Authorization` header:
 
-### Users
-
--   `GET /api/v1/users` - List all users (paginated)
--   `GET /api/v1/users/{id}` - Get user by ID
--   `POST /api/v1/users` - Create new user
--   `PUT /api/v1/users/{id}` - Update user
--   `DELETE /api/v1/users/{id}` - Delete user (soft delete)
-
-### Products
-
--   `GET /api/v1/products` - List all products (paginated)
--   `GET /api/v1/products/{id}` - Get product by ID
--   `GET /api/v1/products/sku/{sku}` - Get product by SKU
--   `GET /api/v1/products/category/{category}` - Filter by category
--   `GET /api/v1/products/featured` - Get featured products
--   `GET /api/v1/products/on-sale` - Get products on sale
--   `GET /api/v1/products/search?name={name}` - Search by name
--   `POST /api/v1/products` - Create product (Admin/Manager)
--   `PUT /api/v1/products/{id}` - Update product (Admin/Manager)
--   `DELETE /api/v1/products/{id}` - Delete product (Admin)
--   `PATCH /api/v1/products/{id}/soft-delete` - Soft delete (Admin/Manager)
-
-### Inventory Transactions
-
--   `POST /api/v1/inventory-transactions` - Record new transaction
--   `GET /api/v1/inventory-transactions/{id}` - Get transaction by ID
--   `GET /api/v1/inventory-transactions/product/{productId}` - Get product transaction history
-
-### Accounting
-
--   `GET /api/v1/accounting/chart-of-accounts` - List all accounts
--   `GET /api/v1/accounting/chart-of-accounts/{id}` - Get account by ID
--   `POST /api/v1/accounting/chart-of-accounts` - Create new account
--   `GET /api/v1/accounting/journal-entries` - List all journal entries
--   `GET /api/v1/accounting/journal-entries/{id}` - Get entry by ID
-
-## 📖 API Documentation
-
-When running in development mode, access the interactive API documentation:
-
--   **Scalar UI**: `http://localhost:5049/docs`
--   **OpenAPI JSON**: `http://localhost:5049/openapi/v1.json`
-
-### Additional Documentation
-
--   **[OpenTelemetry Guide](docs/OPENTELEMETRY_GUIDE.md)** - Complete guide for distributed tracing and observability
--   **[Running with Jaeger](docs/RUNNING_WITH_JAEGER.md)** - How to run the application with Jaeger for tracing
--   **[Accounting System](docs/ACCOUNTING_SYSTEM.md)** - Detailed documentation about the integrated accounting system
--   **[Accounting Integration Guide](docs/ACCOUNTING_INTEGRATION_GUIDE.md)** - How to use the accounting features in your code
--   **[Business Rules](docs/BUSINESS_RULES.md)** - Business rules and validation logic
--   **[Security Review](docs/SECURITY_REVIEW.md)** - Security considerations and best practices
--   **[Changelog](CHANGELOG.md)** - Version history and changes
-
-## 🏗 Building and Deployment
-
-### Local Build
-
-Use the provided PowerShell script:
-
-```powershell
-.\scripts\build-local.ps1
+```http
+Authorization: Bearer <your-jwt-token>
 ```
 
-Or manually:
+### Interactive API Documentation
 
-```bash
-dotnet build -c Release
-dotnet publish -c Release -o ./publish
+Access the **Scalar UI** at `/docs` for interactive API exploration:
+
+-   Try out endpoints directly from the browser
+-   View request/response schemas
+-   Download OpenAPI specification (JSON/YAML)
+-   Explore all available operations
+
+---
+
+## 📊 Observability
+
+---
+
+## 📊 Observability
+
+The application is fully instrumented with **OpenTelemetry** for distributed tracing, metrics, and logging.
+
+### Instrumentation
+
+Automatic instrumentation is enabled for:
+
+-   **ASP.NET Core** - HTTP request/response tracking with status codes, durations, and exceptions
+-   **Entity Framework Core** - Database queries with SQL statements and execution times
+-   **HTTP Client** - Outgoing HTTP requests with URIs and response codes
+-   **.NET Runtime** - Garbage collection, thread pool, and exception metrics
+
+### Distributed Tracing
+
+#### Jaeger UI
+
+When running with Docker Compose, Jaeger is available at:
+
+**URL**: `http://localhost:16686`
+
+**Features:**
+
+-   View end-to-end request traces
+-   Analyze service dependencies
+-   Identify performance bottlenecks
+-   Troubleshoot errors with full stack traces
+-   Monitor request latency percentiles (p50, p75, p95, p99)
+
+#### Custom Tracing
+
+Add custom spans to your code:
+
+```csharp
+using ECommerce.API.Extensions;
+
+public async Task<Order> ProcessOrderAsync(Guid orderId)
+{
+    using var activity = ActivityHelper.StartActivity("ProcessOrder");
+    activity?.SetTag("order.id", orderId);
+
+    try
+    {
+        // Your business logic
+        var order = await _orderRepository.GetByIdAsync(orderId);
+
+        ActivityHelper.AddEvent("OrderRetrieved");
+        ActivityHelper.SetStatus(ActivityStatusCode.Ok);
+
+        return order;
+    }
+    catch (Exception ex)
+    {
+        ActivityHelper.RecordException(ex);
+        throw;
+    }
+}
 ```
 
-### Docker Build
+### Metrics
 
-```bash
-# Using script
-.\scripts\build-docker.cmd
+Available metrics include:
 
-# Or manually
-docker build -t ecommerce-backend:latest .
-docker run -p 80:80 ecommerce-backend:latest
+-   **HTTP Metrics**
+
+    -   `http.server.request.duration` - Request duration histogram
+    -   `http.server.active_requests` - Active requests gauge
+
+-   **Database Metrics**
+
+    -   Query execution times
+    -   Connection pool statistics
+
+-   **Runtime Metrics**
+    -   `process.runtime.dotnet.gc.collections.count` - GC collections
+    -   `process.runtime.dotnet.thread_pool.threads.count` - Thread pool size
+    -   `process.runtime.dotnet.exceptions.count` - Exception count
+
+### Exporters
+
+#### Console Exporter (Development)
+
+Enable in `appsettings.Development.json`:
+
+```json
+{
+    "OpenTelemetry": {
+        "EnableConsoleExporter": true
+    }
+}
 ```
 
-### Version Management
+Traces and metrics will be printed to the console.
 
-Update version in `version.txt` and the build script will automatically update:
+#### OTLP Exporter (Production)
 
--   `ecommerce-backend.csproj`
--   Assembly versions
--   Docker image tags
+Configure the OTLP endpoint for your observability backend:
 
-## 🗄️ Database Schema
+**Jaeger:**
 
-The application includes the following tables:
+```json
+{
+    "OpenTelemetry": {
+        "OtlpEndpoint": "http://jaeger:4317"
+    }
+}
+```
 
-### Core Tables
+**Grafana Cloud / Tempo:**
 
--   **users** - User accounts and profiles
--   **products** - Product catalog
--   **categories** - Product categories (hierarchical)
+```json
+{
+    "OpenTelemetry": {
+        "OtlpEndpoint": "https://otlp-gateway-prod-us-central-0.grafana.net/otlp"
+    }
+}
+```
 
-### E-Commerce Tables
+**Honeycomb:**
 
--   **orders** - Customer orders
--   **order_items** - Order line items
--   **carts** - Shopping carts
--   **cart_items** - Cart line items
--   **payments** - Payment transactions
--   **reviews** - Product reviews
--   **wishlists** - Customer wishlists
--   **wishlist_items** - Wishlist items
--   **addresses** - Shipping/billing addresses
--   **coupons** - Discount coupons
--   **inventories** - Inventory tracking
+```json
+{
+    "OpenTelemetry": {
+        "OtlpEndpoint": "https://api.honeycomb.io:443"
+    }
+}
+```
 
-### Accounting Tables
+### Structured Logging
 
--   **chart_of_accounts** - Chart of accounts
--   **journal_entries** - Journal entries
--   **accounting_entries** - Individual debit/credit entries
--   **inventory_transactions** - Inventory movements with accounting integration
+All logs include contextual information:
+
+```csharp
+_logger.LogInformation(
+    "Order created: OrderId={OrderId}, CustomerId={CustomerId}, Total={Total}",
+    order.Id,
+    order.CustomerId,
+    order.TotalAmount
+);
+```
+
+**Log Levels:**
+
+-   `Trace` - Very detailed diagnostic information
+-   `Debug` - Debugging information
+-   `Information` - General informational messages
+-   `Warning` - Warnings that don't prevent execution
+-   `Error` - Errors that stop the current operation
+-   `Critical` - Critical errors that require immediate attention
+
+---
+
+## 🧪 Testing
+
+### Unit Tests
+
+> ⚠️ **Note**: Unit test project is planned but not yet implemented.
+
+Recommended structure:
+
+```
+tests/
+├── ECommerce.UnitTests/
+│   ├── Domain/
+│   │   ├── Policies/
+│   │   ├── Services/
+│   │   └── ValueObjects/
+│   └── Application/
+│       └── Services/
+```
+
+### Integration Tests
+
+> ⚠️ **Note**: Integration test project is planned but not yet implemented.
+
+Recommended tools:
+
+-   **xUnit** - Test framework
+-   **FluentAssertions** - Assertion library
+-   **Testcontainers** - Docker-based integration tests
+-   **WebApplicationFactory** - In-memory API testing
+
+### Manual Testing
+
+Use the interactive **Scalar UI** at `/docs` to manually test endpoints.
+
+---
+
+## 📚 Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+
+### Business & Architecture
+
+-   **[BUSINESS_RULES.md](docs/BUSINESS_RULES.md)** - Domain policies, specifications, value objects, and business logic
+-   **[ACCOUNTING_SYSTEM.md](docs/ACCOUNTING_SYSTEM.md)** - Double-entry accounting implementation following NBC TG
+-   **[ACCOUNTING_INTEGRATION_GUIDE.md](docs/ACCOUNTING_INTEGRATION_GUIDE.md)** - How to integrate accounting in your code
+
+### Observability
+
+-   **[OPENTELEMETRY_GUIDE.md](docs/OPENTELEMETRY_GUIDE.md)** - Complete OpenTelemetry setup and custom instrumentation
+-   **[RUNNING_WITH_JAEGER.md](docs/RUNNING_WITH_JAEGER.md)** - Running and troubleshooting with Jaeger
+
+### Project Management
+
+-   **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
+-   **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+-   **[SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md)** - Security considerations and best practices
+
+---
+
+## 🔒 Security
+
+### Authentication
+
+-   **JWT Bearer Tokens** with configurable expiration
+-   **BCrypt password hashing** with salt
+-   **Role-based authorization** (Admin, Manager, Customer)
+
+### Best Practices
+
+✅ **Never commit secrets** - Use environment variables or secure vaults  
+✅ **Strong JWT secret** - Minimum 32 characters, randomly generated  
+✅ **HTTPS in production** - Enable SSL/TLS certificates  
+✅ **Input validation** - All DTOs use data annotations  
+✅ **SQL injection protection** - EF Core parameterized queries  
+✅ **CORS configuration** - Configure allowed origins in production  
+✅ **Rate limiting** - Implement rate limiting middleware (planned)  
+✅ **Security headers** - Add HSTS, CSP, X-Frame-Options (planned)
+
+### Production Checklist
+
+Before deploying to production:
+
+-   [ ] Change default admin credentials
+-   [ ] Use strong, randomly generated JWT secret key
+-   [ ] Enable HTTPS with valid SSL certificates
+-   [ ] Configure CORS for specific origins
+-   [ ] Set up database backups and disaster recovery
+-   [ ] Enable application insights and monitoring
+-   [ ] Review and implement security headers
+-   [ ] Configure rate limiting and throttling
+-   [ ] Set up Web Application Firewall (WAF)
+-   [ ] Perform security audit and penetration testing
+
+See **[SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md)** for detailed security guidelines.
+
+---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on:
+Contributions are welcome! Please follow these guidelines:
 
--   Code of Conduct
--   Development workflow
--   Pull request process
--   Coding standards
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Commit your changes** (`git commit -m 'Add amazing feature'`)
+4. **Push to the branch** (`git push origin feature/amazing-feature`)
+5. **Open a Pull Request**
 
-### Development Workflow
+### Code Standards
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run tests and ensure code quality
-5. Commit your changes (`git commit -m 'Add some amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+-   Follow **Clean Architecture** principles
+-   Write **meaningful commit messages**
+-   Add **XML documentation** to public APIs
+-   Follow **.NET coding conventions**
+-   Ensure **no breaking changes** without discussion
+-   Update documentation for new features
+
+Read **[CONTRIBUTING.md](CONTRIBUTING.md)** for detailed contribution guidelines.
+
+---
 
 ## 📄 License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the **GNU General Public License v3.0** (GPL-3.0-only).
 
-### Summary
+See the [LICENSE.md](LICENSE.md) file for full license text.
 
--   ✅ You can use this software for commercial purposes
--   ✅ You can modify and distribute it
--   ✅ You can use it privately
--   ⚠️ You must disclose the source code
--   ⚠️ You must include the license and copyright notice
--   ⚠️ Changes must be documented
+### Key Points
 
-## 👤 Author
+-   ✅ You can use, modify, and distribute this software
+-   ✅ You must disclose source code when distributing
+-   ✅ You must use the same GPL-3.0 license for derivative works
+-   ✅ You must state changes made to the code
+-   ❌ No warranty or liability is provided
+
+---
+
+## 👨‍💻 Author
 
 **Miguel Nischor**
 
 -   GitHub: [@mgnischor](https://github.com/mgnischor)
 -   Repository: [ecommerce-backend](https://github.com/mgnischor/ecommerce-backend)
 
-## 📞 Support
+---
 
-If you have any questions or need help:
+## 🙏 Acknowledgments
 
--   Open an [issue](https://github.com/mgnischor/ecommerce-backend/issues) on GitHub
--   Check the [documentation](docs/)
--   Review the [changelog](CHANGELOG.md)
-
-## 🗺️ Roadmap
-
-### Planned Features
-
--   [ ] Shopping cart API endpoints
--   [ ] Order processing and management
--   [ ] Payment gateway integration
--   [ ] Email notifications
--   [ ] File upload for product images
--   [ ] Real-time inventory updates
--   [ ] Advanced search with filters
--   [ ] Caching layer
--   [ ] Rate limiting
--   [ ] API versioning
-
-### Completed
-
--   [x] User management with authentication
--   [x] Product catalog with categories
--   [x] JWT authentication & authorization
--   [x] Integrated accounting system
--   [x] Inventory tracking with transactions
--   [x] OpenTelemetry integration
--   [x] Comprehensive logging
--   [x] Docker containerization
-
-## 📊 Project Statistics
-
--   **Version**: 0.0.11
--   **Last Updated**: October 2025
--   **Database Tables**: 16
--   **API Endpoints**: 25+
--   **Controllers**: 5
--   **Architecture**: Clean Architecture
--   **License**: GPL-3.0
+-   **ASP.NET Core Team** - For the excellent framework
+-   **EF Core Team** - For the powerful ORM
+-   **OpenTelemetry Community** - For observability standards
+-   **PostgreSQL Team** - For the robust database
+-   **Scalar Team** - For the beautiful API documentation UI
 
 ---
 
-**Repository**: [https://github.com/mgnischor/ecommerce-backend](https://github.com/mgnischor/ecommerce-backend)
+<div align="center">
 
-**Documentation**: [docs/](docs/)
+**⭐ If you find this project useful, please consider giving it a star! ⭐**
 
-**License**: [GPL-3.0](LICENSE.md)
+Made with ❤️ using ASP.NET Core 9
+
+</div>
