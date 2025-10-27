@@ -105,4 +105,5 @@ echo.
 echo Location: src\Infrastructure\SQL\
 echo.
 
-pause
+REM Only pause if running directly (not called from another script)
+if "%1"=="" pause
