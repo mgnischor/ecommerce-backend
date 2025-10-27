@@ -13,12 +13,14 @@ public sealed class ProductController : ControllerBase
 {
     private readonly ProductRepository _productRepository;
     private readonly PostgresqlContext _context;
+    private readonly ILogger<ProductController> _logger;
 
-    public ProductController(ProductRepository productRepository, PostgresqlContext context)
+    public ProductController(ProductRepository productRepository, PostgresqlContext context, ILogger<ProductController> logger)
     {
         _productRepository =
             productRepository ?? throw new ArgumentNullException(nameof(productRepository));
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <summary>
@@ -37,11 +39,19 @@ public sealed class ProductController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Getting all products - Page: {PageNumber}, PageSize: {PageSize}", pageNumber, pageSize);
+
         if (pageNumber < 1)
+        {
+            _logger.LogWarning("Invalid page number: {PageNumber}", pageNumber);
             return BadRequest("Page number must be greater than 0");
+        }
 
         if (pageSize < 1 || pageSize > 100)
+        {
+            _logger.LogWarning("Invalid page size: {PageSize}", pageSize);
             return BadRequest("Page size must be between 1 and 100");
+        }
 
         var products = await _productRepository.GetPagedAsync(
             pageNumber,
@@ -49,6 +59,8 @@ public sealed class ProductController : ControllerBase
             cancellationToken
         );
         var totalCount = await _productRepository.GetCountAsync(cancellationToken);
+
+        _logger.LogInformation("Retrieved {Count} products out of {TotalCount} total", products.Count, totalCount);
 
         Response.Headers.Append("X-Total-Count", totalCount.ToString());
         Response.Headers.Append("X-Page-Number", pageNumber.ToString());
@@ -185,17 +197,27 @@ public sealed class ProductController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Creating new product with SKU: {Sku}", newProduct?.Sku ?? "null");
+
         if (newProduct == null)
+        {
+            _logger.LogWarning("Attempt to create product with null data");
             return BadRequest("Product data is required");
+        }
 
         if (await _productRepository.ExistsBySkuAsync(newProduct.Sku, cancellationToken))
+        {
+            _logger.LogWarning("Attempt to create product with duplicate SKU: {Sku}", newProduct.Sku);
             return Conflict(new { Message = $"Product with SKU '{newProduct.Sku}' already exists" });
+        }
 
         newProduct.CreatedAt = DateTime.UtcNow;
         newProduct.UpdatedAt = DateTime.UtcNow;
 
         await _productRepository.AddAsync(newProduct, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Successfully created product: {ProductId}, SKU: {Sku}", newProduct.Id, newProduct.Sku);
 
         return CreatedAtAction(nameof(GetProductById), new { id = newProduct.Id }, newProduct);
     }
@@ -219,29 +241,45 @@ public sealed class ProductController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Updating product: {ProductId}", id);
+
         if (updatedProduct == null)
+        {
+            _logger.LogWarning("Attempt to update product with null data for ID: {ProductId}", id);
             return BadRequest("Product data is required");
+        }
 
         if (id != updatedProduct.Id)
+        {
+            _logger.LogWarning("Product ID mismatch in update request. URL ID: {UrlId}, Body ID: {BodyId}", id, updatedProduct.Id);
             return BadRequest("ID mismatch");
+        }
 
         var existingProduct = await _productRepository.GetByIdAsync(id, cancellationToken);
         if (existingProduct == null)
+        {
+            _logger.LogWarning("Attempt to update non-existent product: {ProductId}", id);
             return NotFound(new { Message = $"Product with ID '{id}' not found" });
+        }
 
         var skuExists = await _productRepository.ExistsBySkuAsync(
             updatedProduct.Sku,
             cancellationToken
         );
         if (skuExists && existingProduct.Sku != updatedProduct.Sku)
+        {
+            _logger.LogWarning("Attempt to update product {ProductId} with duplicate SKU: {Sku}", id, updatedProduct.Sku);
             return Conflict(
                 new { Message = $"Product with SKU '{updatedProduct.Sku}' already exists" }
             );
+        }
 
         updatedProduct.UpdatedAt = DateTime.UtcNow;
 
         _productRepository.Update(updatedProduct);
         await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Successfully updated product: {ProductId}", id);
 
         return NoContent();
     }
@@ -261,12 +299,19 @@ public sealed class ProductController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Hard deleting product: {ProductId}", id);
+
         var deleted = await _productRepository.RemoveByIdAsync(id, cancellationToken);
 
         if (!deleted)
+        {
+            _logger.LogWarning("Attempt to delete non-existent product: {ProductId}", id);
             return NotFound(new { Message = $"Product with ID '{id}' not found" });
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Successfully deleted product: {ProductId}", id);
 
         return NoContent();
     }
@@ -286,12 +331,19 @@ public sealed class ProductController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Soft deleting product: {ProductId}", id);
+
         var deleted = await _productRepository.SoftDeleteAsync(id, cancellationToken);
 
         if (!deleted)
+        {
+            _logger.LogWarning("Attempt to soft delete non-existent product: {ProductId}", id);
             return NotFound(new { Message = $"Product with ID '{id}' not found" });
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Successfully soft deleted product: {ProductId}", id);
 
         return NoContent();
     }
