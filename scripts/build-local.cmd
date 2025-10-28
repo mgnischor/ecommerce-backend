@@ -5,6 +5,7 @@ cd ..
 
 echo ====================================
 echo  Ecommerce Backend Build Script
+echo  (Uses LOCAL PostgreSQL)
 echo ====================================
 echo.
 
