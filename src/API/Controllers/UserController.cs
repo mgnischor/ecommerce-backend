@@ -6,6 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
 
+/// <summary>
+/// User management endpoints
+/// </summary>
+/// <remarks>
+/// Provides comprehensive user account management including CRUD operations.
+/// All endpoints require authentication. User passwords are stored securely using BCrypt hashing.
+/// </remarks>
+[Tags("Users")]
 [ApiController]
 [Route("api/v1/users")]
 [Produces("application/json")]
@@ -30,13 +38,32 @@ public sealed class UserController : ControllerBase
     /// <summary>
     /// Retrieves all users with pagination support
     /// </summary>
-    /// <param name="pageNumber">Page number (default: 1)</param>
-    /// <param name="pageSize">Page size (default: 10, max: 100)</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Paginated list of users</returns>
+    /// <remarks>
+    /// Returns a paginated list of all registered users. Pagination headers are included in the response.
+    ///
+    /// Sample request:
+    ///
+    ///     GET /api/v1/users?pageNumber=1&amp;pageSize=20
+    ///
+    /// Response headers:
+    /// - X-Total-Count: Total number of users in the system
+    /// - X-Page-Number: Current page number
+    /// - X-Page-Size: Number of items per page
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// </remarks>
+    /// <param name="pageNumber">Page number (1-based, default: 1, minimum: 1)</param>
+    /// <param name="pageSize">Number of items per page (default: 10, range: 1-100)</param>
+    /// <param name="cancellationToken">Cancellation token for the async operation</param>
+    /// <returns>List of users for the requested page</returns>
+    /// <response code="200">Successfully retrieved the user list. Check response headers for pagination details.</response>
+    /// <response code="400">Invalid pagination parameters. Page number must be >= 1, page size must be between 1 and 100.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(IReadOnlyList<UserEntity>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IReadOnlyList<UserEntity>>> GetAllUsers(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
@@ -78,14 +105,30 @@ public sealed class UserController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves a user by ID
+    /// Retrieves a specific user by their unique identifier
     /// </summary>
-    /// <param name="id">User unique identifier</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>User entity</returns>
+    /// <remarks>
+    /// Returns detailed information about a single user including profile data and roles.
+    ///
+    /// Sample request:
+    ///
+    ///     GET /api/v1/users/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// **Note:** Password hash is included in the response but should never be exposed to clients.
+    ///
+    /// </remarks>
+    /// <param name="id">User unique identifier (GUID)</param>
+    /// <param name="cancellationToken">Cancellation token for the async operation</param>
+    /// <returns>The requested user with all details</returns>
+    /// <response code="200">Successfully retrieved the user.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
+    /// <response code="404">User not found with the specified ID.</response>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserEntity>> GetUserById(
         Guid id,
         CancellationToken cancellationToken = default
@@ -106,15 +149,44 @@ public sealed class UserController : ControllerBase
     }
 
     /// <summary>
-    /// Creates a new user
+    /// Creates a new user account
     /// </summary>
-    /// <param name="newUser">User data</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Created user</returns>
+    /// <remarks>
+    /// Creates a new user with the provided data. Email and username must be unique.
+    /// Password will be hashed using BCrypt before storage.
+    ///
+    /// Sample request:
+    ///
+    ///     POST /api/v1/users
+    ///     {
+    ///        "username": "johndoe",
+    ///        "email": "john.doe@example.com",
+    ///        "password": "SecureP@ssw0rd",
+    ///        "firstName": "John",
+    ///        "lastName": "Doe",
+    ///        "role": "Customer",
+    ///        "isActive": true
+    ///     }
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// **Available roles:** Admin, Manager, Customer
+    ///
+    /// The response includes a Location header with the URI of the newly created user.
+    ///
+    /// </remarks>
+    /// <param name="newUser">User data to create (email and username must be unique)</param>
+    /// <param name="cancellationToken">Cancellation token for the async operation</param>
+    /// <returns>The created user with generated ID</returns>
+    /// <response code="201">Successfully created the user. Location header contains the URI of the new resource.</response>
+    /// <response code="400">Invalid request. User data is required and must pass validation.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
+    /// <response code="409">Conflict. A user with the same email or username already exists.</response>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<UserEntity>> CreateUser(
         [FromBody] UserEntity newUser,
         CancellationToken cancellationToken = default
@@ -161,17 +233,47 @@ public sealed class UserController : ControllerBase
     }
 
     /// <summary>
-    /// Updates an existing user
+    /// Updates an existing user account
     /// </summary>
-    /// <param name="id">User unique identifier</param>
-    /// <param name="updatedUser">Updated user data</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>No content</returns>
+    /// <remarks>
+    /// Replaces all properties of an existing user with the provided data.
+    /// The user ID in the URL must match the ID in the request body.
+    ///
+    /// Sample request:
+    ///
+    ///     PUT /api/v1/users/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    ///     {
+    ///        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    ///        "username": "johndoe",
+    ///        "email": "john.doe.updated@example.com",
+    ///        "password": "NewSecureP@ssw0rd",
+    ///        "firstName": "John",
+    ///        "lastName": "Doe",
+    ///        "role": "Manager",
+    ///        "isActive": true
+    ///     }
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// **Note:** If changing the email, ensure the new email is not already in use.
+    /// If updating the password, it will be re-hashed using BCrypt.
+    ///
+    /// </remarks>
+    /// <param name="id">User unique identifier (must match the ID in request body)</param>
+    /// <param name="updatedUser">Complete updated user data</param>
+    /// <param name="cancellationToken">Cancellation token for the async operation</param>
+    /// <returns>No content on success</returns>
+    /// <response code="204">Successfully updated the user. No content returned.</response>
+    /// <response code="400">Invalid request. ID mismatch or validation errors.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
+    /// <response code="404">User not found with the specified ID.</response>
+    /// <response code="409">Conflict. The new email is already in use by another user.</response>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateUser(
         Guid id,
         [FromBody] UserEntity updatedUser,
@@ -228,14 +330,31 @@ public sealed class UserController : ControllerBase
     }
 
     /// <summary>
-    /// Deletes a user by ID
+    /// Permanently deletes a user account
     /// </summary>
+    /// <remarks>
+    /// Permanently removes a user from the database. This action cannot be undone.
+    ///
+    /// Sample request:
+    ///
+    ///     DELETE /api/v1/users/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// **Warning:** This is a destructive operation. All user data and associated records will be removed.
+    /// Consider deactivating the account instead by setting isActive to false.
+    ///
+    /// </remarks>
     /// <param name="id">User unique identifier</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>No content</returns>
+    /// <param name="cancellationToken">Cancellation token for the async operation</param>
+    /// <returns>No content on success</returns>
+    /// <response code="204">Successfully deleted the user permanently.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
+    /// <response code="404">User not found with the specified ID.</response>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteUser(
         Guid id,
         CancellationToken cancellationToken = default
@@ -259,13 +378,25 @@ public sealed class UserController : ControllerBase
     }
 
     /// <summary>
-    /// Returns available endpoints
+    /// Returns a list of all available endpoints for the Users API
     /// </summary>
-    /// <returns>
-    /// List of available endpoints
-    /// </returns>
+    /// <remarks>
+    /// Provides API discovery by listing all available endpoints with their HTTP methods and paths.
+    /// Useful for client applications to dynamically discover API capabilities.
+    ///
+    /// Sample request:
+    ///
+    ///     GET /api/v1/users/endpoints
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// </remarks>
+    /// <returns>List of available endpoints with methods and paths</returns>
+    /// <response code="200">Successfully retrieved the endpoints list.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
     [HttpGet("endpoints")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult GetEndpoints()
     {
         var endpoints = new[]
@@ -282,10 +413,25 @@ public sealed class UserController : ControllerBase
     }
 
     /// <summary>
-    /// Returns allowed HTTP methods for this endpoint
+    /// Returns allowed HTTP methods for the Users API
     /// </summary>
+    /// <remarks>
+    /// Returns the allowed HTTP methods in the Allow response header.
+    /// Useful for CORS preflight requests and API capability discovery.
+    ///
+    /// Sample request:
+    ///
+    ///     OPTIONS /api/v1/users
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// </remarks>
+    /// <returns>No content with Allow header containing supported methods</returns>
+    /// <response code="204">No content. Check the Allow header for supported HTTP methods.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
     [HttpOptions]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult GetOptions()
     {
         Response.Headers.Append("Allow", "GET,POST,PUT,DELETE,OPTIONS");
