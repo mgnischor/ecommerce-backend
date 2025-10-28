@@ -34,7 +34,7 @@ docker-compose -f docker-compose.dev.yml up -d
 
 This will start:
 
--   **PostgreSQL**: Database on port 5432 (with `ecommerce_dev` database)
+-   **PostgreSQL**: Database on port 5432 (with `ecommerce` database)
 -   **Jaeger**: Distributed tracing on port 16686 (UI) and 4317 (OTLP)
 -   **E-Commerce Backend**: API on port 5049 (development mode with console exporter)
 
