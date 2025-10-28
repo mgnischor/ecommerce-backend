@@ -217,11 +217,92 @@ The solution follows **Clean Architecture** principles with four distinct layers
 Ensure you have the following installed:
 
 -   [.NET SDK 9.0+](https://dotnet.microsoft.com/download)
--   [Docker Desktop](https://www.docker.com/products/docker-desktop) (for containerized development)
--   [PostgreSQL 16+](https://www.postgresql.org/download/) (optional, if running without Docker)
+-   [Docker Desktop](https://www.docker.com/products/docker-desktop) (for Docker-based development)
+-   [PostgreSQL 16+](https://www.postgresql.org/download/) (for local development without Docker)
 -   [Git](https://git-scm.com/downloads)
 
-### Local Development
+### Build and Run Options
+
+You have **two ways** to build and run the application:
+
+#### Option 1: Local Development (PostgreSQL on localhost)
+
+Uses your **local PostgreSQL** installation. Ideal for rapid development with hot reload.
+
+**Windows CMD:**
+
+```cmd
+cd scripts
+build-local.cmd
+```
+
+**PowerShell:**
+
+```powershell
+cd scripts
+.\build-local.ps1
+```
+
+**Requirements:**
+
+-   PostgreSQL running locally on port 5432
+-   Database credentials configured in `appsettings.json`
+
+**What it does:**
+
+1. ✅ Increments project version
+2. ✅ Creates new EF Core migration
+3. ✅ Builds project (Debug & Release)
+4. ✅ Publishes artifacts
+5. ✅ Exports SQL migration scripts
+6. ✅ Applies migrations to local database
+
+#### Option 2: Docker Build (PostgreSQL via container)
+
+Runs everything in **Docker containers** with isolated PostgreSQL. Ideal for testing production-like environments.
+
+**Windows CMD:**
+
+```cmd
+cd scripts
+build-docker.cmd
+```
+
+**PowerShell:**
+
+```powershell
+cd scripts
+.\build-docker.ps1
+```
+
+**Requirements:**
+
+-   Docker Desktop installed and running
+-   No local PostgreSQL needed
+
+**What it does:**
+
+1. ✅ Creates Docker network
+2. ✅ Starts PostgreSQL container
+3. ✅ Builds development image (port 5049)
+4. ✅ Builds production image (port 8080)
+5. ✅ Starts both containers with database connectivity
+
+**Containers created:**
+
+-   `ecommerce-postgres` - PostgreSQL 16 Alpine
+-   `ecommerce-backend-dev` - Development mode
+-   `ecommerce-backend-prod` - Production mode
+
+**Cleanup Docker containers:**
+
+```powershell
+cd scripts
+.\cleanup-docker.ps1  # PowerShell
+cleanup-docker.cmd    # CMD
+```
+
+### Quick Setup (First Time)
 
 #### 1. Clone the Repository
 
@@ -230,37 +311,40 @@ git clone https://github.com/mgnischor/ecommerce-backend.git
 cd ecommerce-backend
 ```
 
-#### 2. Start PostgreSQL (Docker)
+#### 2. Choose Your Approach
+
+**For Local Development:**
 
 ```powershell
-docker run --name ecommerce-postgres -e POSTGRES_USER=ecommerce -e POSTGRES_PASSWORD=ecommerce -e POSTGRES_DB=ecommerce_dev -p 5432:5432 -d postgres:16-alpine
+# Start local PostgreSQL (if not already running)
+# Then run:
+cd scripts
+.\build-local.ps1
 ```
 
-#### 3. Restore Dependencies
+**For Docker Development:**
 
 ```powershell
-dotnet restore
+cd scripts
+.\build-docker.ps1
 ```
 
-#### 4. Apply Database Migrations
+#### 3. Access the Application
 
-```powershell
-dotnet ef database update
-```
+**Local Build:**
 
-#### 5. Run the Application
-
-```powershell
-dotnet run
-```
-
-The API will be available at:
-
--   **HTTPS**: `https://localhost:5049`
--   **HTTP**: `http://localhost:5048`
+-   **API**: `https://localhost:5049`
 -   **API Docs**: `https://localhost:5049/docs`
 
-#### 6. Default Credentials
+**Docker Build:**
+
+-   **Development API**: `http://localhost:5049`
+-   **Production API**: `http://localhost:8080`
+-   **PostgreSQL**: `localhost:5432`
+-   **API Docs (Dev)**: `http://localhost:5049/docs`
+-   **API Docs (Prod)**: `http://localhost:8080/docs`
+
+#### 4. Default Credentials
 
 On first run, an admin user is automatically seeded:
 
@@ -269,7 +353,9 @@ On first run, an admin user is automatically seeded:
 
 > ⚠️ **Important**: Change these credentials immediately in production!
 
-### Docker Compose
+### Docker Compose (Alternative)
+
+For a complete environment with Jaeger tracing:
 
 #### Development Mode (with Jaeger)
 
@@ -309,6 +395,10 @@ docker-compose down
 docker-compose down -v
 ```
 
+### Script Reference
+
+For detailed information about all build scripts, see **[scripts/README.md](scripts/README.md)**.
+
 ---
 
 ## ⚙️ Configuration
@@ -334,7 +424,7 @@ Configuration is managed through `appsettings.json` and `appsettings.Development
 **Environment Variable:**
 
 ```powershell
-$env:ConnectionStrings__DefaultConnection = "Host=localhost;Database=ecommerce_dev;Username=ecommerce;Password=ecommerce;Port=5432"
+$env:ConnectionStrings__DefaultConnection = "Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432"
 ```
 
 #### JWT Configuration
