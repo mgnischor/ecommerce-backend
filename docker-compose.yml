@@ -1,72 +1,75 @@
 version: "3.8"
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:16-alpine
-    container_name: ecommerce-postgres
-    environment:
-      POSTGRES_USER: ecommerce
-      POSTGRES_PASSWORD: ecommerce
-      POSTGRES_DB: ecommerce
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - ecommerce-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ecommerce"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # PostgreSQL Database
+    postgres:
+        image: postgres:16-alpine
+        container_name: ecommerce-postgres
+        environment:
+            POSTGRES_USER: ecommerce
+            POSTGRES_PASSWORD: ecommerce
+            POSTGRES_DB: ecommerce
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        networks:
+            - ecommerce-network
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ecommerce"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
-  # Jaeger - Distributed Tracing
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    container_name: ecommerce-jaeger
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-      - LOG_LEVEL=debug
-    ports:
-      - "16686:16686" # Jaeger UI
-      - "4317:4317" # OTLP gRPC receiver
-      - "4318:4318" # OTLP HTTP receiver
-      - "14250:14250" # Jaeger gRPC
-      - "14268:14268" # Jaeger HTTP
-    networks:
-      - ecommerce-network
+    # Jaeger - Distributed Tracing
+    jaeger:
+        image: jaegertracing/all-in-one:latest
+        container_name: ecommerce-jaeger
+        environment:
+            - COLLECTOR_OTLP_ENABLED=true
+            - LOG_LEVEL=debug
+        ports:
+            - "16686:16686" # Jaeger UI
+            - "4317:4317" # OTLP gRPC receiver
+            - "4318:4318" # OTLP HTTP receiver
+            - "14250:14250" # Jaeger gRPC
+            - "14268:14268" # Jaeger HTTP
+        networks:
+            - ecommerce-network
 
-  # E-Commerce Backend API
-  ecommerce-backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ecommerce-backend
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432
-      - OpenTelemetry__ServiceName=ECommerce.Backend
-      - OpenTelemetry__ServiceVersion=0.0.10
-      - OpenTelemetry__EnableConsoleExporter=false
-      - OpenTelemetry__OtlpEndpoint=http://jaeger:4317
-    ports:
-      - "80:80"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      jaeger:
-        condition: service_started
-    networks:
-      - ecommerce-network
-    restart: unless-stopped
+    # E-Commerce Backend API
+    ecommerce-backend:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: production
+            args:
+                BUILD_DEVELOPMENT: 0
+        container_name: ecommerce-backend
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Production
+            - ASPNETCORE_URLS=http://+:80
+            - ConnectionStrings__DefaultConnection=Host=postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432
+            - OpenTelemetry__ServiceName=ECommerce.Backend
+            - OpenTelemetry__ServiceVersion=0.0.10
+            - OpenTelemetry__EnableConsoleExporter=false
+            - OpenTelemetry__OtlpEndpoint=http://jaeger:4317
+        ports:
+            - "80:80"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            jaeger:
+                condition: service_started
+        networks:
+            - ecommerce-network
+        restart: unless-stopped
 
 volumes:
-  postgres-data:
-    name: ecommerce-postgres-data
+    postgres-data:
+        name: ecommerce-postgres-data
 
 networks:
-  ecommerce-network:
-    name: ecommerce-network
-    driver: bridge
+    ecommerce-network:
+        name: ecommerce-network
+        driver: bridge
