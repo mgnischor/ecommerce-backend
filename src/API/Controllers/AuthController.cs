@@ -5,9 +5,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
 
+/// <summary>
+/// Authentication endpoints for user login and token management
+/// </summary>
+/// <remarks>
+/// Provides JWT-based authentication services. All authentication endpoints are public.
+/// </remarks>
 [ApiController]
 [Route("api/v1")]
 [Produces("application/json")]
+[Tags("Authentication")]
 public sealed class AuthController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
@@ -32,13 +39,33 @@ public sealed class AuthController : ControllerBase
     /// <summary>
     /// Authenticates a user and returns a JWT token
     /// </summary>
-    /// <param name="loginRequest">Login credentials</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Login response with JWT token</returns>
+    /// <remarks>
+    /// Validates user credentials and generates a JWT bearer token for API access.
+    ///
+    /// Sample request:
+    ///
+    ///     POST /api/v1/login
+    ///     {
+    ///        "email": "admin@ecommerce.com.br",
+    ///        "password": "admin"
+    ///     }
+    ///
+    /// The token expires after the configured expiration time (default: 60 minutes).
+    /// Include the token in subsequent requests using the Authorization header:
+    ///
+    ///     Authorization: Bearer {token}
+    ///
+    /// </remarks>
+    /// <param name="loginRequest">Login credentials containing email and password</param>
+    /// <param name="cancellationToken">Cancellation token for the async operation</param>
+    /// <returns>JWT token with expiration details and user information</returns>
+    /// <response code="200">Login successful. Returns JWT token and user details.</response>
+    /// <response code="400">Invalid request. Missing or malformed credentials.</response>
+    /// <response code="401">Authentication failed. Invalid email or password, or account is not active.</response>
     [HttpPost("login")]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<LoginResponseDto>> Login(
         [FromBody] LoginRequestDto loginRequest,
         CancellationToken cancellationToken = default
@@ -112,6 +139,15 @@ public sealed class AuthController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Lists all available authentication endpoints
+    /// </summary>
+    /// <remarks>
+    /// Returns a list of authentication-related API endpoints with their HTTP methods.
+    /// This is a utility endpoint for API discovery.
+    /// </remarks>
+    /// <returns>List of available endpoints</returns>
+    /// <response code="200">Successfully retrieved endpoints list</response>
     [HttpGet("endpoints")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetEndpoints()
@@ -126,8 +162,13 @@ public sealed class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Returns allowed HTTP methods for this endpoint
+    /// Returns allowed HTTP methods for authentication endpoints
     /// </summary>
+    /// <remarks>
+    /// OPTIONS request to discover supported HTTP methods for this resource.
+    /// Returns methods in the Allow header.
+    /// </remarks>
+    /// <response code="204">No content. Check the Allow header for supported methods.</response>
     [HttpOptions]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public IActionResult GetOptions()
