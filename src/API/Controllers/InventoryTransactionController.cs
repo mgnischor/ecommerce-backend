@@ -7,8 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace ECommerce.API.Controllers;
 
 /// <summary>
-/// Controller for managing inventory transactions
+/// Inventory transaction management endpoints
 /// </summary>
+/// <remarks>
+/// Provides inventory tracking with automatic accounting integration. All inventory movements
+/// (receiving, shipping, adjustments, transfers) are automatically posted to the accounting system.
+/// All endpoints require authentication.
+/// </remarks>
+[Tags("Inventory")]
 [ApiController]
 [Route("api/v1/inventory-transactions")]
 [Produces("application/json")]
@@ -31,14 +37,44 @@ public sealed class InventoryTransactionController : ControllerBase
     /// <summary>
     /// Records a new inventory transaction with automatic accounting integration
     /// </summary>
-    /// <param name="request">Transaction details</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Created inventory transaction</returns>
+    /// <remarks>
+    /// Creates an inventory transaction and automatically generates corresponding journal entries.
+    /// The system posts debits and credits based on transaction type (Receiving, Shipping, Adjustment, Transfer).
+    ///
+    /// Sample request:
+    ///
+    ///     POST /api/v1/inventory-transactions
+    ///     {
+    ///        "transactionType": "Receiving",
+    ///        "productId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    ///        "productSku": "PROD-001",
+    ///        "productName": "Gaming Laptop",
+    ///        "quantity": 10,
+    ///        "unitCost": 1000.00,
+    ///        "toLocation": "Warehouse A",
+    ///        "documentNumber": "PO-2024-001",
+    ///        "notes": "Received from supplier XYZ"
+    ///     }
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// **Transaction types:** Receiving, Shipping, Adjustment, Transfer
+    ///
+    /// **Accounting integration:** Automatically creates journal entries with proper debits/credits
+    ///
+    /// </remarks>
+    /// <param name="request">Transaction details including type, product, quantity, and cost</param>
+    /// <param name="cancellationToken">Cancellation token for the async operation</param>
+    /// <returns>Created inventory transaction with generated transaction number and journal entry ID</returns>
+    /// <response code="201">Successfully created the transaction. Location header contains the URI of the new resource.</response>
+    /// <response code="400">Invalid request. Validation errors in transaction data.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
+    /// <response code="500">Internal server error. Failed to create transaction or accounting entries.</response>
     [HttpPost]
     [ProducesResponseType(typeof(InventoryTransactionResponseDto), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<InventoryTransactionResponseDto>> RecordTransaction(
         [FromBody] RecordInventoryTransactionRequestDto request,
         CancellationToken cancellationToken = default
@@ -135,15 +171,30 @@ public sealed class InventoryTransactionController : ControllerBase
     }
 
     /// <summary>
-    /// Gets an inventory transaction by identifier
+    /// Retrieves a specific inventory transaction by its unique identifier
     /// </summary>
-    /// <param name="id">Transaction identifier</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Inventory transaction details</returns>
+    /// <remarks>
+    /// Returns detailed information about a single inventory transaction including accounting integration details.
+    ///
+    /// Sample request:
+    ///
+    ///     GET /api/v1/inventory-transactions/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// **Note:** This endpoint is currently a placeholder and requires service implementation.
+    ///
+    /// </remarks>
+    /// <param name="id">Transaction unique identifier (GUID)</param>
+    /// <param name="cancellationToken">Cancellation token for the async operation</param>
+    /// <returns>Inventory transaction details with accounting references</returns>
+    /// <response code="200">Successfully retrieved the transaction.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
+    /// <response code="404">Transaction not found with the specified ID.</response>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(InventoryTransactionResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<InventoryTransactionResponseDto>> GetTransactionById(
         Guid id,
         CancellationToken cancellationToken = default
@@ -162,11 +213,26 @@ public sealed class InventoryTransactionController : ControllerBase
     }
 
     /// <summary>
-    /// Gets all inventory transactions for a specific product
+    /// Retrieves all inventory transactions for a specific product
     /// </summary>
-    /// <param name="productId">Product identifier</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>List of inventory transactions</returns>
+    /// <remarks>
+    /// Returns the complete transaction history for a product including all movements and adjustments.
+    /// Useful for inventory audit trails and stock movement analysis.
+    ///
+    /// Sample request:
+    ///
+    ///     GET /api/v1/inventory-transactions/product/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// Results include all transaction types: Receiving, Shipping, Adjustments, and Transfers.
+    ///
+    /// </remarks>
+    /// <param name="productId">Product unique identifier (GUID)</param>
+    /// <param name="cancellationToken">Cancellation token for the async operation</param>
+    /// <returns>List of all inventory transactions for the specified product</returns>
+    /// <response code="200">Successfully retrieved product transactions. May be empty if no transactions found.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
     [HttpGet("product/{productId:guid}")]
     [ProducesResponseType(
         typeof(IEnumerable<InventoryTransactionResponseDto>),
@@ -231,18 +297,34 @@ public sealed class InventoryTransactionController : ControllerBase
     }
 
     /// <summary>
-    /// Gets inventory transactions within a date range
+    /// Retrieves inventory transactions within a specified date range
     /// </summary>
-    /// <param name="startDate">Start date (inclusive)</param>
-    /// <param name="endDate">End date (inclusive)</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>List of inventory transactions</returns>
+    /// <remarks>
+    /// Returns all inventory transactions that occurred between the start and end dates (inclusive).
+    /// Useful for period-end inventory reconciliation and reporting.
+    ///
+    /// Sample request:
+    ///
+    ///     GET /api/v1/inventory-transactions/period?startDate=2024-01-01&amp;endDate=2024-01-31
+    ///
+    /// **Required permissions:** Authenticated user
+    ///
+    /// **Note:** Both dates are inclusive. Time component is ignored (full day ranges).
+    ///
+    /// </remarks>
+    /// <param name="startDate">Start date of the period (inclusive)</param>
+    /// <param name="endDate">End date of the period (inclusive)</param>
+    /// <param name="cancellationToken">Cancellation token for the async operation</param>
+    /// <returns>List of inventory transactions within the specified period</returns>
+    /// <response code="200">Successfully retrieved transactions for the period. May be empty if no transactions found.</response>
+    /// <response code="400">Invalid date range. Start date must be before or equal to end date.</response>
+    /// <response code="401">Unauthorized. Authentication required.</response>
     [HttpGet("period")]
     [ProducesResponseType(
         typeof(IEnumerable<InventoryTransactionResponseDto>),
         StatusCodes.Status200OK
     )]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<
         ActionResult<IEnumerable<InventoryTransactionResponseDto>>
