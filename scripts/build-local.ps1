@@ -5,6 +5,7 @@ Set-Location $PSScriptRoot\..
 
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host " Ecommerce Backend Build Script" -ForegroundColor Cyan
+Write-Host " (Uses LOCAL PostgreSQL)" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host ""
 
