@@ -22,14 +22,9 @@ internal sealed class VendorEntityConfiguration : IEntityTypeConfiguration<Vendo
             .HasColumnName("created_by")
             .HasDefaultValue(Guid.Parse("ce06e1a8-f688-44b6-b616-4badf09d9153"));
 
-        builder
-            .Property(v => v.UpdatedBy)
-            .HasColumnName("updated_by");
+        builder.Property(v => v.UpdatedBy).HasColumnName("updated_by");
 
-        builder
-            .Property(v => v.UserId)
-            .HasColumnName("user_id")
-            .IsRequired();
+        builder.Property(v => v.UserId).HasColumnName("user_id").IsRequired();
 
         builder
             .Property(v => v.BusinessName)
@@ -112,11 +107,7 @@ internal sealed class VendorEntityConfiguration : IEntityTypeConfiguration<Vendo
             .HasMaxLength(100)
             .IsUnicode(true);
 
-        builder
-            .Property(v => v.TaxId)
-            .HasColumnName("tax_id")
-            .HasMaxLength(50)
-            .IsUnicode(false);
+        builder.Property(v => v.TaxId).HasColumnName("tax_id").HasMaxLength(50).IsUnicode(false);
 
         builder
             .Property(v => v.RegistrationNumber)
@@ -136,10 +127,7 @@ internal sealed class VendorEntityConfiguration : IEntityTypeConfiguration<Vendo
             .HasColumnType("decimal(3,2)")
             .HasDefaultValue(0m);
 
-        builder
-            .Property(v => v.TotalRatings)
-            .HasColumnName("total_ratings")
-            .HasDefaultValue(0);
+        builder.Property(v => v.TotalRatings).HasColumnName("total_ratings").HasDefaultValue(0);
 
         builder
             .Property(v => v.TotalSales)
@@ -147,17 +135,14 @@ internal sealed class VendorEntityConfiguration : IEntityTypeConfiguration<Vendo
             .HasColumnType("decimal(18,2)")
             .HasDefaultValue(0m);
 
-        builder
-            .Property(v => v.TotalOrders)
-            .HasColumnName("total_orders")
-            .HasDefaultValue(0);
+        builder.Property(v => v.TotalOrders).HasColumnName("total_orders").HasDefaultValue(0);
 
         builder
             .Property(v => v.Status)
             .HasColumnName("status")
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(0);
+            .HasDefaultValue(ECommerce.Domain.Enums.VendorStatus.Pending);
 
         builder
             .Property(v => v.BankAccountNumber)
@@ -183,25 +168,16 @@ internal sealed class VendorEntityConfiguration : IEntityTypeConfiguration<Vendo
             .HasMaxLength(256)
             .IsUnicode(false);
 
-        builder
-            .Property(v => v.IsVerified)
-            .HasColumnName("is_verified")
-            .HasDefaultValue(false);
+        builder.Property(v => v.IsVerified).HasColumnName("is_verified").HasDefaultValue(false);
 
         builder
             .Property(v => v.VerifiedAt)
             .HasColumnName("verified_at")
             .HasColumnType("timestamp with time zone");
 
-        builder
-            .Property(v => v.IsFeatured)
-            .HasColumnName("is_featured")
-            .HasDefaultValue(false);
+        builder.Property(v => v.IsFeatured).HasColumnName("is_featured").HasDefaultValue(false);
 
-        builder
-            .Property(v => v.IsDeleted)
-            .HasColumnName("is_deleted")
-            .HasDefaultValue(false);
+        builder.Property(v => v.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false);
 
         builder
             .Property(v => v.CreatedAt)
