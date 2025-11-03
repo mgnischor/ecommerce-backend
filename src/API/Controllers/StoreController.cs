@@ -92,18 +92,45 @@ public sealed class StoreController : ControllerBase
     /// </summary>
     [HttpGet("search/city/{city}")]
     [ProducesResponseType(typeof(IEnumerable<StoreEntity>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<StoreEntity>>> GetStoresByCity(
         string city,
         CancellationToken cancellationToken = default
     )
     {
-        var stores = await _context
-            .Stores
-            .Where(s => s.City.ToLower() == city.ToLower() && s.IsActive && !s.IsDeleted)
-            .OrderBy(s => s.DisplayOrder)
-            .ToListAsync(cancellationToken);
+        // Input validation
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            return BadRequest(new { Message = "City name is required" });
+        }
 
-        return Ok(stores);
+        if (city.Length > 100)
+        {
+            return BadRequest(new { Message = "City name must not exceed 100 characters" });
+        }
+
+        try
+        {
+            // Use parameterized query
+            var cityLower = city.ToLowerInvariant();
+            
+            var stores = await _context.Stores
+                .Where(s => s.City.ToLower() == cityLower && s.IsActive && !s.IsDeleted)
+                .OrderBy(s => s.DisplayOrder)
+                .Take(100) // Limit results
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            _logger.LogInformation("Store search by city completed: '{City}', Results: {Count}", 
+                city, stores.Count);
+
+            return Ok(stores);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error searching stores by city: {City}", city);
+            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+        }
     }
 
     /// <summary>
