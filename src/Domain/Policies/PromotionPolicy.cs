@@ -7,8 +7,6 @@ namespace ECommerce.Domain.Policies;
 /// </summary>
 public static class PromotionPolicy
 {
-    private const int MaxPromotionNameLength = 200;
-    private const int MinPromotionNameLength = 3;
     private const decimal MaxDiscountPercentage = 100m;
     private const decimal MaxDiscountAmount = 999999.99m;
     private const int MaxCombinablePromotions = 3;
@@ -17,12 +15,7 @@ public static class PromotionPolicy
     /// <summary>
     /// Validates if a promotion is currently active
     /// </summary>
-    public static bool IsActive(
-        bool isActive,
-        bool isDeleted,
-        DateTime startDate,
-        DateTime endDate
-    )
+    public static bool IsActive(bool isActive, bool isDeleted, DateTime startDate, DateTime endDate)
     {
         if (!isActive || isDeleted)
             return false;
@@ -119,12 +112,11 @@ public static class PromotionPolicy
     {
         decimal discount = type switch
         {
-            PromotionType.PercentageDiscount
-                => CalculatePercentageDiscount(
-                    discountPercentage ?? 0,
-                    orderSubtotal,
-                    maximumDiscountAmount
-                ),
+            PromotionType.PercentageDiscount => CalculatePercentageDiscount(
+                discountPercentage ?? 0,
+                orderSubtotal,
+                maximumDiscountAmount
+            ),
             PromotionType.FixedAmountDiscount => Math.Min(discountAmount ?? 0, orderSubtotal),
             PromotionType.FreeShipping => 0, // Handled separately in shipping calculation
             _ => 0,
@@ -169,10 +161,7 @@ public static class PromotionPolicy
     /// <summary>
     /// Checks if promotions can be combined
     /// </summary>
-    public static bool CanCombinePromotions(
-        List<bool> promotionCombinableFlags,
-        int promotionCount
-    )
+    public static bool CanCombinePromotions(List<bool> promotionCombinableFlags, int promotionCount)
     {
         // Check if all promotions allow combination
         if (!promotionCombinableFlags.All(flag => flag))
@@ -185,10 +174,7 @@ public static class PromotionPolicy
     /// <summary>
     /// Determines promotion priority order for application
     /// </summary>
-    public static List<T> OrderByPriority<T>(
-        List<T> promotions,
-        Func<T, int> prioritySelector
-    )
+    public static List<T> OrderByPriority<T>(List<T> promotions, Func<T, int> prioritySelector)
     {
         return promotions.OrderByDescending(prioritySelector).ToList();
     }
