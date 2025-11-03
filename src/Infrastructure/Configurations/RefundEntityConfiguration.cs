@@ -22,23 +22,13 @@ internal sealed class RefundEntityConfiguration : IEntityTypeConfiguration<Refun
             .HasColumnName("created_by")
             .HasDefaultValue(Guid.Parse("ce06e1a8-f688-44b6-b616-4badf09d9153"));
 
-        builder
-            .Property(r => r.UpdatedBy)
-            .HasColumnName("updated_by");
+        builder.Property(r => r.UpdatedBy).HasColumnName("updated_by");
 
-        builder
-            .Property(r => r.OrderId)
-            .HasColumnName("order_id")
-            .IsRequired();
+        builder.Property(r => r.OrderId).HasColumnName("order_id").IsRequired();
 
-        builder
-            .Property(r => r.CustomerId)
-            .HasColumnName("customer_id")
-            .IsRequired();
+        builder.Property(r => r.CustomerId).HasColumnName("customer_id").IsRequired();
 
-        builder
-            .Property(r => r.PaymentId)
-            .HasColumnName("payment_id");
+        builder.Property(r => r.PaymentId).HasColumnName("payment_id");
 
         builder
             .Property(r => r.RefundNumber)
@@ -52,7 +42,7 @@ internal sealed class RefundEntityConfiguration : IEntityTypeConfiguration<Refun
             .HasColumnName("status")
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(0);
+            .HasDefaultValue(ECommerce.Domain.Enums.RefundStatus.Requested);
 
         builder
             .Property(r => r.RefundAmount)
@@ -106,9 +96,7 @@ internal sealed class RefundEntityConfiguration : IEntityTypeConfiguration<Refun
             .HasColumnName("approved_at")
             .HasColumnType("timestamp with time zone");
 
-        builder
-            .Property(r => r.ApprovedBy)
-            .HasColumnName("approved_by");
+        builder.Property(r => r.ApprovedBy).HasColumnName("approved_by");
 
         builder
             .Property(r => r.ProcessedAt)
@@ -137,10 +125,7 @@ internal sealed class RefundEntityConfiguration : IEntityTypeConfiguration<Refun
             .HasColumnName("restocking_fee")
             .HasColumnType("decimal(18,2)");
 
-        builder
-            .Property(r => r.IsDeleted)
-            .HasColumnName("is_deleted")
-            .HasDefaultValue(false);
+        builder.Property(r => r.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false);
 
         builder
             .Property(r => r.CreatedAt)
@@ -156,7 +141,10 @@ internal sealed class RefundEntityConfiguration : IEntityTypeConfiguration<Refun
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.HasIndex(r => r.RefundNumber).IsUnique().HasDatabaseName("ix_refunds_refund_number");
+        builder
+            .HasIndex(r => r.RefundNumber)
+            .IsUnique()
+            .HasDatabaseName("ix_refunds_refund_number");
         builder.HasIndex(r => r.OrderId).HasDatabaseName("ix_refunds_order_id");
         builder.HasIndex(r => r.CustomerId).HasDatabaseName("ix_refunds_customer_id");
         builder.HasIndex(r => r.Status).HasDatabaseName("ix_refunds_status");
