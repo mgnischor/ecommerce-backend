@@ -1,10 +1,10 @@
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using System.Text.RegularExpressions;
 
 namespace ECommerce.API.Controllers;
 
@@ -28,9 +28,9 @@ public sealed class PromotionController : ControllerBase
     }
 
     private string? GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
-    
+
     private bool IsAdmin() => User.IsInRole("Admin");
-    
+
     private bool IsManager() => User.IsInRole("Manager");
 
     /// <summary>
@@ -45,9 +45,10 @@ public sealed class PromotionController : ControllerBase
         try
         {
             var now = DateTime.UtcNow;
-            var promotions = await _context.Promotions
-                .Where(p => p.IsActive && !p.IsDeleted && 
-                           p.StartDate <= now && p.EndDate >= now)
+            var promotions = await _context
+                .Promotions.Where(p =>
+                    p.IsActive && !p.IsDeleted && p.StartDate <= now && p.EndDate >= now
+                )
                 .OrderByDescending(p => p.Priority)
                 .ThenByDescending(p => p.StartDate)
                 .Take(MaxPromotions)
@@ -60,7 +61,10 @@ public sealed class PromotionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving active promotions");
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -76,9 +80,14 @@ public sealed class PromotionController : ControllerBase
         try
         {
             var now = DateTime.UtcNow;
-            var promotions = await _context.Promotions
-                .Where(p => p.IsFeatured && p.IsActive && !p.IsDeleted && 
-                           p.StartDate <= now && p.EndDate >= now)
+            var promotions = await _context
+                .Promotions.Where(p =>
+                    p.IsFeatured
+                    && p.IsActive
+                    && !p.IsDeleted
+                    && p.StartDate <= now
+                    && p.EndDate >= now
+                )
                 .OrderByDescending(p => p.Priority)
                 .Take(50) // Limit featured promotions
                 .AsNoTracking()
@@ -90,7 +99,10 @@ public sealed class PromotionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving featured promotions");
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -114,8 +126,8 @@ public sealed class PromotionController : ControllerBase
 
         try
         {
-            var promotion = await _context.Promotions
-                .AsNoTracking()
+            var promotion = await _context
+                .Promotions.AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted, cancellationToken);
 
             if (promotion == null)
@@ -129,7 +141,10 @@ public sealed class PromotionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving promotion: {PromotionId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -167,8 +182,8 @@ public sealed class PromotionController : ControllerBase
 
         try
         {
-            var promotion = await _context.Promotions
-                .AsNoTracking()
+            var promotion = await _context
+                .Promotions.AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Code == code && !p.IsDeleted, cancellationToken);
 
             if (promotion == null)
@@ -191,7 +206,10 @@ public sealed class PromotionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving promotion by code");
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -217,17 +235,26 @@ public sealed class PromotionController : ControllerBase
         // Input validation
         if (string.IsNullOrWhiteSpace(promotion.Name) || promotion.Name.Length > 200)
         {
-            return BadRequest(new { Message = "Valid promotion name is required (max 200 characters)" });
+            return BadRequest(
+                new { Message = "Valid promotion name is required (max 200 characters)" }
+            );
         }
 
         if (string.IsNullOrWhiteSpace(promotion.Code) || promotion.Code.Length > 50)
         {
-            return BadRequest(new { Message = "Valid promotion code is required (max 50 characters)" });
+            return BadRequest(
+                new { Message = "Valid promotion code is required (max 50 characters)" }
+            );
         }
 
         if (!Regex.IsMatch(promotion.Code, @"^[a-zA-Z0-9\-_]+$"))
         {
-            return BadRequest(new { Message = "Invalid promotion code format. Use alphanumeric, hyphens, underscores only" });
+            return BadRequest(
+                new
+                {
+                    Message = "Invalid promotion code format. Use alphanumeric, hyphens, underscores only",
+                }
+            );
         }
 
         if (promotion.StartDate >= promotion.EndDate)
@@ -235,8 +262,10 @@ public sealed class PromotionController : ControllerBase
             return BadRequest(new { Message = "End date must be after start date" });
         }
 
-        if (promotion.DiscountPercentage.HasValue && 
-            (promotion.DiscountPercentage < 0 || promotion.DiscountPercentage > 100))
+        if (
+            promotion.DiscountPercentage.HasValue
+            && (promotion.DiscountPercentage < 0 || promotion.DiscountPercentage > 100)
+        )
         {
             return BadRequest(new { Message = "Discount percentage must be between 0 and 100" });
         }
@@ -244,8 +273,10 @@ public sealed class PromotionController : ControllerBase
         try
         {
             // Check for duplicate code
-            var duplicateCode = await _context.Promotions
-                .AnyAsync(p => p.Code == promotion.Code && !p.IsDeleted, cancellationToken);
+            var duplicateCode = await _context.Promotions.AnyAsync(
+                p => p.Code == promotion.Code && !p.IsDeleted,
+                cancellationToken
+            );
 
             if (duplicateCode)
             {
@@ -260,7 +291,7 @@ public sealed class PromotionController : ControllerBase
                 Name = promotion.Name,
                 Code = promotion.Code,
                 Description = promotion.Description,
-                PromotionType = promotion.PromotionType,
+                Type = promotion.Type,
                 DiscountPercentage = promotion.DiscountPercentage,
                 DiscountAmount = promotion.DiscountAmount,
                 MinimumOrderAmount = promotion.MinimumOrderAmount,
@@ -270,26 +301,37 @@ public sealed class PromotionController : ControllerBase
                 IsActive = promotion.IsActive,
                 IsFeatured = promotion.IsFeatured,
                 Priority = promotion.Priority,
-                UsageLimit = promotion.UsageLimit,
+                MaxUsageCount = promotion.MaxUsageCount,
                 UsageCount = 0, // Always start at 0
                 IsCombinable = promotion.IsCombinable,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty
+                CreatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty,
             };
 
             _context.Promotions.Add(newPromotion);
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Promotion created: {PromotionId}, Code: {Code}, User: {UserId}", 
-                newPromotion.Id, newPromotion.Code, GetCurrentUserId());
+            _logger.LogInformation(
+                "Promotion created: {PromotionId}, Code: {Code}, User: {UserId}",
+                newPromotion.Id,
+                newPromotion.Code,
+                GetCurrentUserId()
+            );
 
-            return CreatedAtAction(nameof(GetPromotionById), new { id = newPromotion.Id }, newPromotion);
+            return CreatedAtAction(
+                nameof(GetPromotionById),
+                new { id = newPromotion.Id },
+                newPromotion
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating promotion with code: {Code}", promotion.Code);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -316,14 +358,20 @@ public sealed class PromotionController : ControllerBase
 
         if (id == Guid.Empty || id != promotion.Id)
         {
-            _logger.LogWarning("ID mismatch in promotion update. Route: {RouteId}, Body: {BodyId}", id, promotion.Id);
+            _logger.LogWarning(
+                "ID mismatch in promotion update. Route: {RouteId}, Body: {BodyId}",
+                id,
+                promotion.Id
+            );
             return BadRequest(new { Message = "ID mismatch" });
         }
 
         // Input validation
         if (string.IsNullOrWhiteSpace(promotion.Name) || promotion.Name.Length > 200)
         {
-            return BadRequest(new { Message = "Valid promotion name is required (max 200 characters)" });
+            return BadRequest(
+                new { Message = "Valid promotion name is required (max 200 characters)" }
+            );
         }
 
         if (promotion.StartDate >= promotion.EndDate)
@@ -333,8 +381,10 @@ public sealed class PromotionController : ControllerBase
 
         try
         {
-            var existingPromotion = await _context.Promotions
-                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted, cancellationToken);
+            var existingPromotion = await _context.Promotions.FirstOrDefaultAsync(
+                p => p.Id == id && !p.IsDeleted,
+                cancellationToken
+            );
 
             if (existingPromotion == null)
             {
@@ -345,12 +395,17 @@ public sealed class PromotionController : ControllerBase
             // Check for code conflict if code changed
             if (existingPromotion.Code != promotion.Code)
             {
-                var duplicateCode = await _context.Promotions
-                    .AnyAsync(p => p.Code == promotion.Code && p.Id != id && !p.IsDeleted, cancellationToken);
+                var duplicateCode = await _context.Promotions.AnyAsync(
+                    p => p.Code == promotion.Code && p.Id != id && !p.IsDeleted,
+                    cancellationToken
+                );
 
                 if (duplicateCode)
                 {
-                    _logger.LogWarning("Duplicate promotion code in update: {Code}", promotion.Code);
+                    _logger.LogWarning(
+                        "Duplicate promotion code in update: {Code}",
+                        promotion.Code
+                    );
                     return Conflict(new { Message = "Promotion code already exists" });
                 }
             }
@@ -359,7 +414,7 @@ public sealed class PromotionController : ControllerBase
             existingPromotion.Name = promotion.Name;
             existingPromotion.Code = promotion.Code;
             existingPromotion.Description = promotion.Description;
-            existingPromotion.PromotionType = promotion.PromotionType;
+            existingPromotion.Type = promotion.Type;
             existingPromotion.DiscountPercentage = promotion.DiscountPercentage;
             existingPromotion.DiscountAmount = promotion.DiscountAmount;
             existingPromotion.MinimumOrderAmount = promotion.MinimumOrderAmount;
@@ -369,25 +424,39 @@ public sealed class PromotionController : ControllerBase
             existingPromotion.IsActive = promotion.IsActive;
             existingPromotion.IsFeatured = promotion.IsFeatured;
             existingPromotion.Priority = promotion.Priority;
-            existingPromotion.UsageLimit = promotion.UsageLimit;
+            existingPromotion.MaxUsageCount = promotion.MaxUsageCount;
             existingPromotion.IsCombinable = promotion.IsCombinable;
             existingPromotion.UpdatedAt = DateTime.UtcNow;
-            existingPromotion.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty;
+            existingPromotion.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId)
+                ? userId
+                : Guid.Empty;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Promotion updated: {PromotionId}, User: {UserId}", id, GetCurrentUserId());
+            _logger.LogInformation(
+                "Promotion updated: {PromotionId}, User: {UserId}",
+                id,
+                GetCurrentUserId()
+            );
             return NoContent();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating promotion: {PromotionId}", id);
-            return Conflict(new { Message = "The promotion was modified by another user. Please refresh and try again" });
+            return Conflict(
+                new
+                {
+                    Message = "The promotion was modified by another user. Please refresh and try again",
+                }
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating promotion: {PromotionId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -412,8 +481,10 @@ public sealed class PromotionController : ControllerBase
 
         try
         {
-            var promotion = await _context.Promotions
-                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted, cancellationToken);
+            var promotion = await _context.Promotions.FirstOrDefaultAsync(
+                p => p.Id == id && !p.IsDeleted,
+                cancellationToken
+            );
 
             if (promotion == null)
             {
@@ -423,18 +494,27 @@ public sealed class PromotionController : ControllerBase
 
             promotion.IsDeleted = true;
             promotion.UpdatedAt = DateTime.UtcNow;
-            promotion.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty;
+            promotion.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId)
+                ? userId
+                : Guid.Empty;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogWarning("Promotion deleted: {PromotionId}, Code: {Code}, User: {UserId}", 
-                id, promotion.Code, GetCurrentUserId());
+            _logger.LogWarning(
+                "Promotion deleted: {PromotionId}, Code: {Code}, User: {UserId}",
+                id,
+                promotion.Code,
+                GetCurrentUserId()
+            );
             return NoContent();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting promotion: {PromotionId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 }
