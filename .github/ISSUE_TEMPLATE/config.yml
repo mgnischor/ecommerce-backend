@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Discussion Forum
+    url: https://github.com/mgnischor/ecommerce-backend/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📚 Documentation
+    url: https://github.com/mgnischor/ecommerce-backend/blob/develop/README.md
+    about: Read the project documentation
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/mgnischor/ecommerce-backend/security/advisories/new
+    about: Report a security vulnerability (private disclosure)
