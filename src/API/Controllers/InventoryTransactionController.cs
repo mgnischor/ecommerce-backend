@@ -195,7 +195,7 @@ public sealed class InventoryTransactionController : ControllerBase
     [ProducesResponseType(typeof(InventoryTransactionResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<InventoryTransactionResponseDto>> GetTransactionById(
+    public Task<ActionResult<InventoryTransactionResponseDto>> GetTransactionById(
         Guid id,
         CancellationToken cancellationToken = default
     )
@@ -209,7 +209,9 @@ public sealed class InventoryTransactionController : ControllerBase
             id
         );
 
-        return NotFound(new { Message = "Transaction retrieval not yet implemented" });
+        return Task.FromResult<ActionResult<InventoryTransactionResponseDto>>(
+            NotFound(new { Message = "Transaction retrieval not yet implemented" })
+        );
     }
 
     /// <summary>
