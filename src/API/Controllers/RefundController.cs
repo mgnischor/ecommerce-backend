@@ -1,9 +1,9 @@
+using System.Security.Claims;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace ECommerce.API.Controllers;
 
@@ -30,9 +30,9 @@ public sealed class RefundController : ControllerBase
     }
 
     private string? GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
-    
+
     private bool IsAdmin() => User.IsInRole("Admin");
-    
+
     private bool IsManager() => User.IsInRole("Manager");
 
     /// <summary>
@@ -129,27 +129,36 @@ public sealed class RefundController : ControllerBase
             var currentUserId = GetCurrentUserId();
             if (!IsAdmin() && !IsManager() && customerId.ToString() != currentUserId)
             {
-                _logger.LogWarning("Unauthorized access attempt to customer refunds: {CustomerId}, User: {UserId}", 
-                    customerId, currentUserId);
+                _logger.LogWarning(
+                    "Unauthorized access attempt to customer refunds: {CustomerId}, User: {UserId}",
+                    customerId,
+                    currentUserId
+                );
                 return Forbid();
             }
 
-            var refunds = await _context.Refunds
-                .Where(r => r.CustomerId == customerId && !r.IsDeleted)
+            var refunds = await _context
+                .Refunds.Where(r => r.CustomerId == customerId && !r.IsDeleted)
                 .OrderByDescending(r => r.CreatedAt)
                 .Take(100) // Limit results to prevent DoS
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            _logger.LogInformation("Retrieved {Count} refunds for customer: {CustomerId}", 
-                refunds.Count, customerId);
+            _logger.LogInformation(
+                "Retrieved {Count} refunds for customer: {CustomerId}",
+                refunds.Count,
+                customerId
+            );
 
             return Ok(refunds);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving refunds for customer: {CustomerId}", customerId);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -272,8 +281,10 @@ public sealed class RefundController : ControllerBase
 
         try
         {
-            var refund = await _context.Refunds
-                .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted, cancellationToken);
+            var refund = await _context.Refunds.FirstOrDefaultAsync(
+                r => r.Id == id && !r.IsDeleted,
+                cancellationToken
+            );
 
             if (refund == null)
             {
@@ -282,30 +293,44 @@ public sealed class RefundController : ControllerBase
             }
 
             // Validate state transition
-            if (refund.Status == Domain.Enums.RefundStatus.Completed || 
-                refund.Status == Domain.Enums.RefundStatus.Cancelled)
+            if (
+                refund.Status == Domain.Enums.RefundStatus.Completed
+                || refund.Status == Domain.Enums.RefundStatus.Cancelled
+            )
             {
-                _logger.LogWarning("Invalid refund status for rejection: {RefundId}, Status: {Status}", 
-                    id, refund.Status);
+                _logger.LogWarning(
+                    "Invalid refund status for rejection: {RefundId}, Status: {Status}",
+                    id,
+                    refund.Status
+                );
                 return BadRequest(new { Message = "Cannot reject a refund in this status" });
             }
 
             refund.Status = Domain.Enums.RefundStatus.Rejected;
             refund.RejectionReason = reason;
             refund.UpdatedAt = DateTime.UtcNow;
-            refund.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty;
+            refund.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId)
+                ? userId
+                : Guid.Empty;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogWarning("Refund rejected: {RefundId}, User: {UserId}, Reason: {Reason}", 
-                id, GetCurrentUserId(), reason);
+            _logger.LogWarning(
+                "Refund rejected: {RefundId}, User: {UserId}, Reason: {Reason}",
+                id,
+                GetCurrentUserId(),
+                reason
+            );
 
             return NoContent();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error rejecting refund: {RefundId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
