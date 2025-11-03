@@ -18,7 +18,10 @@ public sealed class ProductVariantController : ControllerBase
     private readonly PostgresqlContext _context;
     private readonly ILogger<ProductVariantController> _logger;
 
-    public ProductVariantController(PostgresqlContext context, ILogger<ProductVariantController> logger)
+    public ProductVariantController(
+        PostgresqlContext context,
+        ILogger<ProductVariantController> logger
+    )
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -35,8 +38,7 @@ public sealed class ProductVariantController : ControllerBase
     )
     {
         var variants = await _context
-            .ProductVariants
-            .Where(v => v.ProductId == productId && !v.IsDeleted)
+            .ProductVariants.Where(v => v.ProductId == productId && !v.IsDeleted)
             .OrderBy(v => v.DisplayOrder)
             .ThenBy(v => v.Name)
             .ToListAsync(cancellationToken);
@@ -97,8 +99,8 @@ public sealed class ProductVariantController : ControllerBase
 
         try
         {
-            var variant = await _context.ProductVariants
-                .AsNoTracking()
+            var variant = await _context
+                .ProductVariants.AsNoTracking()
                 .FirstOrDefaultAsync(v => v.Sku == sku && !v.IsDeleted, cancellationToken);
 
             if (variant == null)
@@ -108,10 +110,13 @@ public sealed class ProductVariantController : ControllerBase
 
             return Ok(variant);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Don't log the SKU to avoid exposing potential attack vectors in logs
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
