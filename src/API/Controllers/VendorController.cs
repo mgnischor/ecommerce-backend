@@ -99,27 +99,52 @@ public sealed class VendorController : ControllerBase
     /// </summary>
     [HttpGet("search")]
     [ProducesResponseType(typeof(IEnumerable<VendorEntity>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<VendorEntity>>> SearchVendors(
         [FromQuery] string searchTerm,
         CancellationToken cancellationToken = default
     )
     {
+        // Input validation
         if (string.IsNullOrWhiteSpace(searchTerm))
-            return BadRequest("Search term is required");
+        {
+            return BadRequest(new { Message = "Search term is required" });
+        }
 
-        var vendors = await _context
-            .Vendors.Where(
-                v =>
-                    !v.IsDeleted
-                    && (
-                        v.StoreName.ToLower().Contains(searchTerm.ToLower())
-                        || v.BusinessName.ToLower().Contains(searchTerm.ToLower())
-                    )
-            )
-            .OrderByDescending(v => v.Rating)
-            .ToListAsync(cancellationToken);
+        if (searchTerm.Length < 2)
+        {
+            return BadRequest(new { Message = "Search term must be at least 2 characters" });
+        }
 
-        return Ok(vendors);
+        if (searchTerm.Length > 100)
+        {
+            return BadRequest(new { Message = "Search term must not exceed 100 characters" });
+        }
+
+        try
+        {
+            // Use EF Core parameterized queries (prevents SQL injection)
+            var searchTermLower = searchTerm.ToLowerInvariant();
+            
+            var vendors = await _context.Vendors
+                .Where(v => !v.IsDeleted &&
+                    (EF.Functions.Like(v.StoreName.ToLower(), $"%{searchTermLower}%") ||
+                     EF.Functions.Like(v.BusinessName.ToLower(), $"%{searchTermLower}%")))
+                .OrderByDescending(v => v.Rating)
+                .Take(50) // Limit results
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            _logger.LogInformation("Vendor search completed: '{SearchTerm}', Results: {Count}", 
+                searchTerm, vendors.Count);
+
+            return Ok(vendors);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error searching vendors with term: {SearchTerm}", searchTerm);
+            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+        }
     }
 
     /// <summary>
