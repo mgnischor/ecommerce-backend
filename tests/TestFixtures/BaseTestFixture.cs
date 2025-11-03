@@ -33,6 +33,6 @@ public abstract class BaseTestFixture
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
-        return new PostgresqlContext(options);
+        return new TestPostgresqlContext(options);
     }
 }
