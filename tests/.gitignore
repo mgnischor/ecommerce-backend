@@ -1,0 +1,20 @@
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Build outputs
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Coverage reports
+CoverageReport/
+coverage*.xml
+coverage*.json
