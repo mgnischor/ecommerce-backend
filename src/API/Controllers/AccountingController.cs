@@ -205,7 +205,7 @@ public sealed class AccountingController : ControllerBase
     )
     {
         _logger.LogInformation(
-            "Retrieving journal entries: PageNumber={PageNumber}, PageSize={PageSize}",
+            "Fetching journal entries: Page={PageNumber}, PageSize={PageSize}",
             pageNumber,
             pageSize
         );
@@ -224,13 +224,13 @@ public sealed class AccountingController : ControllerBase
 
         try
         {
-            var allEntries = await _journalEntryRepository.GetAllAsync(cancellationToken);
-            var entries = allEntries
-                .OrderByDescending(je => je.EntryDate)
+            var entries = (await _journalEntryRepository.GetAllAsync(cancellationToken))
+                .OrderByDescending(e => e.EntryDate)
                 .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
+                .Take(pageSize)
+                .ToList();
 
-            var response = new List<JournalEntryResponseDto>();
+            var result = new List<JournalEntryResponseDto>();
 
             foreach (var entry in entries)
             {
@@ -248,7 +248,7 @@ public sealed class AccountingController : ControllerBase
                     EntryNumber = entry.EntryNumber,
                     EntryDate = entry.EntryDate,
                     DocumentType = entry.DocumentType,
-                    DocumentNumber = entry.DocumentNumber,
+                    DocumentNumber = entry.DocumentNumber ?? string.Empty,
                     History = entry.History,
                     TotalAmount = entry.TotalAmount,
                     IsPosted = entry.IsPosted,
@@ -266,38 +266,31 @@ public sealed class AccountingController : ControllerBase
                             {
                                 Id = ae.Id,
                                 AccountId = ae.AccountId,
-                                AccountCode = account?.AccountCode ?? "N/A",
-                                AccountName = account?.AccountName ?? "N/A",
-                                EntryType = ae.EntryType.ToString(),
+                                AccountCode = account?.AccountCode ?? string.Empty,
+                                AccountName = account?.AccountName ?? string.Empty,
                                 Amount = ae.Amount,
+                                EntryType = ae.EntryType.ToString(),
                                 Description = ae.Description,
-                                CostCenter = ae.CostCenter,
                             };
                         })
                         .ToList(),
                 };
 
-                response.Add(entryDto);
+                result.Add(entryDto);
             }
 
             _logger.LogInformation(
-                "Retrieved {Count} journal entries (page {PageNumber} of size {PageSize})",
-                response.Count,
-                pageNumber,
-                pageSize
+                "Retrieved {Count} journal entries: Page={PageNumber}",
+                result.Count,
+                pageNumber
             );
 
-            return Ok(response);
+            return Ok(result);
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                ex,
-                "Error retrieving journal entries: PageNumber={PageNumber}, PageSize={PageSize}",
-                pageNumber,
-                pageSize
-            );
-            throw;
+            _logger.LogError(ex, "Error retrieving journal entries");
+            return StatusCode(500, new { Message = "An error occurred processing your request" });
         }
     }
 
@@ -357,7 +350,7 @@ public sealed class AccountingController : ControllerBase
                 EntryNumber = entry.EntryNumber,
                 EntryDate = entry.EntryDate,
                 DocumentType = entry.DocumentType,
-                DocumentNumber = entry.DocumentNumber,
+                DocumentNumber = entry.DocumentNumber ?? string.Empty,
                 History = entry.History,
                 TotalAmount = entry.TotalAmount,
                 IsPosted = entry.IsPosted,
@@ -463,7 +456,7 @@ public sealed class AccountingController : ControllerBase
                     EntryNumber = entry.EntryNumber,
                     EntryDate = entry.EntryDate,
                     DocumentType = entry.DocumentType,
-                    DocumentNumber = entry.DocumentNumber,
+                    DocumentNumber = entry.DocumentNumber ?? string.Empty,
                     History = entry.History,
                     TotalAmount = entry.TotalAmount,
                     IsPosted = entry.IsPosted,
