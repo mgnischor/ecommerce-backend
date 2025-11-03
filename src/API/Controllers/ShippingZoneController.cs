@@ -1,9 +1,9 @@
+using System.Security.Claims;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace ECommerce.API.Controllers;
 
@@ -41,8 +41,8 @@ public sealed class ShippingZoneController : ControllerBase
     {
         try
         {
-            var zones = await _context.ShippingZones
-                .Where(z => z.IsActive && !z.IsDeleted)
+            var zones = await _context
+                .ShippingZones.Where(z => z.IsActive && !z.IsDeleted)
                 .OrderBy(z => z.Priority)
                 .ThenBy(z => z.Name)
                 .Take(MaxShippingZones)
@@ -55,7 +55,10 @@ public sealed class ShippingZoneController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving shipping zones");
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -79,8 +82,8 @@ public sealed class ShippingZoneController : ControllerBase
 
         try
         {
-            var zone = await _context.ShippingZones
-                .AsNoTracking()
+            var zone = await _context
+                .ShippingZones.AsNoTracking()
                 .FirstOrDefaultAsync(z => z.Id == id && !z.IsDeleted, cancellationToken);
 
             if (zone == null)
@@ -94,7 +97,10 @@ public sealed class ShippingZoneController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving shipping zone: {ZoneId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -140,8 +146,10 @@ public sealed class ShippingZoneController : ControllerBase
         try
         {
             // Check for duplicate name
-            var duplicateName = await _context.ShippingZones
-                .AnyAsync(z => z.Name == zone.Name && !z.IsDeleted, cancellationToken);
+            var duplicateName = await _context.ShippingZones.AnyAsync(
+                z => z.Name == zone.Name && !z.IsDeleted,
+                cancellationToken
+            );
 
             if (duplicateName)
             {
@@ -163,26 +171,34 @@ public sealed class ShippingZoneController : ControllerBase
                 RatePerItem = zone.RatePerItem,
                 TaxRate = zone.TaxRate,
                 FreeShippingThreshold = zone.FreeShippingThreshold,
-                EstimatedDeliveryDays = zone.EstimatedDeliveryDays,
+                EstimatedDeliveryDaysMin = zone.EstimatedDeliveryDaysMin,
+                EstimatedDeliveryDaysMax = zone.EstimatedDeliveryDaysMax,
                 Priority = zone.Priority,
                 IsActive = zone.IsActive,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty
+                CreatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty,
             };
 
             _context.ShippingZones.Add(newZone);
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Shipping zone created: {ZoneId}, Name: {Name}, User: {UserId}", 
-                newZone.Id, newZone.Name, GetCurrentUserId());
+            _logger.LogInformation(
+                "Shipping zone created: {ZoneId}, Name: {Name}, User: {UserId}",
+                newZone.Id,
+                newZone.Name,
+                GetCurrentUserId()
+            );
 
             return CreatedAtAction(nameof(GetShippingZoneById), new { id = newZone.Id }, newZone);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating shipping zone");
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -208,7 +224,11 @@ public sealed class ShippingZoneController : ControllerBase
 
         if (id == Guid.Empty || id != zone.Id)
         {
-            _logger.LogWarning("ID mismatch in shipping zone update. Route: {RouteId}, Body: {BodyId}", id, zone.Id);
+            _logger.LogWarning(
+                "ID mismatch in shipping zone update. Route: {RouteId}, Body: {BodyId}",
+                id,
+                zone.Id
+            );
             return BadRequest(new { Message = "ID mismatch" });
         }
 
@@ -225,8 +245,10 @@ public sealed class ShippingZoneController : ControllerBase
 
         try
         {
-            var existingZone = await _context.ShippingZones
-                .FirstOrDefaultAsync(z => z.Id == id && !z.IsDeleted, cancellationToken);
+            var existingZone = await _context.ShippingZones.FirstOrDefaultAsync(
+                z => z.Id == id && !z.IsDeleted,
+                cancellationToken
+            );
 
             if (existingZone == null)
             {
@@ -237,8 +259,10 @@ public sealed class ShippingZoneController : ControllerBase
             // Check for name conflict if name changed
             if (existingZone.Name != zone.Name)
             {
-                var duplicateName = await _context.ShippingZones
-                    .AnyAsync(z => z.Name == zone.Name && z.Id != id && !z.IsDeleted, cancellationToken);
+                var duplicateName = await _context.ShippingZones.AnyAsync(
+                    z => z.Name == zone.Name && z.Id != id && !z.IsDeleted,
+                    cancellationToken
+                );
 
                 if (duplicateName)
                 {
@@ -258,26 +282,41 @@ public sealed class ShippingZoneController : ControllerBase
             existingZone.RatePerItem = zone.RatePerItem;
             existingZone.TaxRate = zone.TaxRate;
             existingZone.FreeShippingThreshold = zone.FreeShippingThreshold;
-            existingZone.EstimatedDeliveryDays = zone.EstimatedDeliveryDays;
+            existingZone.EstimatedDeliveryDaysMin = zone.EstimatedDeliveryDaysMin;
+            existingZone.EstimatedDeliveryDaysMax = zone.EstimatedDeliveryDaysMax;
             existingZone.Priority = zone.Priority;
             existingZone.IsActive = zone.IsActive;
             existingZone.UpdatedAt = DateTime.UtcNow;
-            existingZone.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty;
+            existingZone.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId)
+                ? userId
+                : Guid.Empty;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Shipping zone updated: {ZoneId}, User: {UserId}", id, GetCurrentUserId());
+            _logger.LogInformation(
+                "Shipping zone updated: {ZoneId}, User: {UserId}",
+                id,
+                GetCurrentUserId()
+            );
             return NoContent();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating shipping zone: {ZoneId}", id);
-            return Conflict(new { Message = "The shipping zone was modified by another user. Please refresh and try again" });
+            return Conflict(
+                new
+                {
+                    Message = "The shipping zone was modified by another user. Please refresh and try again",
+                }
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating shipping zone: {ZoneId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -302,8 +341,10 @@ public sealed class ShippingZoneController : ControllerBase
 
         try
         {
-            var zone = await _context.ShippingZones
-                .FirstOrDefaultAsync(z => z.Id == id && !z.IsDeleted, cancellationToken);
+            var zone = await _context.ShippingZones.FirstOrDefaultAsync(
+                z => z.Id == id && !z.IsDeleted,
+                cancellationToken
+            );
 
             if (zone == null)
             {
@@ -313,18 +354,27 @@ public sealed class ShippingZoneController : ControllerBase
 
             zone.IsDeleted = true;
             zone.UpdatedAt = DateTime.UtcNow;
-            zone.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty;
+            zone.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId)
+                ? userId
+                : Guid.Empty;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogWarning("Shipping zone deleted: {ZoneId}, Name: {Name}, User: {UserId}", 
-                id, zone.Name, GetCurrentUserId());
+            _logger.LogWarning(
+                "Shipping zone deleted: {ZoneId}, Name: {Name}, User: {UserId}",
+                id,
+                zone.Name,
+                GetCurrentUserId()
+            );
             return NoContent();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting shipping zone: {ZoneId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 }
