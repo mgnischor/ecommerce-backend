@@ -2,6 +2,7 @@
 global using System;
 global using System.Collections.Generic;
 global using System.Linq;
+global using System.Threading;
 global using System.Threading.Tasks;
 global using ECommerce.Application.Interfaces;
 global using ECommerce.Application.Services;
