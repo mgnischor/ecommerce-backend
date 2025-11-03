@@ -22,9 +22,7 @@ internal sealed class PromotionEntityConfiguration : IEntityTypeConfiguration<Pr
             .HasColumnName("created_by")
             .HasDefaultValue(Guid.Parse("ce06e1a8-f688-44b6-b616-4badf09d9153"));
 
-        builder
-            .Property(p => p.UpdatedBy)
-            .HasColumnName("updated_by");
+        builder.Property(p => p.UpdatedBy).HasColumnName("updated_by");
 
         builder
             .Property(p => p.Name)
@@ -45,13 +43,9 @@ internal sealed class PromotionEntityConfiguration : IEntityTypeConfiguration<Pr
             .HasColumnName("type")
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(0);
+            .HasDefaultValue(ECommerce.Domain.Enums.PromotionType.PercentageDiscount);
 
-        builder
-            .Property(p => p.Code)
-            .HasColumnName("code")
-            .HasMaxLength(50)
-            .IsUnicode(false);
+        builder.Property(p => p.Code).HasColumnName("code").HasMaxLength(50).IsUnicode(false);
 
         builder
             .Property(p => p.DiscountPercentage)
@@ -85,18 +79,11 @@ internal sealed class PromotionEntityConfiguration : IEntityTypeConfiguration<Pr
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
-        builder
-            .Property(p => p.MaxUsageCount)
-            .HasColumnName("max_usage_count");
+        builder.Property(p => p.MaxUsageCount).HasColumnName("max_usage_count");
 
-        builder
-            .Property(p => p.UsageCount)
-            .HasColumnName("usage_count")
-            .HasDefaultValue(0);
+        builder.Property(p => p.UsageCount).HasColumnName("usage_count").HasDefaultValue(0);
 
-        builder
-            .Property(p => p.MaxUsagePerUser)
-            .HasColumnName("max_usage_per_user");
+        builder.Property(p => p.MaxUsagePerUser).HasColumnName("max_usage_per_user");
 
         builder
             .Property(p => p.EligibleProductIds)
@@ -116,25 +103,13 @@ internal sealed class PromotionEntityConfiguration : IEntityTypeConfiguration<Pr
             .HasColumnType("uuid[]")
             .HasDefaultValueSql("'{}'");
 
-        builder
-            .Property(p => p.Priority)
-            .HasColumnName("priority")
-            .HasDefaultValue(0);
+        builder.Property(p => p.Priority).HasColumnName("priority").HasDefaultValue(0);
 
-        builder
-            .Property(p => p.IsCombinable)
-            .HasColumnName("is_combinable")
-            .HasDefaultValue(true);
+        builder.Property(p => p.IsCombinable).HasColumnName("is_combinable").HasDefaultValue(true);
 
-        builder
-            .Property(p => p.IsActive)
-            .HasColumnName("is_active")
-            .HasDefaultValue(true);
+        builder.Property(p => p.IsActive).HasColumnName("is_active").HasDefaultValue(true);
 
-        builder
-            .Property(p => p.IsFeatured)
-            .HasColumnName("is_featured")
-            .HasDefaultValue(false);
+        builder.Property(p => p.IsFeatured).HasColumnName("is_featured").HasDefaultValue(false);
 
         builder
             .Property(p => p.BannerUrl)
@@ -148,10 +123,7 @@ internal sealed class PromotionEntityConfiguration : IEntityTypeConfiguration<Pr
             .HasMaxLength(5000)
             .IsUnicode(true);
 
-        builder
-            .Property(p => p.IsDeleted)
-            .HasColumnName("is_deleted")
-            .HasDefaultValue(false);
+        builder.Property(p => p.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false);
 
         builder
             .Property(p => p.CreatedAt)
@@ -173,6 +145,13 @@ internal sealed class PromotionEntityConfiguration : IEntityTypeConfiguration<Pr
         builder.HasIndex(p => p.IsFeatured).HasDatabaseName("ix_promotions_is_featured");
         builder.HasIndex(p => p.StartDate).HasDatabaseName("ix_promotions_start_date");
         builder.HasIndex(p => p.EndDate).HasDatabaseName("ix_promotions_end_date");
-        builder.HasIndex(p => new { p.StartDate, p.EndDate, p.IsActive }).HasDatabaseName("ix_promotions_active_dates");
+        builder
+            .HasIndex(p => new
+            {
+                p.StartDate,
+                p.EndDate,
+                p.IsActive,
+            })
+            .HasDatabaseName("ix_promotions_active_dates");
     }
 }
