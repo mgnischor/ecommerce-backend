@@ -1,10 +1,10 @@
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using System.Text.RegularExpressions;
 
 namespace ECommerce.API.Controllers;
 
@@ -45,8 +45,8 @@ public sealed class ProductAttributeController : ControllerBase
     {
         try
         {
-            var attributes = await _context.ProductAttributes
-                .Where(a => !a.IsDeleted)
+            var attributes = await _context
+                .ProductAttributes.Where(a => !a.IsDeleted)
                 .OrderBy(a => a.DisplayOrder)
                 .ThenBy(a => a.Name)
                 .Take(MaxAttributes)
@@ -59,7 +59,10 @@ public sealed class ProductAttributeController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving product attributes");
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -84,8 +87,8 @@ public sealed class ProductAttributeController : ControllerBase
 
         try
         {
-            var attribute = await _context.ProductAttributes
-                .AsNoTracking()
+            var attribute = await _context
+                .ProductAttributes.AsNoTracking()
                 .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted, cancellationToken);
 
             if (attribute == null)
@@ -99,7 +102,10 @@ public sealed class ProductAttributeController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving product attribute: {AttributeId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -138,8 +144,8 @@ public sealed class ProductAttributeController : ControllerBase
 
         try
         {
-            var attribute = await _context.ProductAttributes
-                .AsNoTracking()
+            var attribute = await _context
+                .ProductAttributes.AsNoTracking()
                 .FirstOrDefaultAsync(a => a.Code == code && !a.IsDeleted, cancellationToken);
 
             if (attribute == null)
@@ -153,7 +159,10 @@ public sealed class ProductAttributeController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving product attribute by code");
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -169,8 +178,8 @@ public sealed class ProductAttributeController : ControllerBase
     {
         try
         {
-            var attributes = await _context.ProductAttributes
-                .Where(a => a.IsVariantAttribute && !a.IsDeleted)
+            var attributes = await _context
+                .ProductAttributes.Where(a => a.IsVariantAttribute && !a.IsDeleted)
                 .OrderBy(a => a.DisplayOrder)
                 .Take(MaxAttributes)
                 .AsNoTracking()
@@ -182,7 +191,10 @@ public sealed class ProductAttributeController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving variant attributes");
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -207,17 +219,26 @@ public sealed class ProductAttributeController : ControllerBase
         // Input validation
         if (string.IsNullOrWhiteSpace(attribute.Name) || attribute.Name.Length > 100)
         {
-            return BadRequest(new { Message = "Valid attribute name is required (max 100 characters)" });
+            return BadRequest(
+                new { Message = "Valid attribute name is required (max 100 characters)" }
+            );
         }
 
         if (string.IsNullOrWhiteSpace(attribute.Code) || attribute.Code.Length > 50)
         {
-            return BadRequest(new { Message = "Valid attribute code is required (max 50 characters)" });
+            return BadRequest(
+                new { Message = "Valid attribute code is required (max 50 characters)" }
+            );
         }
 
         if (!Regex.IsMatch(attribute.Code, @"^[a-zA-Z0-9\-_]+$"))
         {
-            return BadRequest(new { Message = "Invalid attribute code format. Use alphanumeric, hyphens, underscores only" });
+            return BadRequest(
+                new
+                {
+                    Message = "Invalid attribute code format. Use alphanumeric, hyphens, underscores only",
+                }
+            );
         }
 
         if (attribute.DisplayOrder < 0)
@@ -228,12 +249,17 @@ public sealed class ProductAttributeController : ControllerBase
         try
         {
             // Check for duplicate code
-            var duplicateCode = await _context.ProductAttributes
-                .AnyAsync(a => a.Code == attribute.Code && !a.IsDeleted, cancellationToken);
+            var duplicateCode = await _context.ProductAttributes.AnyAsync(
+                a => a.Code == attribute.Code && !a.IsDeleted,
+                cancellationToken
+            );
 
             if (duplicateCode)
             {
-                _logger.LogWarning("Duplicate product attribute code attempt: {Code}", attribute.Code);
+                _logger.LogWarning(
+                    "Duplicate product attribute code attempt: {Code}",
+                    attribute.Code
+                );
                 return Conflict(new { Message = "Attribute code already exists" });
             }
 
@@ -254,21 +280,32 @@ public sealed class ProductAttributeController : ControllerBase
                 DisplayOrder = attribute.DisplayOrder,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty
+                CreatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty,
             };
 
             _context.ProductAttributes.Add(newAttribute);
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Product attribute created: {AttributeId}, Code: {Code}, User: {UserId}", 
-                newAttribute.Id, newAttribute.Code, GetCurrentUserId());
+            _logger.LogInformation(
+                "Product attribute created: {AttributeId}, Code: {Code}, User: {UserId}",
+                newAttribute.Id,
+                newAttribute.Code,
+                GetCurrentUserId()
+            );
 
-            return CreatedAtAction(nameof(GetAttributeById), new { id = newAttribute.Id }, newAttribute);
+            return CreatedAtAction(
+                nameof(GetAttributeById),
+                new { id = newAttribute.Id },
+                newAttribute
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating product attribute");
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -294,20 +331,28 @@ public sealed class ProductAttributeController : ControllerBase
 
         if (id == Guid.Empty || id != attribute.Id)
         {
-            _logger.LogWarning("ID mismatch in attribute update. Route: {RouteId}, Body: {BodyId}", id, attribute.Id);
+            _logger.LogWarning(
+                "ID mismatch in attribute update. Route: {RouteId}, Body: {BodyId}",
+                id,
+                attribute.Id
+            );
             return BadRequest(new { Message = "ID mismatch" });
         }
 
         // Input validation
         if (string.IsNullOrWhiteSpace(attribute.Name) || attribute.Name.Length > 100)
         {
-            return BadRequest(new { Message = "Valid attribute name is required (max 100 characters)" });
+            return BadRequest(
+                new { Message = "Valid attribute name is required (max 100 characters)" }
+            );
         }
 
         try
         {
-            var existingAttribute = await _context.ProductAttributes
-                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted, cancellationToken);
+            var existingAttribute = await _context.ProductAttributes.FirstOrDefaultAsync(
+                a => a.Id == id && !a.IsDeleted,
+                cancellationToken
+            );
 
             if (existingAttribute == null)
             {
@@ -318,12 +363,17 @@ public sealed class ProductAttributeController : ControllerBase
             // Check for code conflict if code changed
             if (existingAttribute.Code != attribute.Code)
             {
-                var duplicateCode = await _context.ProductAttributes
-                    .AnyAsync(a => a.Code == attribute.Code && a.Id != id && !a.IsDeleted, cancellationToken);
+                var duplicateCode = await _context.ProductAttributes.AnyAsync(
+                    a => a.Code == attribute.Code && a.Id != id && !a.IsDeleted,
+                    cancellationToken
+                );
 
                 if (duplicateCode)
                 {
-                    _logger.LogWarning("Duplicate attribute code in update: {Code}", attribute.Code);
+                    _logger.LogWarning(
+                        "Duplicate attribute code in update: {Code}",
+                        attribute.Code
+                    );
                     return Conflict(new { Message = "Attribute code already exists" });
                 }
             }
@@ -341,22 +391,36 @@ public sealed class ProductAttributeController : ControllerBase
             existingAttribute.DefaultValue = attribute.DefaultValue;
             existingAttribute.DisplayOrder = attribute.DisplayOrder;
             existingAttribute.UpdatedAt = DateTime.UtcNow;
-            existingAttribute.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty;
+            existingAttribute.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId)
+                ? userId
+                : Guid.Empty;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Product attribute updated: {AttributeId}, User: {UserId}", id, GetCurrentUserId());
+            _logger.LogInformation(
+                "Product attribute updated: {AttributeId}, User: {UserId}",
+                id,
+                GetCurrentUserId()
+            );
             return NoContent();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating attribute: {AttributeId}", id);
-            return Conflict(new { Message = "The attribute was modified by another user. Please refresh and try again" });
+            return Conflict(
+                new
+                {
+                    Message = "The attribute was modified by another user. Please refresh and try again",
+                }
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating product attribute: {AttributeId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -381,8 +445,10 @@ public sealed class ProductAttributeController : ControllerBase
 
         try
         {
-            var attribute = await _context.ProductAttributes
-                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted, cancellationToken);
+            var attribute = await _context.ProductAttributes.FirstOrDefaultAsync(
+                a => a.Id == id && !a.IsDeleted,
+                cancellationToken
+            );
 
             if (attribute == null)
             {
@@ -392,18 +458,27 @@ public sealed class ProductAttributeController : ControllerBase
 
             attribute.IsDeleted = true;
             attribute.UpdatedAt = DateTime.UtcNow;
-            attribute.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty;
+            attribute.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId)
+                ? userId
+                : Guid.Empty;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogWarning("Product attribute deleted: {AttributeId}, Code: {Code}, User: {UserId}", 
-                id, attribute.Code, GetCurrentUserId());
+            _logger.LogWarning(
+                "Product attribute deleted: {AttributeId}, Code: {Code}, User: {UserId}",
+                id,
+                attribute.Code,
+                GetCurrentUserId()
+            );
             return NoContent();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting product attribute: {AttributeId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 }
