@@ -71,21 +71,48 @@ public sealed class ProductVariantController : ControllerBase
     /// </summary>
     [HttpGet("sku/{sku}")]
     [ProducesResponseType(typeof(ProductVariantEntity), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductVariantEntity>> GetVariantBySku(
         string sku,
         CancellationToken cancellationToken = default
     )
     {
-        var variant = await _context.ProductVariants.FirstOrDefaultAsync(
-            v => v.Sku == sku && !v.IsDeleted,
-            cancellationToken
-        );
+        // Input validation
+        if (string.IsNullOrWhiteSpace(sku))
+        {
+            return BadRequest(new { Message = "SKU is required" });
+        }
 
-        if (variant == null)
-            return NotFound(new { Message = $"Product variant with SKU '{sku}' not found" });
+        if (sku.Length > 50)
+        {
+            return BadRequest(new { Message = "SKU must not exceed 50 characters" });
+        }
 
-        return Ok(variant);
+        // Validate SKU format (alphanumeric, hyphens, underscores)
+        if (!System.Text.RegularExpressions.Regex.IsMatch(sku, @"^[a-zA-Z0-9\-_]+$"))
+        {
+            return BadRequest(new { Message = "Invalid SKU format" });
+        }
+
+        try
+        {
+            var variant = await _context.ProductVariants
+                .AsNoTracking()
+                .FirstOrDefaultAsync(v => v.Sku == sku && !v.IsDeleted, cancellationToken);
+
+            if (variant == null)
+            {
+                return NotFound(new { Message = "Product variant not found" });
+            }
+
+            return Ok(variant);
+        }
+        catch (Exception ex)
+        {
+            // Don't log the SKU to avoid exposing potential attack vectors in logs
+            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+        }
     }
 
     /// <summary>
