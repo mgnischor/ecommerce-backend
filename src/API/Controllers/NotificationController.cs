@@ -3,6 +3,7 @@ using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ECommerce.API.Controllers;
 
@@ -18,6 +19,7 @@ public sealed class NotificationController : ControllerBase
 {
     private readonly PostgresqlContext _context;
     private readonly ILogger<NotificationController> _logger;
+    private const int MaxNotificationsPerUser = 1000;
 
     public NotificationController(PostgresqlContext context, ILogger<NotificationController> logger)
     {
@@ -25,29 +27,64 @@ public sealed class NotificationController : ControllerBase
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    private string? GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+    
+    private bool IsAdmin() => User.IsInRole("Admin");
+    
+    private bool IsManager() => User.IsInRole("Manager");
+
     /// <summary>
     /// Retrieves notifications for the authenticated user
     /// </summary>
     [HttpGet("user/{userId:guid}")]
     [ProducesResponseType(typeof(IEnumerable<NotificationEntity>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<IEnumerable<NotificationEntity>>> GetUserNotifications(
         Guid userId,
         [FromQuery] bool unreadOnly = false,
         CancellationToken cancellationToken = default
     )
     {
-        var query = _context.Notifications
-            .Where(n => n.UserId == userId && !n.IsDeleted);
+        if (userId == Guid.Empty)
+        {
+            _logger.LogWarning("Invalid user GUID provided for notifications");
+            return BadRequest(new { Message = "Invalid user ID" });
+        }
 
-        if (unreadOnly)
-            query = query.Where(n => !n.IsRead);
+        try
+        {
+            // IDOR Protection: Users can only access their own notifications
+            var currentUserId = GetCurrentUserId();
+            if (!IsAdmin() && userId.ToString() != currentUserId)
+            {
+                _logger.LogWarning("Unauthorized access attempt to user notifications: {UserId}, User: {CurrentUserId}", 
+                    userId, currentUserId);
+                return Forbid();
+            }
 
-        var notifications = await query
-            .OrderByDescending(n => n.Priority)
-            .ThenByDescending(n => n.CreatedAt)
-            .ToListAsync(cancellationToken);
+            var query = _context.Notifications
+                .Where(n => n.UserId == userId && !n.IsDeleted);
 
-        return Ok(notifications);
+            if (unreadOnly)
+                query = query.Where(n => !n.IsRead);
+
+            var notifications = await query
+                .OrderByDescending(n => n.Priority)
+                .ThenByDescending(n => n.CreatedAt)
+                .Take(MaxNotificationsPerUser)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            _logger.LogInformation("Retrieved {Count} notifications for user: {UserId}", 
+                notifications.Count, userId);
+
+            return Ok(notifications);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving notifications for user: {UserId}", userId);
+            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+        }
     }
 
     /// <summary>
@@ -101,26 +138,56 @@ public sealed class NotificationController : ControllerBase
     /// </summary>
     [HttpPatch("{id:guid}/read")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> MarkAsRead(
         Guid id,
         CancellationToken cancellationToken = default
     )
     {
-        var notification = await _context.Notifications.FindAsync(
-            new object[] { id },
-            cancellationToken
-        );
+        if (id == Guid.Empty)
+        {
+            _logger.LogWarning("Invalid notification GUID provided");
+            return BadRequest(new { Message = "Invalid notification ID" });
+        }
 
-        if (notification == null || notification.IsDeleted)
-            return NotFound(new { Message = $"Notification with ID '{id}' not found" });
+        try
+        {
+            var notification = await _context.Notifications
+                .FirstOrDefaultAsync(n => n.Id == id && !n.IsDeleted, cancellationToken);
 
-        notification.IsRead = true;
-        notification.ReadAt = DateTime.UtcNow;
+            if (notification == null)
+            {
+                _logger.LogWarning("Notification not found: {NotificationId}", id);
+                return NotFound(new { Message = "Notification not found" });
+            }
 
-        await _context.SaveChangesAsync(cancellationToken);
+            // IDOR Protection: Users can only mark their own notifications as read
+            var currentUserId = GetCurrentUserId();
+            if (!IsAdmin() && notification.UserId.ToString() != currentUserId)
+            {
+                _logger.LogWarning("Unauthorized attempt to mark notification as read: {NotificationId}, User: {UserId}", 
+                    id, currentUserId);
+                return Forbid();
+            }
 
-        return NoContent();
+            if (!notification.IsRead)
+            {
+                notification.IsRead = true;
+                notification.ReadAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync(cancellationToken);
+                
+                _logger.LogInformation("Notification marked as read: {NotificationId}, User: {UserId}", 
+                    id, currentUserId);
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error marking notification as read: {NotificationId}", id);
+            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+        }
     }
 
     /// <summary>
@@ -128,24 +195,56 @@ public sealed class NotificationController : ControllerBase
     /// </summary>
     [HttpPatch("user/{userId:guid}/read-all")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> MarkAllAsRead(
         Guid userId,
         CancellationToken cancellationToken = default
     )
     {
-        var notifications = await _context.Notifications
-            .Where(n => n.UserId == userId && !n.IsRead && !n.IsDeleted)
-            .ToListAsync(cancellationToken);
-
-        foreach (var notification in notifications)
+        if (userId == Guid.Empty)
         {
-            notification.IsRead = true;
-            notification.ReadAt = DateTime.UtcNow;
+            _logger.LogWarning("Invalid user GUID provided for mark all as read");
+            return BadRequest(new { Message = "Invalid user ID" });
         }
 
-        await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            // IDOR Protection: Users can only mark their own notifications
+            var currentUserId = GetCurrentUserId();
+            if (!IsAdmin() && userId.ToString() != currentUserId)
+            {
+                _logger.LogWarning("Unauthorized attempt to mark all notifications as read: {UserId}, User: {CurrentUserId}", 
+                    userId, currentUserId);
+                return Forbid();
+            }
 
-        return NoContent();
+            var notifications = await _context.Notifications
+                .Where(n => n.UserId == userId && !n.IsRead && !n.IsDeleted)
+                .Take(MaxNotificationsPerUser)
+                .ToListAsync(cancellationToken);
+
+            if (notifications.Any())
+            {
+                var now = DateTime.UtcNow;
+                foreach (var notification in notifications)
+                {
+                    notification.IsRead = true;
+                    notification.ReadAt = now;
+                }
+
+                await _context.SaveChangesAsync(cancellationToken);
+
+                _logger.LogInformation("Marked {Count} notifications as read for user: {UserId}", 
+                    notifications.Count, userId);
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error marking all notifications as read for user: {UserId}", userId);
+            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+        }
     }
 
     /// <summary>
