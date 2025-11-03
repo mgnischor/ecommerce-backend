@@ -93,25 +93,51 @@ public sealed class SupplierController : ControllerBase
     /// </summary>
     [HttpGet("search")]
     [ProducesResponseType(typeof(IEnumerable<SupplierEntity>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<SupplierEntity>>> SearchSuppliers(
         [FromQuery] string searchTerm,
         CancellationToken cancellationToken = default
     )
     {
+        // Input validation
         if (string.IsNullOrWhiteSpace(searchTerm))
-            return BadRequest("Search term is required");
+        {
+            return BadRequest(new { Message = "Search term is required" });
+        }
 
-        var suppliers = await _context
-            .Suppliers
-            .Where(
-                s =>
-                    !s.IsDeleted
-                    && s.CompanyName.ToLower().Contains(searchTerm.ToLower())
-            )
-            .OrderBy(s => s.CompanyName)
-            .ToListAsync(cancellationToken);
+        if (searchTerm.Length < 2)
+        {
+            return BadRequest(new { Message = "Search term must be at least 2 characters" });
+        }
 
-        return Ok(suppliers);
+        if (searchTerm.Length > 100)
+        {
+            return BadRequest(new { Message = "Search term must not exceed 100 characters" });
+        }
+
+        try
+        {
+            // Use EF Core parameterized queries (prevents SQL injection)
+            var searchTermLower = searchTerm.ToLowerInvariant();
+            
+            var suppliers = await _context.Suppliers
+                .Where(s => !s.IsDeleted &&
+                    EF.Functions.Like(s.CompanyName.ToLower(), $"%{searchTermLower}%"))
+                .OrderBy(s => s.CompanyName)
+                .Take(50) // Limit results
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            _logger.LogInformation("Supplier search completed: '{SearchTerm}', Results: {Count}", 
+                searchTerm, suppliers.Count);
+
+            return Ok(suppliers);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error searching suppliers with term: {SearchTerm}", searchTerm);
+            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+        }
     }
 
     /// <summary>
