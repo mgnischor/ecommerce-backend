@@ -1,10 +1,10 @@
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using System.Text.RegularExpressions;
 
 namespace ECommerce.API.Controllers;
 
@@ -73,8 +73,13 @@ public sealed class ShipmentController : ControllerBase
             // Prevent excessive data retrieval
             if (totalCount > MaxResultLimit && pageNumber * pageSize > MaxResultLimit)
             {
-                _logger.LogWarning("Attempt to retrieve data beyond limit. User: {UserId}", GetCurrentUserId());
-                return BadRequest(new { Message = "Result set too large. Please refine your query" });
+                _logger.LogWarning(
+                    "Attempt to retrieve data beyond limit. User: {UserId}",
+                    GetCurrentUserId()
+                );
+                return BadRequest(
+                    new { Message = "Result set too large. Please refine your query" }
+                );
             }
 
             var shipments = await query
@@ -87,17 +92,27 @@ public sealed class ShipmentController : ControllerBase
             Response.Headers.Append("X-Total-Count", totalCount.ToString());
             Response.Headers.Append("X-Page-Number", pageNumber.ToString());
             Response.Headers.Append("X-Page-Size", pageSize.ToString());
-            Response.Headers.Append("X-Total-Pages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
+            Response.Headers.Append(
+                "X-Total-Pages",
+                ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString()
+            );
 
-            _logger.LogInformation("Retrieved {Count} shipments. Page: {Page}, User: {UserId}", 
-                shipments.Count, pageNumber, GetCurrentUserId());
+            _logger.LogInformation(
+                "Retrieved {Count} shipments. Page: {Page}, User: {UserId}",
+                shipments.Count,
+                pageNumber,
+                GetCurrentUserId()
+            );
 
             return Ok(shipments);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving shipments. User: {UserId}", GetCurrentUserId());
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -121,39 +136,53 @@ public sealed class ShipmentController : ControllerBase
 
         try
         {
-            var shipment = await _context.Shipments
-                .AsNoTracking()
+            var shipment = await _context
+                .Shipments.AsNoTracking()
                 .FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted, cancellationToken);
 
             if (shipment == null)
             {
-                _logger.LogWarning("Shipment not found: {ShipmentId}, User: {UserId}", id, GetCurrentUserId());
+                _logger.LogWarning(
+                    "Shipment not found: {ShipmentId}, User: {UserId}",
+                    id,
+                    GetCurrentUserId()
+                );
                 return NotFound(new { Message = "Shipment not found" });
             }
 
             // Authorization check - users can only view their own shipments unless admin/manager
             if (!IsAdmin() && !IsManager())
             {
-                var order = await _context.Orders
-                    .AsNoTracking()
+                var order = await _context
+                    .Orders.AsNoTracking()
                     .FirstOrDefaultAsync(o => o.Id == shipment.OrderId, cancellationToken);
 
                 var currentUserId = GetCurrentUserId();
                 if (order == null || order.CustomerId.ToString() != currentUserId)
                 {
-                    _logger.LogWarning("Unauthorized access attempt to shipment: {ShipmentId}, User: {UserId}", 
-                        id, currentUserId);
+                    _logger.LogWarning(
+                        "Unauthorized access attempt to shipment: {ShipmentId}, User: {UserId}",
+                        id,
+                        currentUserId
+                    );
                     return Forbid();
                 }
             }
 
-            _logger.LogInformation("Shipment retrieved: {ShipmentId}, User: {UserId}", id, GetCurrentUserId());
+            _logger.LogInformation(
+                "Shipment retrieved: {ShipmentId}, User: {UserId}",
+                id,
+                GetCurrentUserId()
+            );
             return Ok(shipment);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving shipment: {ShipmentId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -178,13 +207,17 @@ public sealed class ShipmentController : ControllerBase
         try
         {
             // Verify order exists and user has access
-            var order = await _context.Orders
-                .AsNoTracking()
+            var order = await _context
+                .Orders.AsNoTracking()
                 .FirstOrDefaultAsync(o => o.Id == orderId && !o.IsDeleted, cancellationToken);
 
             if (order == null)
             {
-                _logger.LogWarning("Order not found: {OrderId}, User: {UserId}", orderId, GetCurrentUserId());
+                _logger.LogWarning(
+                    "Order not found: {OrderId}, User: {UserId}",
+                    orderId,
+                    GetCurrentUserId()
+                );
                 return NotFound(new { Message = "Order not found" });
             }
 
@@ -192,27 +225,37 @@ public sealed class ShipmentController : ControllerBase
             var currentUserId = GetCurrentUserId();
             if (!IsAdmin() && !IsManager() && order.CustomerId.ToString() != currentUserId)
             {
-                _logger.LogWarning("Unauthorized access attempt to order shipments: {OrderId}, User: {UserId}", 
-                    orderId, currentUserId);
+                _logger.LogWarning(
+                    "Unauthorized access attempt to order shipments: {OrderId}, User: {UserId}",
+                    orderId,
+                    currentUserId
+                );
                 return Forbid();
             }
 
-            var shipments = await _context.Shipments
-                .Where(s => s.OrderId == orderId && !s.IsDeleted)
+            var shipments = await _context
+                .Shipments.Where(s => s.OrderId == orderId && !s.IsDeleted)
                 .OrderByDescending(s => s.CreatedAt)
                 .Take(100) // Limit results
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            _logger.LogInformation("Retrieved {Count} shipments for order: {OrderId}, User: {UserId}", 
-                shipments.Count, orderId, currentUserId);
+            _logger.LogInformation(
+                "Retrieved {Count} shipments for order: {OrderId}, User: {UserId}",
+                shipments.Count,
+                orderId,
+                currentUserId
+            );
 
             return Ok(shipments);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving shipments for order: {OrderId}", orderId);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -247,8 +290,8 @@ public sealed class ShipmentController : ControllerBase
         try
         {
             // Use parameterized query to prevent SQL injection
-            var shipment = await _context.Shipments
-                .AsNoTracking()
+            var shipment = await _context
+                .Shipments.AsNoTracking()
                 .FirstOrDefaultAsync(
                     s => s.TrackingNumber == trackingNumber && !s.IsDeleted,
                     cancellationToken
@@ -256,17 +299,26 @@ public sealed class ShipmentController : ControllerBase
 
             if (shipment == null)
             {
-                _logger.LogInformation("Tracking number not found: {TrackingNumber}", trackingNumber);
+                _logger.LogInformation(
+                    "Tracking number not found: {TrackingNumber}",
+                    trackingNumber
+                );
                 return NotFound(new { Message = "Shipment not found" });
             }
 
-            _logger.LogInformation("Shipment tracked successfully: {TrackingNumber}", trackingNumber);
+            _logger.LogInformation(
+                "Shipment tracked successfully: {TrackingNumber}",
+                trackingNumber
+            );
             return Ok(shipment);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error tracking shipment: {TrackingNumber}", trackingNumber);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -296,35 +348,52 @@ public sealed class ShipmentController : ControllerBase
             return BadRequest(new { Message = "Valid Order ID is required" });
         }
 
-        if (string.IsNullOrWhiteSpace(shipment.TrackingNumber) || shipment.TrackingNumber.Length > 50)
+        if (
+            string.IsNullOrWhiteSpace(shipment.TrackingNumber)
+            || shipment.TrackingNumber.Length > 50
+        )
         {
-            return BadRequest(new { Message = "Valid tracking number is required (max 50 characters)" });
+            return BadRequest(
+                new { Message = "Valid tracking number is required (max 50 characters)" }
+            );
         }
 
         if (string.IsNullOrWhiteSpace(shipment.Carrier) || shipment.Carrier.Length > 100)
         {
-            return BadRequest(new { Message = "Valid carrier name is required (max 100 characters)" });
+            return BadRequest(
+                new { Message = "Valid carrier name is required (max 100 characters)" }
+            );
         }
 
         try
         {
             // Verify order exists
-            var orderExists = await _context.Orders
-                .AnyAsync(o => o.Id == shipment.OrderId && !o.IsDeleted, cancellationToken);
+            var orderExists = await _context.Orders.AnyAsync(
+                o => o.Id == shipment.OrderId && !o.IsDeleted,
+                cancellationToken
+            );
 
             if (!orderExists)
             {
-                _logger.LogWarning("Attempt to create shipment for non-existent order: {OrderId}", shipment.OrderId);
+                _logger.LogWarning(
+                    "Attempt to create shipment for non-existent order: {OrderId}",
+                    shipment.OrderId
+                );
                 return BadRequest(new { Message = "Order not found" });
             }
 
             // Check for duplicate tracking number
-            var duplicateTracking = await _context.Shipments
-                .AnyAsync(s => s.TrackingNumber == shipment.TrackingNumber && !s.IsDeleted, cancellationToken);
+            var duplicateTracking = await _context.Shipments.AnyAsync(
+                s => s.TrackingNumber == shipment.TrackingNumber && !s.IsDeleted,
+                cancellationToken
+            );
 
             if (duplicateTracking)
             {
-                _logger.LogWarning("Duplicate tracking number attempt: {TrackingNumber}", shipment.TrackingNumber);
+                _logger.LogWarning(
+                    "Duplicate tracking number attempt: {TrackingNumber}",
+                    shipment.TrackingNumber
+                );
                 return Conflict(new { Message = "Tracking number already exists" });
             }
 
@@ -337,24 +406,35 @@ public sealed class ShipmentController : ControllerBase
                 Carrier = shipment.Carrier,
                 Status = shipment.Status,
                 ShippedAt = shipment.ShippedAt,
-                EstimatedDeliveryDate = shipment.EstimatedDeliveryDate,
+                ExpectedDeliveryDate = shipment.ExpectedDeliveryDate,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty
+                CreatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty,
             };
 
             _context.Shipments.Add(newShipment);
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Shipment created: {ShipmentId}, Order: {OrderId}, User: {UserId}", 
-                newShipment.Id, newShipment.OrderId, GetCurrentUserId());
+            _logger.LogInformation(
+                "Shipment created: {ShipmentId}, Order: {OrderId}, User: {UserId}",
+                newShipment.Id,
+                newShipment.OrderId,
+                GetCurrentUserId()
+            );
 
-            return CreatedAtAction(nameof(GetShipmentById), new { id = newShipment.Id }, newShipment);
+            return CreatedAtAction(
+                nameof(GetShipmentById),
+                new { id = newShipment.Id },
+                newShipment
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating shipment for order: {OrderId}", shipment.OrderId);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -381,20 +461,31 @@ public sealed class ShipmentController : ControllerBase
 
         if (id == Guid.Empty || id != shipment.Id)
         {
-            _logger.LogWarning("ID mismatch in shipment update. Route: {RouteId}, Body: {BodyId}", id, shipment.Id);
+            _logger.LogWarning(
+                "ID mismatch in shipment update. Route: {RouteId}, Body: {BodyId}",
+                id,
+                shipment.Id
+            );
             return BadRequest(new { Message = "ID mismatch" });
         }
 
         // Input validation
-        if (string.IsNullOrWhiteSpace(shipment.TrackingNumber) || shipment.TrackingNumber.Length > 50)
+        if (
+            string.IsNullOrWhiteSpace(shipment.TrackingNumber)
+            || shipment.TrackingNumber.Length > 50
+        )
         {
-            return BadRequest(new { Message = "Valid tracking number is required (max 50 characters)" });
+            return BadRequest(
+                new { Message = "Valid tracking number is required (max 50 characters)" }
+            );
         }
 
         try
         {
-            var existingShipment = await _context.Shipments
-                .FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted, cancellationToken);
+            var existingShipment = await _context.Shipments.FirstOrDefaultAsync(
+                s => s.Id == id && !s.IsDeleted,
+                cancellationToken
+            );
 
             if (existingShipment == null)
             {
@@ -405,13 +496,17 @@ public sealed class ShipmentController : ControllerBase
             // Check for tracking number conflict
             if (existingShipment.TrackingNumber != shipment.TrackingNumber)
             {
-                var duplicateTracking = await _context.Shipments
-                    .AnyAsync(s => s.TrackingNumber == shipment.TrackingNumber && 
-                                   s.Id != id && !s.IsDeleted, cancellationToken);
+                var duplicateTracking = await _context.Shipments.AnyAsync(
+                    s => s.TrackingNumber == shipment.TrackingNumber && s.Id != id && !s.IsDeleted,
+                    cancellationToken
+                );
 
                 if (duplicateTracking)
                 {
-                    _logger.LogWarning("Duplicate tracking number in update: {TrackingNumber}", shipment.TrackingNumber);
+                    _logger.LogWarning(
+                        "Duplicate tracking number in update: {TrackingNumber}",
+                        shipment.TrackingNumber
+                    );
                     return Conflict(new { Message = "Tracking number already exists" });
                 }
             }
@@ -421,25 +516,39 @@ public sealed class ShipmentController : ControllerBase
             existingShipment.Carrier = shipment.Carrier;
             existingShipment.Status = shipment.Status;
             existingShipment.ShippedAt = shipment.ShippedAt;
-            existingShipment.EstimatedDeliveryDate = shipment.EstimatedDeliveryDate;
-            existingShipment.ActualDeliveryDate = shipment.ActualDeliveryDate;
+            existingShipment.ExpectedDeliveryDate = shipment.ExpectedDeliveryDate;
+            existingShipment.DeliveredAt = shipment.DeliveredAt;
             existingShipment.UpdatedAt = DateTime.UtcNow;
-            existingShipment.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty;
+            existingShipment.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId)
+                ? userId
+                : Guid.Empty;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Shipment updated: {ShipmentId}, User: {UserId}", id, GetCurrentUserId());
+            _logger.LogInformation(
+                "Shipment updated: {ShipmentId}, User: {UserId}",
+                id,
+                GetCurrentUserId()
+            );
             return NoContent();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating shipment: {ShipmentId}", id);
-            return Conflict(new { Message = "The shipment was modified by another user. Please refresh and try again" });
+            return Conflict(
+                new
+                {
+                    Message = "The shipment was modified by another user. Please refresh and try again",
+                }
+            );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating shipment: {ShipmentId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -464,8 +573,10 @@ public sealed class ShipmentController : ControllerBase
 
         try
         {
-            var shipment = await _context.Shipments
-                .FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted, cancellationToken);
+            var shipment = await _context.Shipments.FirstOrDefaultAsync(
+                s => s.Id == id && !s.IsDeleted,
+                cancellationToken
+            );
 
             if (shipment == null)
             {
@@ -475,17 +586,26 @@ public sealed class ShipmentController : ControllerBase
 
             shipment.IsDeleted = true;
             shipment.UpdatedAt = DateTime.UtcNow;
-            shipment.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId) ? userId : Guid.Empty;
+            shipment.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId)
+                ? userId
+                : Guid.Empty;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogWarning("Shipment deleted: {ShipmentId}, User: {UserId}", id, GetCurrentUserId());
+            _logger.LogWarning(
+                "Shipment deleted: {ShipmentId}, User: {UserId}",
+                id,
+                GetCurrentUserId()
+            );
             return NoContent();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting shipment: {ShipmentId}", id);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 }
