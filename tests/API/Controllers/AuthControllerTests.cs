@@ -3,7 +3,6 @@ using ECommerce.API.Controllers;
 using ECommerce.API.DTOs;
 using ECommerce.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Tests.API.Controllers;
 
