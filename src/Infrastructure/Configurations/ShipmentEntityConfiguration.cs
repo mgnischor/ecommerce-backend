@@ -22,14 +22,9 @@ internal sealed class ShipmentEntityConfiguration : IEntityTypeConfiguration<Shi
             .HasColumnName("created_by")
             .HasDefaultValue(Guid.Parse("ce06e1a8-f688-44b6-b616-4badf09d9153"));
 
-        builder
-            .Property(s => s.UpdatedBy)
-            .HasColumnName("updated_by");
+        builder.Property(s => s.UpdatedBy).HasColumnName("updated_by");
 
-        builder
-            .Property(s => s.OrderId)
-            .HasColumnName("order_id")
-            .IsRequired();
+        builder.Property(s => s.OrderId).HasColumnName("order_id").IsRequired();
 
         builder
             .Property(s => s.ShippingAddressId)
@@ -61,7 +56,7 @@ internal sealed class ShipmentEntityConfiguration : IEntityTypeConfiguration<Shi
             .HasColumnName("status")
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(0);
+            .HasDefaultValue(ECommerce.Domain.Enums.ShipmentStatus.Preparing);
 
         builder
             .Property(s => s.ShippingCost)
@@ -77,20 +72,11 @@ internal sealed class ShipmentEntityConfiguration : IEntityTypeConfiguration<Shi
             .HasColumnType("decimal(10,2)")
             .HasDefaultValue(0);
 
-        builder
-            .Property(s => s.Length)
-            .HasColumnName("length")
-            .HasColumnType("decimal(10,2)");
+        builder.Property(s => s.Length).HasColumnName("length").HasColumnType("decimal(10,2)");
 
-        builder
-            .Property(s => s.Width)
-            .HasColumnName("width")
-            .HasColumnType("decimal(10,2)");
+        builder.Property(s => s.Width).HasColumnName("width").HasColumnType("decimal(10,2)");
 
-        builder
-            .Property(s => s.Height)
-            .HasColumnName("height")
-            .HasColumnType("decimal(10,2)");
+        builder.Property(s => s.Height).HasColumnName("height").HasColumnType("decimal(10,2)");
 
         builder
             .Property(s => s.ExpectedDeliveryDate)
@@ -113,16 +99,9 @@ internal sealed class ShipmentEntityConfiguration : IEntityTypeConfiguration<Shi
             .HasMaxLength(500)
             .IsUnicode(false);
 
-        builder
-            .Property(s => s.Notes)
-            .HasColumnName("notes")
-            .HasMaxLength(1000)
-            .IsUnicode(true);
+        builder.Property(s => s.Notes).HasColumnName("notes").HasMaxLength(1000).IsUnicode(true);
 
-        builder
-            .Property(s => s.IsInsured)
-            .HasColumnName("is_insured")
-            .HasDefaultValue(false);
+        builder.Property(s => s.IsInsured).HasColumnName("is_insured").HasDefaultValue(false);
 
         builder
             .Property(s => s.InsuranceAmount)
@@ -140,10 +119,7 @@ internal sealed class ShipmentEntityConfiguration : IEntityTypeConfiguration<Shi
             .HasMaxLength(200)
             .IsUnicode(true);
 
-        builder
-            .Property(s => s.IsDeleted)
-            .HasColumnName("is_deleted")
-            .HasDefaultValue(false);
+        builder.Property(s => s.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false);
 
         builder
             .Property(s => s.CreatedAt)
