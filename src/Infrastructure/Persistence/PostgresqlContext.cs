@@ -31,6 +31,26 @@ public class PostgresqlContext : DbContext
     // Inventory
     public DbSet<InventoryTransactionEntity> InventoryTransactions { get; set; }
 
+    // Shipping & Refunds
+    public DbSet<ShipmentEntity> Shipments { get; set; }
+    public DbSet<RefundEntity> Refunds { get; set; }
+    public DbSet<ShippingZoneEntity> ShippingZones { get; set; }
+
+    // Vendors & Suppliers
+    public DbSet<VendorEntity> Vendors { get; set; }
+    public DbSet<SupplierEntity> Suppliers { get; set; }
+
+    // Products
+    public DbSet<ProductVariantEntity> ProductVariants { get; set; }
+    public DbSet<ProductAttributeEntity> ProductAttributes { get; set; }
+
+    // Marketing & Notifications
+    public DbSet<PromotionEntity> Promotions { get; set; }
+    public DbSet<NotificationEntity> Notifications { get; set; }
+
+    // Stores
+    public DbSet<StoreEntity> Stores { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PostgresqlContext).Assembly);
