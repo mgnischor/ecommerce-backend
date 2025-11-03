@@ -35,8 +35,7 @@ public sealed class SupplierController : ControllerBase
     )
     {
         var suppliers = await _context
-            .Suppliers
-            .Where(s => s.IsActive && !s.IsDeleted)
+            .Suppliers.Where(s => s.IsActive && !s.IsDeleted)
             .OrderByDescending(s => s.IsPreferred)
             .ThenBy(s => s.CompanyName)
             .ToListAsync(cancellationToken);
@@ -119,24 +118,32 @@ public sealed class SupplierController : ControllerBase
         {
             // Use EF Core parameterized queries (prevents SQL injection)
             var searchTermLower = searchTerm.ToLowerInvariant();
-            
-            var suppliers = await _context.Suppliers
-                .Where(s => !s.IsDeleted &&
-                    EF.Functions.Like(s.CompanyName.ToLower(), $"%{searchTermLower}%"))
+
+            var suppliers = await _context
+                .Suppliers.Where(s =>
+                    !s.IsDeleted
+                    && EF.Functions.Like(s.CompanyName.ToLower(), $"%{searchTermLower}%")
+                )
                 .OrderBy(s => s.CompanyName)
                 .Take(50) // Limit results
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            _logger.LogInformation("Supplier search completed: '{SearchTerm}', Results: {Count}", 
-                searchTerm, suppliers.Count);
+            _logger.LogInformation(
+                "Supplier search completed: '{SearchTerm}', Results: {Count}",
+                searchTerm,
+                suppliers.Count
+            );
 
             return Ok(suppliers);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error searching suppliers with term: {SearchTerm}", searchTerm);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -211,10 +218,7 @@ public sealed class SupplierController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        var supplier = await _context.Suppliers.FindAsync(
-            new object[] { id },
-            cancellationToken
-        );
+        var supplier = await _context.Suppliers.FindAsync(new object[] { id }, cancellationToken);
 
         if (supplier == null || supplier.IsDeleted)
             return NotFound(new { Message = $"Supplier with ID '{id}' not found" });

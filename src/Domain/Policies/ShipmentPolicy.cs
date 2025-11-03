@@ -111,29 +111,22 @@ public static class ShipmentPolicy
         if (!length.HasValue || !width.HasValue || !height.HasValue)
             return actualWeight;
 
-        var volumetricWeight = CalculateVolumetricWeight(
-            length.Value,
-            width.Value,
-            height.Value
-        );
+        var volumetricWeight = CalculateVolumetricWeight(length.Value, width.Value, height.Value);
         return Math.Max(actualWeight, volumetricWeight);
     }
 
     /// <summary>
     /// Estimates delivery date based on shipping method
     /// </summary>
-    public static DateTime EstimateDeliveryDate(
-        DateTime shipDate,
-        ShippingMethod shippingMethod
-    )
+    public static DateTime EstimateDeliveryDate(DateTime shipDate, ShippingMethod shippingMethod)
     {
         var deliveryDays = shippingMethod switch
         {
             ShippingMethod.Express => ExpressDeliveryDays,
-            ShippingMethod.Overnight => 1,
-            ShippingMethod.TwoDay => 2,
+            ShippingMethod.NextDay => 1,
+            ShippingMethod.SameDay => 0,
             ShippingMethod.Standard => StandardDeliveryDays,
-            ShippingMethod.Economy => 10,
+            ShippingMethod.International => 10,
             _ => StandardDeliveryDays,
         };
 

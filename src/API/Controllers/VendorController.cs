@@ -87,7 +87,9 @@ public sealed class VendorController : ControllerBase
     )
     {
         var vendors = await _context
-            .Vendors.Where(v => v.IsFeatured && !v.IsDeleted && v.Status == Domain.Enums.VendorStatus.Active)
+            .Vendors.Where(v =>
+                v.IsFeatured && !v.IsDeleted && v.Status == Domain.Enums.VendorStatus.Active
+            )
             .OrderByDescending(v => v.Rating)
             .ToListAsync(cancellationToken);
 
@@ -125,25 +127,35 @@ public sealed class VendorController : ControllerBase
         {
             // Use EF Core parameterized queries (prevents SQL injection)
             var searchTermLower = searchTerm.ToLowerInvariant();
-            
-            var vendors = await _context.Vendors
-                .Where(v => !v.IsDeleted &&
-                    (EF.Functions.Like(v.StoreName.ToLower(), $"%{searchTermLower}%") ||
-                     EF.Functions.Like(v.BusinessName.ToLower(), $"%{searchTermLower}%")))
+
+            var vendors = await _context
+                .Vendors.Where(v =>
+                    !v.IsDeleted
+                    && (
+                        EF.Functions.Like(v.StoreName.ToLower(), $"%{searchTermLower}%")
+                        || EF.Functions.Like(v.BusinessName.ToLower(), $"%{searchTermLower}%")
+                    )
+                )
                 .OrderByDescending(v => v.Rating)
                 .Take(50) // Limit results
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            _logger.LogInformation("Vendor search completed: '{SearchTerm}', Results: {Count}", 
-                searchTerm, vendors.Count);
+            _logger.LogInformation(
+                "Vendor search completed: '{SearchTerm}', Results: {Count}",
+                searchTerm,
+                vendors.Count
+            );
 
             return Ok(vendors);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error searching vendors with term: {SearchTerm}", searchTerm);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 

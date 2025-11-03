@@ -34,8 +34,7 @@ public sealed class StoreController : ControllerBase
     )
     {
         var stores = await _context
-            .Stores
-            .Where(s => s.IsActive && !s.IsDeleted)
+            .Stores.Where(s => s.IsActive && !s.IsDeleted)
             .OrderBy(s => s.DisplayOrder)
             .ThenBy(s => s.Name)
             .ToListAsync(cancellationToken);
@@ -113,23 +112,29 @@ public sealed class StoreController : ControllerBase
         {
             // Use parameterized query
             var cityLower = city.ToLowerInvariant();
-            
-            var stores = await _context.Stores
-                .Where(s => s.City.ToLower() == cityLower && s.IsActive && !s.IsDeleted)
+
+            var stores = await _context
+                .Stores.Where(s => s.City.ToLower() == cityLower && s.IsActive && !s.IsDeleted)
                 .OrderBy(s => s.DisplayOrder)
                 .Take(100) // Limit results
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            _logger.LogInformation("Store search by city completed: '{City}', Results: {Count}", 
-                city, stores.Count);
+            _logger.LogInformation(
+                "Store search by city completed: '{City}', Results: {Count}",
+                city,
+                stores.Count
+            );
 
             return Ok(stores);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error searching stores by city: {City}", city);
-            return StatusCode(500, new { Message = "An error occurred while processing your request" });
+            return StatusCode(
+                500,
+                new { Message = "An error occurred while processing your request" }
+            );
         }
     }
 
@@ -178,10 +183,7 @@ public sealed class StoreController : ControllerBase
         if (id != store.Id)
             return BadRequest("ID mismatch");
 
-        var existingStore = await _context.Stores.FindAsync(
-            new object[] { id },
-            cancellationToken
-        );
+        var existingStore = await _context.Stores.FindAsync(new object[] { id }, cancellationToken);
 
         if (existingStore == null || existingStore.IsDeleted)
             return NotFound(new { Message = $"Store with ID '{id}' not found" });
