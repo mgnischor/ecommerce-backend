@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ecommerce-backend", "ecommerce-backend.csproj", "{9B6B698F-F371-8EBE-DD70-2F58255A5537}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Backend", "ECommerce.Backend.csproj", "{9B6B698F-F371-8EBE-DD70-2F58255A5537}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Tests", "tests\ECommerce.Tests.csproj", "{A7B9C2E1-4D5F-6A8B-9C0E-1F2D3E4A5B6C}"
 EndProject
