@@ -237,47 +237,150 @@ public sealed class JournalEntryResponseDto
 }
 
 /// <summary>
-/// DTO for accounting entry response
+/// Data Transfer Object (DTO) for individual accounting entry line items within a journal entry
 /// </summary>
+/// <remarks>
+/// <para>
+/// Represents a single debit or credit line in a journal entry. Multiple accounting entries
+/// combine to form a complete journal entry that adheres to double-entry bookkeeping principles.
+/// </para>
+/// <para>
+/// <strong>Debit vs Credit Rules:</strong>
+/// </para>
+/// <list type="table">
+/// <listheader>
+/// <term>Account Type</term>
+/// <description>Increases with</description>
+/// </listheader>
+/// <item>
+/// <term>Asset</term>
+/// <description>Debit</description>
+/// </item>
+/// <item>
+/// <term>Expense</term>
+/// <description>Debit</description>
+/// </item>
+/// <item>
+/// <term>Liability</term>
+/// <description>Credit</description>
+/// </item>
+/// <item>
+/// <term>Equity</term>
+/// <description>Credit</description>
+/// </item>
+/// <item>
+/// <term>Revenue</term>
+/// <description>Credit</description>
+/// </item>
+/// </list>
+/// </remarks>
 public sealed class AccountingEntryResponseDto
 {
     /// <summary>
-    /// Entry identifier
+    /// Gets or sets the unique identifier for the accounting entry line
     /// </summary>
+    /// <value>
+    /// A globally unique identifier (GUID) for this specific debit or credit line.
+    /// </value>
+    /// <example>7fa85f64-5717-4562-b3fc-2c963f66afb0</example>
     public Guid Id { get; set; }
 
     /// <summary>
-    /// Account identifier
+    /// Gets or sets the identifier of the account affected by this entry
     /// </summary>
+    /// <value>
+    /// The GUID referencing the chart of accounts entry that will be debited or credited.
+    /// </value>
+    /// <remarks>
+    /// Links to the <see cref="ChartOfAccountsResponseDto"/> to determine account type,
+    /// code, and name. The account must be analytic (able to receive entries).
+    /// </remarks>
+    /// <example>8fa85f64-5717-4562-b3fc-2c963f66afb1</example>
     public Guid AccountId { get; set; }
 
     /// <summary>
-    /// Account code
+    /// Gets or sets the account code for quick reference
     /// </summary>
+    /// <value>
+    /// The alphanumeric code identifying the account (e.g., "1000", "5100").
+    /// </value>
+    /// <remarks>
+    /// Included for convenience to avoid additional lookups. Matches the AccountCode
+    /// from the referenced chart of accounts entry.
+    /// </remarks>
+    /// <example>5100</example>
     public string AccountCode { get; set; } = string.Empty;
 
     /// <summary>
-    /// Account name
+    /// Gets or sets the account name for display purposes
     /// </summary>
+    /// <value>
+    /// The descriptive name of the account (e.g., "Cost of Goods Sold", "Sales Revenue").
+    /// </value>
+    /// <remarks>
+    /// Included for convenience to provide readable output without additional database queries.
+    /// Matches the AccountName from the referenced chart of accounts entry.
+    /// </remarks>
+    /// <example>Cost of Goods Sold</example>
     public string AccountName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Entry type (Debit or Credit)
+    /// Gets or sets whether this is a debit or credit entry
     /// </summary>
+    /// <value>
+    /// Either "Debit" or "Credit", indicating which side of the accounting equation
+    /// this entry affects.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    /// <strong>Debit:</strong> Increases Asset and Expense accounts, decreases Liability, Equity, and Revenue accounts.
+    /// </para>
+    /// <para>
+    /// <strong>Credit:</strong> Decreases Asset and Expense accounts, increases Liability, Equity, and Revenue accounts.
+    /// </para>
+    /// </remarks>
+    /// <example>Debit</example>
     public string EntryType { get; set; } = string.Empty;
 
     /// <summary>
-    /// Amount
+    /// Gets or sets the monetary amount of the entry
     /// </summary>
+    /// <value>
+    /// The positive decimal value representing the amount to debit or credit to the account.
+    /// </value>
+    /// <remarks>
+    /// Always positive; the <see cref="EntryType"/> determines whether this increases
+    /// or decreases the account balance. The sum of all debits must equal the sum of
+    /// all credits in the parent journal entry.
+    /// </remarks>
+    /// <example>2599.00</example>
     public decimal Amount { get; set; }
 
     /// <summary>
-    /// Description
+    /// Gets or sets an optional description specific to this line item
     /// </summary>
+    /// <value>
+    /// Additional context or explanation for this specific debit/credit entry.
+    /// Can be <c>null</c> if the parent journal entry's History field is sufficient.
+    /// </value>
+    /// <remarks>
+    /// Useful when different line items in the same entry need distinct explanations,
+    /// or for providing account-specific detail.
+    /// </remarks>
+    /// <example>Inventory valuation for product SKU PROD-001</example>
     public string? Description { get; set; }
 
     /// <summary>
-    /// Cost center
+    /// Gets or sets the cost center or department code for management accounting
     /// </summary>
+    /// <value>
+    /// An optional identifier for cost center or department allocation.
+    /// Can be <c>null</c> if cost center tracking is not required.
+    /// </value>
+    /// <remarks>
+    /// Used for management reporting, budget tracking, and departmental profitability analysis.
+    /// Enables tracking of revenues and expenses by business unit or project.
+    /// </remarks>
+    /// <example>DEPT-SALES-01</example>
     public string? CostCenter { get; set; }
 }
