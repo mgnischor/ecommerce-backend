@@ -46,10 +46,29 @@ public sealed class RequireRoleFilter : IAuthorizationFilter
     /// <summary>
     /// Initializes a new instance of the <see cref="RequireRoleFilter"/> class
     /// </summary>
-    /// <param name="logger">Logger for recording authorization failures</param>
-    /// <param name="requiredRoles">Array of allowed access levels</param>
-    /// <exception cref="ArgumentNullException">Thrown when logger or requiredRoles is null</exception>
-    /// <exception cref="ArgumentException">Thrown when no roles are specified</exception>
+    /// <param name="logger">Logger instance for recording authorization failures and security events</param>
+    /// <param name="requiredRoles">Variable-length array of <see cref="UserAccessLevel"/> values representing the roles that are authorized to access the action. User must have at least one of these roles.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="logger"/> or <paramref name="requiredRoles"/> is null</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="requiredRoles"/> is empty. At least one role must be specified for authorization to function.</exception>
+    /// <remarks>
+    /// <para>
+    /// The filter uses the params keyword to accept a variable number of role arguments, making it flexible
+    /// for different authorization scenarios. At least one role must be provided to ensure proper authorization.
+    /// </para>
+    /// <para>
+    /// <strong>Usage Examples:</strong>
+    /// </para>
+    /// <code>
+    /// // Single role requirement
+    /// new RequireRoleFilter(logger, UserAccessLevel.Admin)
+    ///
+    /// // Multiple role requirement (user needs any one of these)
+    /// new RequireRoleFilter(logger, UserAccessLevel.Admin, UserAccessLevel.Manager)
+    ///
+    /// // ServiceFilter attribute usage in controllers
+    /// [ServiceFilter(typeof(RequireRoleFilter), Arguments = new object[] { UserAccessLevel.Admin })]
+    /// </code>
+    /// </remarks>
     public RequireRoleFilter(
         ILogger<RequireRoleFilter> logger,
         params UserAccessLevel[] requiredRoles
@@ -70,12 +89,54 @@ public sealed class RequireRoleFilter : IAuthorizationFilter
     /// <summary>
     /// Validates user authorization before action execution
     /// </summary>
-    /// <param name="context">The authorization filter context</param>
+    /// <param name="context">The authorization filter context containing HTTP context, user claims, and action metadata</param>
     /// <remarks>
-    /// Checks if the user is authenticated and has one of the required roles.
-    /// Extracts role from JWT claims and validates against required roles.
-    /// Returns 401 Unauthorized if not authenticated, or 403 Forbidden if lacking required role.
+    /// <para>
+    /// This method implements role-based access control (RBAC) by validating the authenticated user's role
+    /// against the required roles for the action. It is called before the action method executes.
+    /// </para>
+    /// <para>
+    /// <strong>Authorization Flow:</strong>
+    /// </para>
+    /// <list type="number">
+    /// <item><description><strong>Authentication Check:</strong> Verifies user is authenticated via Identity.IsAuthenticated</description></item>
+    /// <item><description><strong>Claim Extraction:</strong> Searches for role in multiple claim types (ClaimTypes.Role, "role", "AccessLevel")</description></item>
+    /// <item><description><strong>Role Parsing:</strong> Converts string claim value to <see cref="UserAccessLevel"/> enum</description></item>
+    /// <item><description><strong>Authorization Check:</strong> Validates if user's role matches any of the <see cref="_requiredRoles"/></description></item>
+    /// <item><description><strong>Response Generation:</strong> Returns appropriate HTTP status code and error details</description></item>
+    /// </list>
+    /// <para>
+    /// <strong>Response Codes:</strong>
+    /// </para>
+    /// <list type="table">
+    /// <listheader>
+    /// <term>Status Code</term>
+    /// <description>Condition</description>
+    /// </listheader>
+    /// <item>
+    /// <term>401 Unauthorized</term>
+    /// <description>User is not authenticated or authentication token is invalid/missing</description>
+    /// </item>
+    /// <item>
+    /// <term>403 Forbidden</term>
+    /// <description>User is authenticated but lacks required role, has no role claim, or has invalid role claim</description>
+    /// </item>
+    /// <item>
+    /// <term>Success (no result)</term>
+    /// <description>User has one of the required roles and authorization succeeds</description>
+    /// </item>
+    /// </list>
+    /// <para>
+    /// <strong>Security Notes:</strong>
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description>All authorization failures are logged with user ID and attempted action for audit trails</description></item>
+    /// <item><description>403 Forbidden responses include details about required roles and user's current role for debugging</description></item>
+    /// <item><description>Case-insensitive role parsing improves compatibility with various JWT implementations</description></item>
+    /// <item><description>Multiple claim type checks support different JWT token formats</description></item>
+    /// </list>
     /// </remarks>
+    /// <exception cref="ArgumentNullException">Thrown if context is null (handled by framework)</exception>
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         var user = context.HttpContext.User;
