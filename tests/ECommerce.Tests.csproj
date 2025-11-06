@@ -38,7 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ecommerce-backend.csproj" />
+        <ProjectReference Include="..\ECommerce.Backend.csproj" />
     </ItemGroup>
 
 </Project>
