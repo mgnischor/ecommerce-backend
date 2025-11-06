@@ -3,8 +3,14 @@ using ECommerce.Domain.Enums;
 namespace ECommerce.Domain.Entities;
 
 /// <summary>
-/// Represents an order in the e-commerce system
+/// Represents a customer order in the e-commerce system.
 /// </summary>
+/// <remarks>
+/// This entity tracks the complete lifecycle of an order from creation through delivery.
+/// It includes pricing details, payment and shipping information, order status tracking,
+/// and supports order modifications, cancellations, and audit trails.
+/// Orders are immutable once confirmed to maintain data integrity for accounting purposes.
+/// </remarks>
 public sealed class OrderEntity
 {
     /// <summary>
