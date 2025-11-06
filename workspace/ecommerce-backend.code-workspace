@@ -22,12 +22,13 @@
         "editor.wordWrap": "wordWrapColumn",
         "editor.wordWrapColumn": 120,
 
+        "files.autoGuessEncoding": true,
         "files.autoSave": "afterDelay",
         "files.autoSaveDelay": 1200,
         "files.defaultLanguage": "csharp",
         "files.enableTrash": true,
         "files.encoding": "utf8",
-        "files.eol": "auto",
+        "files.eol": "\n",
         "files.exclude": {
             "**/.apdisk": true,
             "**/.AppleDB": true,
