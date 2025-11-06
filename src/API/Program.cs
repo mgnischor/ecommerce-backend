@@ -108,7 +108,7 @@ var app = builder.Build();
 // Use global exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Seed database with admin user
+// Apply migrations and seed database
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<PostgresqlContext>();
@@ -117,6 +117,10 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
+        logger.LogInformation("Applying database migrations");
+        await context.Database.MigrateAsync();
+        logger.LogInformation("Database migrations applied successfully");
+
         logger.LogInformation("Starting database seeding");
         await DatabaseSeeder.SeedAdminUserAsync(context, passwordService);
         await DatabaseSeeder.SeedChartOfAccountsAsync(context);
@@ -124,7 +128,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "An error occurred while seeding the database");
+        logger.LogError(ex, "An error occurred while applying migrations or seeding the database");
         throw;
     }
 }
