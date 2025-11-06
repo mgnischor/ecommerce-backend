@@ -1,0 +1,1024 @@
+@ECommerce_HostAddress = http://localhost:5049
+
+### Health Check
+GET {{ECommerce_HostAddress}}/
+Accept: application/json
+
+###
+
+# ============================================
+# AUTHENTICATION ENDPOINTS
+# ============================================
+
+### Login
+POST {{ECommerce_HostAddress}}/api/v1/login
+Content-Type: application/json
+
+{
+  "email": "admin@ecommerce.com.br",
+  "password": "admin"
+}
+
+###
+
+### Get Authentication Endpoints
+GET {{ECommerce_HostAddress}}/api/v1/endpoints
+Accept: application/json
+
+###
+
+### Options for Authentication
+OPTIONS {{ECommerce_HostAddress}}/api/v1
+Accept: application/json
+
+###
+
+# ============================================
+# ACCOUNTING ENDPOINTS
+# ============================================
+
+### Get All Chart of Accounts
+GET {{ECommerce_HostAddress}}/api/v1/accounting/chart-of-accounts
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Account by ID
+GET {{ECommerce_HostAddress}}/api/v1/accounting/chart-of-accounts/{{accountId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Journal Entries (Paginated)
+GET {{ECommerce_HostAddress}}/api/v1/accounting/journal-entries?pageNumber=1&pageSize=50
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Journal Entry by ID
+GET {{ECommerce_HostAddress}}/api/v1/accounting/journal-entries/{{journalEntryId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Journal Entries by Product
+GET {{ECommerce_HostAddress}}/api/v1/accounting/journal-entries/product/{{productId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# INVENTORY TRANSACTION ENDPOINTS
+# ============================================
+
+### Record Inventory Transaction
+POST {{ECommerce_HostAddress}}/api/v1/inventory-transactions
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "transactionType": "Receiving",
+  "productId": "{{productId}}",
+  "productSku": "PROD-001",
+  "productName": "Gaming Laptop",
+  "quantity": 10,
+  "unitCost": 1000.00,
+  "toLocation": "Warehouse A",
+  "documentNumber": "PO-2024-001",
+  "notes": "Received from supplier XYZ"
+}
+
+###
+
+### Get Inventory Transaction by ID
+GET {{ECommerce_HostAddress}}/api/v1/inventory-transactions/{{transactionId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Product Transactions
+GET {{ECommerce_HostAddress}}/api/v1/inventory-transactions/product/{{productId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Transactions by Period
+GET {{ECommerce_HostAddress}}/api/v1/inventory-transactions/period?startDate=2024-01-01&endDate=2024-01-31
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# NOTIFICATION ENDPOINTS
+# ============================================
+
+### Get User Notifications
+GET {{ECommerce_HostAddress}}/api/v1/notifications/user/{{userId}}?unreadOnly=false
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Notification by ID
+GET {{ECommerce_HostAddress}}/api/v1/notifications/{{notificationId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Create Notification (Admin/Manager)
+POST {{ECommerce_HostAddress}}/api/v1/notifications
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "userId": "{{userId}}",
+  "type": "OrderUpdate",
+  "title": "Order Shipped",
+  "message": "Your order #12345 has been shipped",
+  "priority": 2,
+  "isRead": false
+}
+
+###
+
+### Mark Notification as Read
+PATCH {{ECommerce_HostAddress}}/api/v1/notifications/{{notificationId}}/read
+Authorization: Bearer {{authToken}}
+
+###
+
+### Mark All Notifications as Read
+PATCH {{ECommerce_HostAddress}}/api/v1/notifications/user/{{userId}}/read-all
+Authorization: Bearer {{authToken}}
+
+###
+
+### Delete Notification
+DELETE {{ECommerce_HostAddress}}/api/v1/notifications/{{notificationId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Unread Notification Count
+GET {{ECommerce_HostAddress}}/api/v1/notifications/user/{{userId}}/unread-count
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# PRODUCT ATTRIBUTE ENDPOINTS
+# ============================================
+
+### Get All Product Attributes
+GET {{ECommerce_HostAddress}}/api/v1/product-attributes
+Accept: application/json
+
+###
+
+### Get Product Attribute by ID
+GET {{ECommerce_HostAddress}}/api/v1/product-attributes/{{attributeId}}
+Accept: application/json
+
+###
+
+### Get Product Attribute by Code
+GET {{ECommerce_HostAddress}}/api/v1/product-attributes/code/{{attributeCode}}
+Accept: application/json
+
+###
+
+### Get Variant Attributes
+GET {{ECommerce_HostAddress}}/api/v1/product-attributes/variant
+Accept: application/json
+
+###
+
+### Create Product Attribute (Admin/Manager)
+POST {{ECommerce_HostAddress}}/api/v1/product-attributes
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Product Color",
+  "code": "product-color",
+  "description": "Available colors for the product",
+  "dataType": "List",
+  "isRequired": false,
+  "isVariantAttribute": true,
+  "isSearchable": true,
+  "isFilterable": true,
+  "displayOrder": 10
+}
+
+###
+
+### Update Product Attribute (Admin/Manager)
+PUT {{ECommerce_HostAddress}}/api/v1/product-attributes/{{attributeId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{attributeId}}",
+  "name": "Product Color Updated",
+  "code": "product-color",
+  "description": "Updated description",
+  "dataType": "List",
+  "isRequired": true,
+  "isVariantAttribute": true,
+  "isSearchable": true,
+  "isFilterable": true,
+  "displayOrder": 15
+}
+
+###
+
+### Delete Product Attribute (Admin)
+DELETE {{ECommerce_HostAddress}}/api/v1/product-attributes/{{attributeId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# PRODUCT ENDPOINTS
+# ============================================
+
+### Get All Products (Paginated)
+GET {{ECommerce_HostAddress}}/api/v1/products?pageNumber=1&pageSize=20
+Accept: application/json
+
+###
+
+### Get Product by ID
+GET {{ECommerce_HostAddress}}/api/v1/products/{{productId}}
+Accept: application/json
+
+###
+
+### Get Product by SKU
+GET {{ECommerce_HostAddress}}/api/v1/products/sku/{{productSku}}
+Accept: application/json
+
+###
+
+### Get Products by Category
+GET {{ECommerce_HostAddress}}/api/v1/products/category/{{categoryId}}
+Accept: application/json
+
+###
+
+### Get Featured Products
+GET {{ECommerce_HostAddress}}/api/v1/products/featured
+Accept: application/json
+
+###
+
+### Get Products On Sale
+GET {{ECommerce_HostAddress}}/api/v1/products/on-sale
+Accept: application/json
+
+###
+
+### Search Products
+GET {{ECommerce_HostAddress}}/api/v1/products/search?searchTerm=laptop
+Accept: application/json
+
+###
+
+### Create Product (Admin/Manager)
+POST {{ECommerce_HostAddress}}/api/v1/products
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Gaming Laptop",
+  "sku": "LAPTOP-001",
+  "description": "High-performance gaming laptop with RGB keyboard",
+  "price": 1299.99,
+  "stockQuantity": 50,
+  "category": 1,
+  "isFeatured": true,
+  "isOnSale": false
+}
+
+###
+
+### Update Product (Admin/Manager)
+PUT {{ECommerce_HostAddress}}/api/v1/products/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{productId}}",
+  "name": "Updated Gaming Laptop",
+  "sku": "LAPTOP-001",
+  "description": "Updated high-performance gaming laptop",
+  "price": 1199.99,
+  "stockQuantity": 45,
+  "category": 1,
+  "isFeatured": false,
+  "isOnSale": true,
+  "salePrice": 999.99
+}
+
+###
+
+### Delete Product (Admin)
+DELETE {{ECommerce_HostAddress}}/api/v1/products/{{productId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+### Soft Delete Product (Admin/Manager)
+PATCH {{ECommerce_HostAddress}}/api/v1/products/{{productId}}/soft-delete
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Product Endpoints
+GET {{ECommerce_HostAddress}}/api/v1/products/endpoints
+Accept: application/json
+
+###
+
+### Options for Products
+OPTIONS {{ECommerce_HostAddress}}/api/v1/products
+Accept: application/json
+
+###
+
+# ============================================
+# PRODUCT VARIANT ENDPOINTS
+# ============================================
+
+### Get Variants by Product
+GET {{ECommerce_HostAddress}}/api/v1/product-variants/product/{{productId}}
+Accept: application/json
+
+###
+
+### Get Product Variant by ID
+GET {{ECommerce_HostAddress}}/api/v1/product-variants/{{variantId}}
+Accept: application/json
+
+###
+
+### Get Product Variant by SKU
+GET {{ECommerce_HostAddress}}/api/v1/product-variants/sku/{{variantSku}}
+Accept: application/json
+
+###
+
+### Create Product Variant (Admin/Manager)
+POST {{ECommerce_HostAddress}}/api/v1/product-variants
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "productId": "{{productId}}",
+  "name": "Blue - Large",
+  "sku": "LAPTOP-001-BLU-L",
+  "price": 1299.99,
+  "stockQuantity": 10,
+  "displayOrder": 1
+}
+
+###
+
+### Update Product Variant (Admin/Manager)
+PUT {{ECommerce_HostAddress}}/api/v1/product-variants/{{variantId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{variantId}}",
+  "productId": "{{productId}}",
+  "name": "Blue - Large Updated",
+  "sku": "LAPTOP-001-BLU-L",
+  "price": 1199.99,
+  "stockQuantity": 8,
+  "displayOrder": 1
+}
+
+###
+
+### Delete Product Variant (Admin)
+DELETE {{ECommerce_HostAddress}}/api/v1/product-variants/{{variantId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# PROMOTION ENDPOINTS
+# ============================================
+
+### Get Active Promotions
+GET {{ECommerce_HostAddress}}/api/v1/promotions
+Accept: application/json
+
+###
+
+### Get Featured Promotions
+GET {{ECommerce_HostAddress}}/api/v1/promotions/featured
+Accept: application/json
+
+###
+
+### Get Promotion by ID
+GET {{ECommerce_HostAddress}}/api/v1/promotions/{{promotionId}}
+Accept: application/json
+
+###
+
+### Get Promotion by Code
+GET {{ECommerce_HostAddress}}/api/v1/promotions/code/{{promotionCode}}
+Accept: application/json
+
+###
+
+### Create Promotion (Admin/Manager)
+POST {{ECommerce_HostAddress}}/api/v1/promotions
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Summer Sale",
+  "code": "SUMMER2024",
+  "description": "20% off all products",
+  "type": "Percentage",
+  "discountPercentage": 20,
+  "startDate": "2024-06-01T00:00:00Z",
+  "endDate": "2024-08-31T23:59:59Z",
+  "isActive": true,
+  "isFeatured": true,
+  "priority": 1
+}
+
+###
+
+### Update Promotion (Admin/Manager)
+PUT {{ECommerce_HostAddress}}/api/v1/promotions/{{promotionId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{promotionId}}",
+  "name": "Summer Sale Updated",
+  "code": "SUMMER2024",
+  "description": "25% off all products",
+  "type": "Percentage",
+  "discountPercentage": 25,
+  "startDate": "2024-06-01T00:00:00Z",
+  "endDate": "2024-08-31T23:59:59Z",
+  "isActive": true,
+  "isFeatured": true,
+  "priority": 1
+}
+
+###
+
+### Delete Promotion (Admin)
+DELETE {{ECommerce_HostAddress}}/api/v1/promotions/{{promotionId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# REFUND ENDPOINTS
+# ============================================
+
+### Get All Refunds (Admin/Manager - Paginated)
+GET {{ECommerce_HostAddress}}/api/v1/refunds?pageNumber=1&pageSize=10
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Refund by ID
+GET {{ECommerce_HostAddress}}/api/v1/refunds/{{refundId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Refunds by Order
+GET {{ECommerce_HostAddress}}/api/v1/refunds/order/{{orderId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Refunds by Customer
+GET {{ECommerce_HostAddress}}/api/v1/refunds/customer/{{customerId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Create Refund
+POST {{ECommerce_HostAddress}}/api/v1/refunds
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "orderId": "{{orderId}}",
+  "customerId": "{{customerId}}",
+  "amount": 99.99,
+  "reason": "Product defective",
+  "status": "Pending"
+}
+
+###
+
+### Update Refund (Admin/Manager)
+PUT {{ECommerce_HostAddress}}/api/v1/refunds/{{refundId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{refundId}}",
+  "orderId": "{{orderId}}",
+  "customerId": "{{customerId}}",
+  "amount": 99.99,
+  "reason": "Product defective - updated",
+  "status": "Approved"
+}
+
+###
+
+### Approve Refund (Admin/Manager)
+PATCH {{ECommerce_HostAddress}}/api/v1/refunds/{{refundId}}/approve
+Authorization: Bearer {{authToken}}
+
+###
+
+### Reject Refund (Admin/Manager)
+PATCH {{ECommerce_HostAddress}}/api/v1/refunds/{{refundId}}/reject
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+"Refund does not meet return policy requirements"
+
+###
+
+### Delete Refund (Admin)
+DELETE {{ECommerce_HostAddress}}/api/v1/refunds/{{refundId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# SHIPMENT ENDPOINTS
+# ============================================
+
+### Get All Shipments (Admin/Manager - Paginated)
+GET {{ECommerce_HostAddress}}/api/v1/shipments?pageNumber=1&pageSize=10
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Shipment by ID
+GET {{ECommerce_HostAddress}}/api/v1/shipments/{{shipmentId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Shipments by Order
+GET {{ECommerce_HostAddress}}/api/v1/shipments/order/{{orderId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Track Shipment by Tracking Number (Public)
+GET {{ECommerce_HostAddress}}/api/v1/shipments/tracking/{{trackingNumber}}
+Accept: application/json
+
+###
+
+### Create Shipment (Admin/Manager)
+POST {{ECommerce_HostAddress}}/api/v1/shipments
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "orderId": "{{orderId}}",
+  "trackingNumber": "TRACK123456",
+  "carrier": "FedEx",
+  "status": "InTransit",
+  "shippedAt": "2024-01-15T10:00:00Z",
+  "expectedDeliveryDate": "2024-01-20T23:59:59Z"
+}
+
+###
+
+### Update Shipment (Admin/Manager)
+PUT {{ECommerce_HostAddress}}/api/v1/shipments/{{shipmentId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{shipmentId}}",
+  "orderId": "{{orderId}}",
+  "trackingNumber": "TRACK123456",
+  "carrier": "FedEx",
+  "status": "Delivered",
+  "shippedAt": "2024-01-15T10:00:00Z",
+  "expectedDeliveryDate": "2024-01-20T23:59:59Z",
+  "deliveredAt": "2024-01-19T14:30:00Z"
+}
+
+###
+
+### Delete Shipment (Admin)
+DELETE {{ECommerce_HostAddress}}/api/v1/shipments/{{shipmentId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# SHIPPING ZONE ENDPOINTS
+# ============================================
+
+### Get All Shipping Zones (Public)
+GET {{ECommerce_HostAddress}}/api/v1/shipping-zones
+Accept: application/json
+
+###
+
+### Get Shipping Zone by ID
+GET {{ECommerce_HostAddress}}/api/v1/shipping-zones/{{shippingZoneId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Create Shipping Zone (Admin/Manager)
+POST {{ECommerce_HostAddress}}/api/v1/shipping-zones
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "North America",
+  "description": "Shipping zone for North America",
+  "countries": ["US", "CA", "MX"],
+  "baseRate": 5.99,
+  "ratePerKg": 2.50,
+  "ratePerItem": 1.00,
+  "freeShippingThreshold": 50.00,
+  "estimatedDeliveryDaysMin": 3,
+  "estimatedDeliveryDaysMax": 7,
+  "priority": 1,
+  "isActive": true
+}
+
+###
+
+### Update Shipping Zone (Admin/Manager)
+PUT {{ECommerce_HostAddress}}/api/v1/shipping-zones/{{shippingZoneId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{shippingZoneId}}",
+  "name": "North America Updated",
+  "description": "Updated shipping zone for North America",
+  "countries": ["US", "CA", "MX"],
+  "baseRate": 6.99,
+  "ratePerKg": 2.75,
+  "ratePerItem": 1.25,
+  "freeShippingThreshold": 75.00,
+  "estimatedDeliveryDaysMin": 2,
+  "estimatedDeliveryDaysMax": 5,
+  "priority": 1,
+  "isActive": true
+}
+
+###
+
+### Delete Shipping Zone (Admin)
+DELETE {{ECommerce_HostAddress}}/api/v1/shipping-zones/{{shippingZoneId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# STORE ENDPOINTS
+# ============================================
+
+### Get All Stores
+GET {{ECommerce_HostAddress}}/api/v1/stores
+Accept: application/json
+
+###
+
+### Get Store by ID
+GET {{ECommerce_HostAddress}}/api/v1/stores/{{storeId}}
+Accept: application/json
+
+###
+
+### Get Store by Code
+GET {{ECommerce_HostAddress}}/api/v1/stores/code/{{storeCode}}
+Accept: application/json
+
+###
+
+### Search Stores by City
+GET {{ECommerce_HostAddress}}/api/v1/stores/search/city/{{cityName}}
+Accept: application/json
+
+###
+
+### Create Store (Admin)
+POST {{ECommerce_HostAddress}}/api/v1/stores
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "storeCode": "STORE-001",
+  "name": "Downtown Store",
+  "address": "123 Main Street",
+  "city": "New York",
+  "state": "NY",
+  "postalCode": "10001",
+  "country": "USA",
+  "phone": "+1-555-0100",
+  "email": "downtown@store.com",
+  "isActive": true,
+  "displayOrder": 1
+}
+
+###
+
+### Update Store (Admin/Manager)
+PUT {{ECommerce_HostAddress}}/api/v1/stores/{{storeId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{storeId}}",
+  "storeCode": "STORE-001",
+  "name": "Downtown Store Updated",
+  "address": "123 Main Street",
+  "city": "New York",
+  "state": "NY",
+  "postalCode": "10001",
+  "country": "USA",
+  "phone": "+1-555-0100",
+  "email": "downtown@store.com",
+  "isActive": true,
+  "displayOrder": 1
+}
+
+###
+
+### Delete Store (Admin)
+DELETE {{ECommerce_HostAddress}}/api/v1/stores/{{storeId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# SUPPLIER ENDPOINTS
+# ============================================
+
+### Get All Suppliers (Admin/Manager)
+GET {{ECommerce_HostAddress}}/api/v1/suppliers
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Supplier by ID (Admin/Manager)
+GET {{ECommerce_HostAddress}}/api/v1/suppliers/{{supplierId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get Supplier by Code (Admin/Manager)
+GET {{ECommerce_HostAddress}}/api/v1/suppliers/code/{{supplierCode}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Search Suppliers (Admin/Manager)
+GET {{ECommerce_HostAddress}}/api/v1/suppliers/search?searchTerm=supplier
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Create Supplier (Admin/Manager)
+POST {{ECommerce_HostAddress}}/api/v1/suppliers
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "supplierCode": "SUP-001",
+  "companyName": "Tech Supplies Inc.",
+  "contactName": "John Smith",
+  "email": "contact@techsupplies.com",
+  "phone": "+1-555-0200",
+  "address": "456 Industrial Blvd",
+  "city": "Chicago",
+  "state": "IL",
+  "postalCode": "60601",
+  "country": "USA",
+  "isPreferred": true,
+  "isActive": true
+}
+
+###
+
+### Update Supplier (Admin/Manager)
+PUT {{ECommerce_HostAddress}}/api/v1/suppliers/{{supplierId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{supplierId}}",
+  "supplierCode": "SUP-001",
+  "companyName": "Tech Supplies Inc. Updated",
+  "contactName": "John Smith",
+  "email": "contact@techsupplies.com",
+  "phone": "+1-555-0200",
+  "address": "456 Industrial Blvd",
+  "city": "Chicago",
+  "state": "IL",
+  "postalCode": "60601",
+  "country": "USA",
+  "isPreferred": true,
+  "isActive": true
+}
+
+###
+
+### Delete Supplier (Admin)
+DELETE {{ECommerce_HostAddress}}/api/v1/suppliers/{{supplierId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# USER ENDPOINTS
+# ============================================
+
+### Get All Users (Paginated)
+GET {{ECommerce_HostAddress}}/api/v1/users?pageNumber=1&pageSize=20
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get User by ID
+GET {{ECommerce_HostAddress}}/api/v1/users/{{userId}}
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Create User
+POST {{ECommerce_HostAddress}}/api/v1/users
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "username": "johndoe",
+  "email": "john.doe@example.com",
+  "password": "SecureP@ssw0rd",
+  "firstName": "John",
+  "lastName": "Doe",
+  "role": "Customer",
+  "isActive": true
+}
+
+###
+
+### Update User
+PUT {{ECommerce_HostAddress}}/api/v1/users/{{userId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{userId}}",
+  "username": "johndoe",
+  "email": "john.doe.updated@example.com",
+  "password": "NewSecureP@ssw0rd",
+  "firstName": "John",
+  "lastName": "Doe",
+  "role": "Manager",
+  "isActive": true
+}
+
+###
+
+### Delete User
+DELETE {{ECommerce_HostAddress}}/api/v1/users/{{userId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+### Get User Endpoints
+GET {{ECommerce_HostAddress}}/api/v1/users/endpoints
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+### Options for Users
+OPTIONS {{ECommerce_HostAddress}}/api/v1/users
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+# ============================================
+# VENDOR ENDPOINTS
+# ============================================
+
+### Get All Vendors (Paginated)
+GET {{ECommerce_HostAddress}}/api/v1/vendors?pageNumber=1&pageSize=10
+Accept: application/json
+
+###
+
+### Get Vendor by ID
+GET {{ECommerce_HostAddress}}/api/v1/vendors/{{vendorId}}
+Accept: application/json
+
+###
+
+### Get Featured Vendors
+GET {{ECommerce_HostAddress}}/api/v1/vendors/featured
+Accept: application/json
+
+###
+
+### Search Vendors
+GET {{ECommerce_HostAddress}}/api/v1/vendors/search?searchTerm=vendor
+Accept: application/json
+
+###
+
+### Create Vendor
+POST {{ECommerce_HostAddress}}/api/v1/vendors
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "storeName": "Tech Store",
+  "businessName": "Tech Store LLC",
+  "email": "contact@techstore.com",
+  "phone": "+1-555-0300",
+  "description": "Electronics and gadgets vendor",
+  "rating": 4.5,
+  "status": "Active",
+  "isFeatured": true
+}
+
+###
+
+### Update Vendor (Admin/Manager)
+PUT {{ECommerce_HostAddress}}/api/v1/vendors/{{vendorId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "id": "{{vendorId}}",
+  "storeName": "Tech Store Updated",
+  "businessName": "Tech Store LLC",
+  "email": "contact@techstore.com",
+  "phone": "+1-555-0300",
+  "description": "Updated electronics and gadgets vendor",
+  "rating": 4.8,
+  "status": "Active",
+  "isFeatured": true
+}
+
+###
+
+### Verify Vendor (Admin)
+PATCH {{ECommerce_HostAddress}}/api/v1/vendors/{{vendorId}}/verify
+Authorization: Bearer {{authToken}}
+
+###
+
+### Delete Vendor (Admin)
+DELETE {{ECommerce_HostAddress}}/api/v1/vendors/{{vendorId}}
+Authorization: Bearer {{authToken}}
+
+###
