@@ -1,4 +1,6 @@
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Events;
+using ECommerce.Domain.Policies;
 
 namespace ECommerce.Domain.Aggregates;
 
@@ -9,6 +11,7 @@ public sealed class ProductAggregate
 {
     private readonly List<ReviewEntity> _reviews = new();
     private readonly List<InventoryEntity> _inventoryLocations = new();
+    private readonly List<DomainEvent> _domainEvents = new();
 
     /// <summary>
     /// Product entity (aggregate root)
@@ -47,6 +50,11 @@ public sealed class ProductAggregate
     /// Whether product is in stock
     /// </summary>
     public bool IsInStock => TotalAvailableStock > 0;
+
+    /// <summary>
+    /// Domain events collection (read-only)
+    /// </summary>
+    public IReadOnlyList<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     private ProductAggregate(ProductEntity product)
     {
@@ -183,6 +191,9 @@ public sealed class ProductAggregate
     /// <summary>
     /// Updates stock quantity for a location
     /// </summary>
+    /// <remarks>
+    /// DEPRECATED: Use specific transaction methods (RecordPurchase, RecordAdjustment, etc.) for better traceability
+    /// </remarks>
     public void UpdateStock(string location, int quantityChange)
     {
         var inventory = _inventoryLocations.FirstOrDefault(i => i.Location == location);
@@ -199,7 +210,17 @@ public sealed class ProductAggregate
         inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
 
         if (quantityChange > 0)
+        {
             inventory.LastStockReceived = DateTime.UtcNow;
+            AddDomainEvent(
+                new StockReplenishedEvent(
+                    Product.Id,
+                    Product.Name,
+                    quantityChange,
+                    inventory.QuantityInStock
+                )
+            );
+        }
 
         inventory.UpdatedAt = DateTime.UtcNow;
 
@@ -209,55 +230,65 @@ public sealed class ProductAggregate
     /// <summary>
     /// Reserves stock for an order
     /// </summary>
-    public void ReserveStock(int quantity, string location = "Main Warehouse")
+    public void ReserveStock(int quantity, Guid orderId, string location = "Main Warehouse")
     {
-        if (quantity <= 0)
-            throw new ArgumentException("Quantity must be greater than zero", nameof(quantity));
+        var validation = StockTransactionPolicy.CanRecordReservation(
+            quantity,
+            _inventoryLocations.FirstOrDefault(i => i.Location == location)?.QuantityAvailable ?? 0,
+            orderId
+        );
+
+        if (!validation.isValid)
+            throw new InvalidOperationException(validation.errorMessage);
 
         var inventory = _inventoryLocations.FirstOrDefault(i => i.Location == location);
         if (inventory == null)
             throw new InvalidOperationException($"Inventory not found for location {location}");
-
-        if (inventory.QuantityAvailable < quantity)
-            throw new InvalidOperationException(
-                $"Insufficient stock. Available: {inventory.QuantityAvailable}, Requested: {quantity}"
-            );
 
         inventory.QuantityReserved += quantity;
         inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
         inventory.UpdatedAt = DateTime.UtcNow;
 
         UpdateProductStockStatus();
+
+        AddDomainEvent(
+            new StockReservedEvent(orderId, Product.Id, quantity, inventory.QuantityAvailable)
+        );
     }
 
     /// <summary>
     /// Releases reserved stock
     /// </summary>
-    public void ReleaseReservedStock(int quantity, string location = "Main Warehouse")
+    public void ReleaseReservedStock(int quantity, Guid orderId, string location = "Main Warehouse")
     {
-        if (quantity <= 0)
-            throw new ArgumentException("Quantity must be greater than zero", nameof(quantity));
-
         var inventory = _inventoryLocations.FirstOrDefault(i => i.Location == location);
         if (inventory == null)
             throw new InvalidOperationException($"Inventory not found for location {location}");
 
-        if (inventory.QuantityReserved < quantity)
-            throw new InvalidOperationException(
-                $"Cannot release more than reserved. Reserved: {inventory.QuantityReserved}, Requested: {quantity}"
-            );
+        var validation = StockTransactionPolicy.CanReleaseReservation(
+            quantity,
+            inventory.QuantityReserved,
+            orderId
+        );
+
+        if (!validation.isValid)
+            throw new InvalidOperationException(validation.errorMessage);
 
         inventory.QuantityReserved -= quantity;
         inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
         inventory.UpdatedAt = DateTime.UtcNow;
 
         UpdateProductStockStatus();
+
+        AddDomainEvent(
+            new StockReleasedEvent(orderId, Product.Id, quantity, inventory.QuantityInStock)
+        );
     }
 
     /// <summary>
     /// Fulfills reserved stock (decreases actual stock)
     /// </summary>
-    public void FulfillReservedStock(int quantity, string location = "Main Warehouse")
+    public void FulfillReservedStock(int quantity, Guid orderId, string location = "Main Warehouse")
     {
         if (quantity <= 0)
             throw new ArgumentException("Quantity must be greater than zero", nameof(quantity));
@@ -271,12 +302,51 @@ public sealed class ProductAggregate
                 $"Cannot fulfill more than reserved. Reserved: {inventory.QuantityReserved}, Requested: {quantity}"
             );
 
+        var validation = StockTransactionPolicy.CanRecordSale(
+            quantity,
+            inventory.QuantityReserved,
+            location
+        );
+
+        if (!validation.isValid)
+            throw new InvalidOperationException(validation.errorMessage);
+
         inventory.QuantityInStock -= quantity;
         inventory.QuantityReserved -= quantity;
         inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
         inventory.UpdatedAt = DateTime.UtcNow;
 
         UpdateProductStockStatus();
+
+        AddDomainEvent(
+            new StockFulfilledEvent(
+                orderId,
+                Product.Id,
+                Product.Name,
+                quantity,
+                inventory.QuantityInStock,
+                location
+            )
+        );
+
+        // Check for low stock after fulfillment
+        if (StockManagementPolicy.IsLowStock(inventory.QuantityAvailable, inventory.ReorderLevel))
+        {
+            AddDomainEvent(
+                new LowStockAlertEvent(
+                    Product.Id,
+                    Product.Name,
+                    inventory.QuantityAvailable,
+                    inventory.ReorderLevel
+                )
+            );
+        }
+
+        // Check for out of stock
+        if (StockManagementPolicy.IsOutOfStock(inventory.QuantityAvailable))
+        {
+            AddDomainEvent(new ProductOutOfStockEvent(Product.Id, Product.Name, Product.Sku));
+        }
     }
 
     /// <summary>
@@ -393,5 +463,268 @@ public sealed class ProductAggregate
             errors.Add("Stock quantity cannot be negative");
 
         return errors.Count == 0;
+    }
+
+    /// <summary>
+    /// Adds a domain event to the aggregate
+    /// </summary>
+    private void AddDomainEvent(DomainEvent domainEvent)
+    {
+        _domainEvents.Add(domainEvent);
+    }
+
+    /// <summary>
+    /// Clears all domain events
+    /// </summary>
+    public void ClearDomainEvents()
+    {
+        _domainEvents.Clear();
+    }
+
+    /// <summary>
+    /// Records a stock purchase transaction
+    /// </summary>
+    public void RecordPurchase(
+        int quantity,
+        decimal unitCost,
+        string location,
+        string documentNumber,
+        string? notes = null
+    )
+    {
+        var validation = StockTransactionPolicy.CanRecordPurchase(
+            quantity,
+            unitCost,
+            location,
+            documentNumber
+        );
+
+        if (!validation.isValid)
+            throw new InvalidOperationException(validation.errorMessage);
+
+        var inventory = _inventoryLocations.FirstOrDefault(i => i.Location == location);
+        if (inventory == null)
+            throw new InvalidOperationException($"Inventory not found for location {location}");
+
+        inventory.QuantityInStock += quantity;
+        inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
+        inventory.LastStockReceived = DateTime.UtcNow;
+        inventory.UpdatedAt = DateTime.UtcNow;
+
+        UpdateProductStockStatus();
+
+        AddDomainEvent(
+            new StockPurchasedEvent(
+                Product.Id,
+                Product.Name,
+                quantity,
+                unitCost,
+                quantity * unitCost,
+                location,
+                documentNumber
+            )
+        );
+    }
+
+    /// <summary>
+    /// Records a stock transfer between locations
+    /// </summary>
+    public void RecordTransfer(
+        int quantity,
+        string fromLocation,
+        string toLocation,
+        string? notes = null
+    )
+    {
+        var fromInventory = _inventoryLocations.FirstOrDefault(i => i.Location == fromLocation);
+        if (fromInventory == null)
+            throw new InvalidOperationException($"Source inventory not found: {fromLocation}");
+
+        var validation = StockTransactionPolicy.CanRecordTransfer(
+            quantity,
+            fromInventory.QuantityAvailable,
+            fromLocation,
+            toLocation
+        );
+
+        if (!validation.isValid)
+            throw new InvalidOperationException(validation.errorMessage);
+
+        var toInventory = _inventoryLocations.FirstOrDefault(i => i.Location == toLocation);
+        if (toInventory == null)
+        {
+            // Create destination location if it doesn't exist
+            AddInventoryLocation(toLocation, 0);
+            toInventory = _inventoryLocations.First(i => i.Location == toLocation);
+        }
+
+        // Remove from source
+        fromInventory.QuantityInStock -= quantity;
+        fromInventory.QuantityAvailable =
+            fromInventory.QuantityInStock - fromInventory.QuantityReserved;
+        fromInventory.UpdatedAt = DateTime.UtcNow;
+
+        // Add to destination
+        toInventory.QuantityInStock += quantity;
+        toInventory.QuantityAvailable = toInventory.QuantityInStock - toInventory.QuantityReserved;
+        toInventory.LastStockReceived = DateTime.UtcNow;
+        toInventory.UpdatedAt = DateTime.UtcNow;
+
+        UpdateProductStockStatus();
+
+        AddDomainEvent(
+            new StockTransferredEvent(Product.Id, Product.Name, quantity, fromLocation, toLocation)
+        );
+    }
+
+    /// <summary>
+    /// Records a stock adjustment (physical count correction)
+    /// </summary>
+    public void RecordAdjustment(string location, int adjustmentQuantity, string reason)
+    {
+        var inventory = _inventoryLocations.FirstOrDefault(i => i.Location == location);
+        if (inventory == null)
+            throw new InvalidOperationException($"Inventory not found for location {location}");
+
+        var validation = StockTransactionPolicy.CanRecordAdjustment(
+            inventory.QuantityInStock,
+            adjustmentQuantity,
+            reason
+        );
+
+        if (!validation.isValid)
+            throw new InvalidOperationException(validation.errorMessage);
+
+        var previousStock = inventory.QuantityInStock;
+
+        inventory.QuantityInStock += adjustmentQuantity;
+        inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
+        inventory.LastInventoryCount = DateTime.UtcNow;
+        inventory.UpdatedAt = DateTime.UtcNow;
+
+        UpdateProductStockStatus();
+
+        AddDomainEvent(
+            new StockAdjustedEvent(
+                Product.Id,
+                Product.Name,
+                adjustmentQuantity,
+                previousStock,
+                inventory.QuantityInStock,
+                location,
+                reason
+            )
+        );
+    }
+
+    /// <summary>
+    /// Records a stock loss (damage, theft, spoilage)
+    /// </summary>
+    public void RecordLoss(string location, int quantity, decimal estimatedUnitCost, string reason)
+    {
+        var inventory = _inventoryLocations.FirstOrDefault(i => i.Location == location);
+        if (inventory == null)
+            throw new InvalidOperationException($"Inventory not found for location {location}");
+
+        var validation = StockTransactionPolicy.CanRecordLoss(
+            quantity,
+            inventory.QuantityInStock,
+            reason
+        );
+
+        if (!validation.isValid)
+            throw new InvalidOperationException(validation.errorMessage);
+
+        inventory.QuantityInStock -= quantity;
+        inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
+        inventory.UpdatedAt = DateTime.UtcNow;
+
+        UpdateProductStockStatus();
+
+        AddDomainEvent(
+            new StockLossEvent(
+                Product.Id,
+                Product.Name,
+                quantity,
+                quantity * estimatedUnitCost,
+                location,
+                reason
+            )
+        );
+    }
+
+    /// <summary>
+    /// Records a purchase return
+    /// </summary>
+    public void RecordPurchaseReturn(
+        string location,
+        int quantity,
+        decimal unitCost,
+        string? reason = null
+    )
+    {
+        var inventory = _inventoryLocations.FirstOrDefault(i => i.Location == location);
+        if (inventory == null)
+            throw new InvalidOperationException($"Inventory not found for location {location}");
+
+        var validation = StockTransactionPolicy.CanRecordReturn(
+            quantity,
+            unitCost,
+            location,
+            null,
+            isPurchaseReturn: true
+        );
+
+        if (!validation.isValid)
+            throw new InvalidOperationException(validation.errorMessage);
+
+        inventory.QuantityInStock -= quantity;
+        inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
+        inventory.UpdatedAt = DateTime.UtcNow;
+
+        UpdateProductStockStatus();
+
+        AddDomainEvent(
+            new PurchaseReturnedEvent(
+                Product.Id,
+                Product.Name,
+                quantity,
+                unitCost,
+                location,
+                reason
+            )
+        );
+    }
+
+    /// <summary>
+    /// Records a sale return
+    /// </summary>
+    public void RecordSaleReturn(string location, int quantity, decimal unitCost, Guid orderId)
+    {
+        var validation = StockTransactionPolicy.CanRecordReturn(
+            quantity,
+            unitCost,
+            location,
+            orderId,
+            isPurchaseReturn: false
+        );
+
+        if (!validation.isValid)
+            throw new InvalidOperationException(validation.errorMessage);
+
+        var inventory = _inventoryLocations.FirstOrDefault(i => i.Location == location);
+        if (inventory == null)
+            throw new InvalidOperationException($"Inventory not found for location {location}");
+
+        inventory.QuantityInStock += quantity;
+        inventory.QuantityAvailable = inventory.QuantityInStock - inventory.QuantityReserved;
+        inventory.LastStockReceived = DateTime.UtcNow;
+        inventory.UpdatedAt = DateTime.UtcNow;
+
+        UpdateProductStockStatus();
+
+        AddDomainEvent(
+            new SaleReturnedEvent(orderId, Product.Id, Product.Name, quantity, unitCost, location)
+        );
     }
 }
