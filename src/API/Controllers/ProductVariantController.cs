@@ -1,3 +1,5 @@
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +30,7 @@ public sealed class ProductVariantController : ControllerBase
     /// <summary>
     /// Logger instance for controller operations
     /// </summary>
-    private readonly ILogger<ProductVariantController> _logger;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProductVariantController"/> class
@@ -38,7 +40,7 @@ public sealed class ProductVariantController : ControllerBase
     /// <exception cref="ArgumentNullException">Thrown when context or logger is null</exception>
     public ProductVariantController(
         PostgresqlContext context,
-        ILogger<ProductVariantController> logger
+        LoggingService<ProductVariantController> logger
     )
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
