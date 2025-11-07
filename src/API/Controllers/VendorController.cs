@@ -1,3 +1,5 @@
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -21,9 +23,9 @@ namespace ECommerce.API.Controllers;
 public sealed class VendorController : ControllerBase
 {
     private readonly PostgresqlContext _context;
-    private readonly ILogger<VendorController> _logger;
+    private readonly ILoggingService _logger;
 
-    public VendorController(PostgresqlContext context, ILogger<VendorController> logger)
+    public VendorController(PostgresqlContext context, LoggingService<VendorController> logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -278,4 +280,18 @@ public sealed class VendorController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        if
+        if (vendor == null)
+            return BadRequest(new { Message = "Vendor data is required" });
+
+        // Set system-managed fields
+        vendor.Id = Guid.NewGuid();
+        vendor.CreatedAt = DateTime.UtcNow;
+        vendor.UpdatedAt = DateTime.UtcNow;
+        vendor.IsDeleted = false;
+
+        _context.Vendors.Add(vendor);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return CreatedAtAction(nameof(GetVendorById), new { id = vendor.Id }, vendor);
+    }
+}
