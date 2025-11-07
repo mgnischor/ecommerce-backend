@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -88,7 +90,7 @@ public sealed class ProductAttributeController : ControllerBase
     /// Used to log attribute access, modifications, validation errors, security events,
     /// and exceptions for monitoring, debugging, and audit trail purposes.
     /// </remarks>
-    private readonly ILogger<ProductAttributeController> _logger;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Maximum number of product attributes that can be retrieved in a single request
@@ -122,7 +124,7 @@ public sealed class ProductAttributeController : ControllerBase
     /// </remarks>
     public ProductAttributeController(
         PostgresqlContext context,
-        ILogger<ProductAttributeController> logger
+        LoggingService<ProductAttributeController> logger
     )
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
