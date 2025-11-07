@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using ECommerce.API.DTOs;
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -73,7 +75,7 @@ public sealed class InventoryTransactionController : ControllerBase
     /// Used to log transaction recordings, retrievals, validation errors, and exceptions
     /// for monitoring, debugging, and audit trail purposes.
     /// </remarks>
-    private readonly ILogger<InventoryTransactionController> _logger;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InventoryTransactionController"/> class
@@ -99,7 +101,7 @@ public sealed class InventoryTransactionController : ControllerBase
     /// </remarks>
     public InventoryTransactionController(
         IInventoryTransactionService transactionService,
-        ILogger<InventoryTransactionController> logger
+        LoggingService<InventoryTransactionController> logger
     )
     {
         _transactionService =
