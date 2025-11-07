@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -42,7 +44,7 @@ public sealed class RefundController : ControllerBase
     /// <summary>
     /// Logger instance for recording controller operations, security events, and errors.
     /// </summary>
-    private readonly ILogger<RefundController> _logger;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Maximum number of items allowed per page in paginated results to prevent performance degradation.
@@ -67,7 +69,7 @@ public sealed class RefundController : ControllerBase
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="context"/> or <paramref name="logger"/> is null.
     /// </exception>
-    public RefundController(PostgresqlContext context, ILogger<RefundController> logger)
+    public RefundController(PostgresqlContext context, LoggingService<RefundController> logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
