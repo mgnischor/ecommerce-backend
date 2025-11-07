@@ -1,3 +1,5 @@
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -20,9 +22,9 @@ namespace ECommerce.API.Controllers;
 public sealed class StoreController : ControllerBase
 {
     private readonly PostgresqlContext _context;
-    private readonly ILogger<StoreController> _logger;
+    private readonly ILoggingService _logger;
 
-    public StoreController(PostgresqlContext context, ILogger<StoreController> logger)
+    public StoreController(PostgresqlContext context, LoggingService<StoreController> logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
