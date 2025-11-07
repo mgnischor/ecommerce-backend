@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -36,7 +38,7 @@ public sealed class PromotionController : ControllerBase
     /// <summary>
     /// Logger instance for recording controller operations and errors.
     /// </summary>
-    private readonly ILogger<PromotionController> _logger;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Maximum number of promotions to return in a single query to prevent performance issues.
@@ -51,7 +53,10 @@ public sealed class PromotionController : ControllerBase
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="context"/> or <paramref name="logger"/> is null.
     /// </exception>
-    public PromotionController(PostgresqlContext context, ILogger<PromotionController> logger)
+    public PromotionController(
+        PostgresqlContext context,
+        LoggingService<PromotionController> logger
+    )
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
