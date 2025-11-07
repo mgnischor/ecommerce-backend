@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -47,7 +49,7 @@ public sealed class ShippingZoneController : ControllerBase
     /// <summary>
     /// Logger instance for recording controller operations, configuration changes, and errors.
     /// </summary>
-    private readonly ILogger<ShippingZoneController> _logger;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Maximum number of shipping zones to return in a single query to prevent performance issues.
@@ -66,7 +68,10 @@ public sealed class ShippingZoneController : ControllerBase
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="context"/> or <paramref name="logger"/> is null.
     /// </exception>
-    public ShippingZoneController(PostgresqlContext context, ILogger<ShippingZoneController> logger)
+    public ShippingZoneController(
+        PostgresqlContext context,
+        LoggingService<ShippingZoneController> logger
+    )
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
