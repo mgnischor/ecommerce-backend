@@ -1,3 +1,5 @@
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
@@ -22,12 +24,12 @@ public sealed class UserController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
     private readonly PostgresqlContext _context;
-    private readonly ILogger<UserController> _logger;
+    private readonly ILoggingService _logger;
 
     public UserController(
         IUserRepository userRepository,
         PostgresqlContext context,
-        ILogger<UserController> logger
+        LoggingService<UserController> logger
     )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
