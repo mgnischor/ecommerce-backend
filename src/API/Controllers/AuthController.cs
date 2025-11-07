@@ -1,5 +1,6 @@
 using ECommerce.API.DTOs;
 using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -78,7 +79,7 @@ public sealed class AuthController : ControllerBase
     /// Used to log authentication attempts, successes, failures, and security-related events
     /// for monitoring and audit purposes.
     /// </remarks>
-    private readonly ILogger<AuthController> _logger;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AuthController"/> class
@@ -111,7 +112,7 @@ public sealed class AuthController : ControllerBase
         IUserRepository userRepository,
         IJwtService jwtService,
         IPasswordService passwordService,
-        ILogger<AuthController> logger
+        LoggingService<AuthController> logger
     )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
