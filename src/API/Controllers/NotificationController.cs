@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -68,7 +70,7 @@ public sealed class NotificationController : ControllerBase
     /// Used to log notification access attempts, security violations, operations, and errors
     /// for monitoring, debugging, and security audit purposes.
     /// </remarks>
-    private readonly ILogger<NotificationController> _logger;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Maximum number of notifications that can be retrieved per user
@@ -99,7 +101,10 @@ public sealed class NotificationController : ControllerBase
     /// The controller is instantiated by the ASP.NET Core dependency injection container
     /// when handling notification-related requests.
     /// </remarks>
-    public NotificationController(PostgresqlContext context, ILogger<NotificationController> logger)
+    public NotificationController(
+        PostgresqlContext context,
+        LoggingService<NotificationController> logger
+    )
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
