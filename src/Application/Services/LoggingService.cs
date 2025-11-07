@@ -32,6 +32,14 @@ public sealed class LoggingService<T> : ILoggingService
         }
     }
 
+    public void LogWarning(Exception exception, string message, params object[] args)
+    {
+        if (exception != null)
+        {
+            _logger.LogWarning(exception, message, args);
+        }
+    }
+
     public void LogError(string message, params object[] args)
     {
         if (!string.IsNullOrWhiteSpace(message))
