@@ -20,6 +20,14 @@ public interface ILoggingService
     void LogWarning(string message, params object[] args);
 
     /// <summary>
+    /// Logs a warning with exception details
+    /// </summary>
+    /// <param name="exception">The exception that occurred</param>
+    /// <param name="message">Additional warning message</param>
+    /// <param name="args">Optional message arguments</param>
+    void LogWarning(Exception exception, string message, params object[] args);
+
+    /// <summary>
     /// Logs an error message
     /// </summary>
     /// <param name="message">The error message to log</param>
