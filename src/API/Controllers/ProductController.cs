@@ -1,3 +1,5 @@
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
@@ -110,7 +112,7 @@ public sealed class ProductController : ControllerBase
     /// and exceptions for monitoring, debugging, audit trail, and compliance purposes.
     /// Enables operational visibility and troubleshooting of product management operations.
     /// </remarks>
-    private readonly ILogger<ProductController> _logger;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProductController"/> class
@@ -140,7 +142,7 @@ public sealed class ProductController : ControllerBase
     public ProductController(
         IProductRepository productRepository,
         PostgresqlContext context,
-        ILogger<ProductController> logger
+        LoggingService<ProductController> logger
     )
     {
         _productRepository =
