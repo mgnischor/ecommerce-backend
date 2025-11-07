@@ -1,4 +1,6 @@
 using ECommerce.API.DTOs;
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -65,7 +67,7 @@ public sealed class AccountingController : ControllerBase
     /// <remarks>
     /// Used to log information, warnings, and errors throughout the accounting controller lifecycle.
     /// </remarks>
-    private readonly ILogger<AccountingController> _logger;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AccountingController"/> class
@@ -85,7 +87,7 @@ public sealed class AccountingController : ControllerBase
         IRepository<ChartOfAccountsEntity> chartOfAccountsRepository,
         IRepository<JournalEntryEntity> journalEntryRepository,
         IRepository<AccountingEntryEntity> accountingEntryRepository,
-        ILogger<AccountingController> logger
+        LoggingService<AccountingController> logger
     )
     {
         _chartOfAccountsRepository =
