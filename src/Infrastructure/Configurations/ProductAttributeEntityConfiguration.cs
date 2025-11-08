@@ -8,11 +8,12 @@ namespace ECommerce.Infrastructure.Configurations;
 /// Configuration for the ProductAttributeEntity.
 /// Maps the ProductAttributeEntity properties to the corresponding database columns and sets up constraints and indexes.
 /// </summary>
-internal sealed class ProductAttributeEntityConfiguration : IEntityTypeConfiguration<ProductAttributeEntity>
+internal sealed class ProductAttributeEntityConfiguration
+    : IEntityTypeConfiguration<ProductAttributeEntity>
 {
     public void Configure(EntityTypeBuilder<ProductAttributeEntity> builder)
     {
-        builder.ToTable("product_attributes", schema: "public");
+        builder.ToTable("ProductAttributes", schema: "public");
 
         builder.HasKey(pa => pa.Id);
         builder.Property(pa => pa.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
@@ -22,9 +23,7 @@ internal sealed class ProductAttributeEntityConfiguration : IEntityTypeConfigura
             .HasColumnName("created_by")
             .HasDefaultValue(Guid.Parse("ce06e1a8-f688-44b6-b616-4badf09d9153"));
 
-        builder
-            .Property(pa => pa.UpdatedBy)
-            .HasColumnName("updated_by");
+        builder.Property(pa => pa.UpdatedBy).HasColumnName("updated_by");
 
         builder
             .Property(pa => pa.Name)
@@ -66,10 +65,7 @@ internal sealed class ProductAttributeEntityConfiguration : IEntityTypeConfigura
             .HasMaxLength(500)
             .IsUnicode(true);
 
-        builder
-            .Property(pa => pa.IsRequired)
-            .HasColumnName("is_required")
-            .HasDefaultValue(false);
+        builder.Property(pa => pa.IsRequired).HasColumnName("is_required").HasDefaultValue(false);
 
         builder
             .Property(pa => pa.IsVariantAttribute)
@@ -91,16 +87,9 @@ internal sealed class ProductAttributeEntityConfiguration : IEntityTypeConfigura
             .HasColumnName("is_visible_on_product_page")
             .HasDefaultValue(true);
 
-        builder
-            .Property(pa => pa.DisplayOrder)
-            .HasColumnName("display_order")
-            .HasDefaultValue(0);
+        builder.Property(pa => pa.DisplayOrder).HasColumnName("display_order").HasDefaultValue(0);
 
-        builder
-            .Property(pa => pa.Unit)
-            .HasColumnName("unit")
-            .HasMaxLength(20)
-            .IsUnicode(false);
+        builder.Property(pa => pa.Unit).HasColumnName("unit").HasMaxLength(20).IsUnicode(false);
 
         builder
             .Property(pa => pa.ValidationPattern)
@@ -114,10 +103,7 @@ internal sealed class ProductAttributeEntityConfiguration : IEntityTypeConfigura
             .HasColumnType("uuid[]")
             .HasDefaultValueSql("'{}'");
 
-        builder
-            .Property(pa => pa.IsDeleted)
-            .HasColumnName("is_deleted")
-            .HasDefaultValue(false);
+        builder.Property(pa => pa.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false);
 
         builder
             .Property(pa => pa.CreatedAt)
@@ -135,8 +121,14 @@ internal sealed class ProductAttributeEntityConfiguration : IEntityTypeConfigura
 
         builder.HasIndex(pa => pa.Code).IsUnique().HasDatabaseName("ix_product_attributes_code");
         builder.HasIndex(pa => pa.Name).HasDatabaseName("ix_product_attributes_name");
-        builder.HasIndex(pa => pa.IsVariantAttribute).HasDatabaseName("ix_product_attributes_is_variant_attribute");
-        builder.HasIndex(pa => pa.IsFilterable).HasDatabaseName("ix_product_attributes_is_filterable");
-        builder.HasIndex(pa => pa.DisplayOrder).HasDatabaseName("ix_product_attributes_display_order");
+        builder
+            .HasIndex(pa => pa.IsVariantAttribute)
+            .HasDatabaseName("ix_product_attributes_is_variant_attribute");
+        builder
+            .HasIndex(pa => pa.IsFilterable)
+            .HasDatabaseName("ix_product_attributes_is_filterable");
+        builder
+            .HasIndex(pa => pa.DisplayOrder)
+            .HasDatabaseName("ix_product_attributes_display_order");
     }
 }

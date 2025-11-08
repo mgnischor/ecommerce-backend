@@ -22,7 +22,7 @@ public class FinancialTransactionConfiguration
     public void Configure(EntityTypeBuilder<FinancialTransactionEntity> builder)
     {
         // Table configuration
-        builder.ToTable("financial_transactions");
+        builder.ToTable("FinancialTransactions");
 
         // Primary key
         builder.HasKey(ft => ft.Id);

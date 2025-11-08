@@ -12,7 +12,7 @@ internal sealed class RefundEntityConfiguration : IEntityTypeConfiguration<Refun
 {
     public void Configure(EntityTypeBuilder<RefundEntity> builder)
     {
-        builder.ToTable("refunds", schema: "public");
+        builder.ToTable("Refunds", schema: "public");
 
         builder.HasKey(r => r.Id);
         builder.Property(r => r.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();

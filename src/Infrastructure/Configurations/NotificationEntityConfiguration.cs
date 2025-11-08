@@ -12,7 +12,7 @@ internal sealed class NotificationEntityConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<NotificationEntity> builder)
     {
-        builder.ToTable("notifications", schema: "public");
+        builder.ToTable("Notifications", schema: "public");
 
         builder.HasKey(n => n.Id);
         builder.Property(n => n.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();

@@ -12,7 +12,8 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Prod
 {
     public void Configure(EntityTypeBuilder<ProductEntity> builder)
     {
-        builder.ToTable("products", schema: "public");
+        // Table configuration
+        builder.ToTable("Products", schema: "public");
 
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
@@ -78,10 +79,7 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Prod
             .IsRequired()
             .HasDefaultValue(0);
 
-        builder
-            .Property(p => p.MinStockLevel)
-            .HasColumnName("min_stock_level")
-            .HasDefaultValue(0);
+        builder.Property(p => p.MinStockLevel).HasColumnName("min_stock_level").HasDefaultValue(0);
 
         builder
             .Property(p => p.MaxOrderQuantity)

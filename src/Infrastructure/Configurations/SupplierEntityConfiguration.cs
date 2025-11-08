@@ -12,7 +12,7 @@ internal sealed class SupplierEntityConfiguration : IEntityTypeConfiguration<Sup
 {
     public void Configure(EntityTypeBuilder<SupplierEntity> builder)
     {
-        builder.ToTable("suppliers", schema: "public");
+        builder.ToTable("Suppliers", schema: "public");
 
         builder.HasKey(s => s.Id);
         builder.Property(s => s.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
@@ -22,9 +22,7 @@ internal sealed class SupplierEntityConfiguration : IEntityTypeConfiguration<Sup
             .HasColumnName("created_by")
             .HasDefaultValue(Guid.Parse("ce06e1a8-f688-44b6-b616-4badf09d9153"));
 
-        builder
-            .Property(s => s.UpdatedBy)
-            .HasColumnName("updated_by");
+        builder.Property(s => s.UpdatedBy).HasColumnName("updated_by");
 
         builder
             .Property(s => s.CompanyName)
@@ -114,11 +112,7 @@ internal sealed class SupplierEntityConfiguration : IEntityTypeConfiguration<Sup
             .HasMaxLength(100)
             .IsUnicode(true);
 
-        builder
-            .Property(s => s.TaxId)
-            .HasColumnName("tax_id")
-            .HasMaxLength(50)
-            .IsUnicode(false);
+        builder.Property(s => s.TaxId).HasColumnName("tax_id").HasMaxLength(50).IsUnicode(false);
 
         builder
             .Property(s => s.RegistrationNumber)
@@ -167,36 +161,20 @@ internal sealed class SupplierEntityConfiguration : IEntityTypeConfiguration<Sup
             .HasColumnType("decimal(3,2)")
             .HasDefaultValue(0m);
 
-        builder
-            .Property(s => s.LeadTimeDays)
-            .HasColumnName("lead_time_days")
-            .HasDefaultValue(0);
+        builder.Property(s => s.LeadTimeDays).HasColumnName("lead_time_days").HasDefaultValue(0);
 
         builder
             .Property(s => s.MinimumOrderAmount)
             .HasColumnName("minimum_order_amount")
             .HasColumnType("decimal(18,2)");
 
-        builder
-            .Property(s => s.Notes)
-            .HasColumnName("notes")
-            .HasMaxLength(2000)
-            .IsUnicode(true);
+        builder.Property(s => s.Notes).HasColumnName("notes").HasMaxLength(2000).IsUnicode(true);
 
-        builder
-            .Property(s => s.IsActive)
-            .HasColumnName("is_active")
-            .HasDefaultValue(true);
+        builder.Property(s => s.IsActive).HasColumnName("is_active").HasDefaultValue(true);
 
-        builder
-            .Property(s => s.IsPreferred)
-            .HasColumnName("is_preferred")
-            .HasDefaultValue(false);
+        builder.Property(s => s.IsPreferred).HasColumnName("is_preferred").HasDefaultValue(false);
 
-        builder
-            .Property(s => s.IsDeleted)
-            .HasColumnName("is_deleted")
-            .HasDefaultValue(false);
+        builder.Property(s => s.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false);
 
         builder
             .Property(s => s.CreatedAt)
@@ -212,7 +190,10 @@ internal sealed class SupplierEntityConfiguration : IEntityTypeConfiguration<Sup
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.HasIndex(s => s.SupplierCode).IsUnique().HasDatabaseName("ix_suppliers_supplier_code");
+        builder
+            .HasIndex(s => s.SupplierCode)
+            .IsUnique()
+            .HasDatabaseName("ix_suppliers_supplier_code");
         builder.HasIndex(s => s.CompanyName).HasDatabaseName("ix_suppliers_company_name");
         builder.HasIndex(s => s.Email).HasDatabaseName("ix_suppliers_email");
         builder.HasIndex(s => s.IsActive).HasDatabaseName("ix_suppliers_is_active");

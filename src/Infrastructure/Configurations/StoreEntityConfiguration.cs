@@ -12,7 +12,7 @@ internal sealed class StoreEntityConfiguration : IEntityTypeConfiguration<StoreE
 {
     public void Configure(EntityTypeBuilder<StoreEntity> builder)
     {
-        builder.ToTable("stores", schema: "public");
+        builder.ToTable("Stores", schema: "public");
 
         builder.HasKey(s => s.Id);
         builder.Property(s => s.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
@@ -22,9 +22,7 @@ internal sealed class StoreEntityConfiguration : IEntityTypeConfiguration<StoreE
             .HasColumnName("created_by")
             .HasDefaultValue(Guid.Parse("ce06e1a8-f688-44b6-b616-4badf09d9153"));
 
-        builder
-            .Property(s => s.UpdatedBy)
-            .HasColumnName("updated_by");
+        builder.Property(s => s.UpdatedBy).HasColumnName("updated_by");
 
         builder
             .Property(s => s.Name)
@@ -95,24 +93,16 @@ internal sealed class StoreEntityConfiguration : IEntityTypeConfiguration<StoreE
             .HasMaxLength(100)
             .IsUnicode(true);
 
-        builder
-            .Property(s => s.Latitude)
-            .HasColumnName("latitude")
-            .HasColumnType("decimal(10,7)");
+        builder.Property(s => s.Latitude).HasColumnName("latitude").HasColumnType("decimal(10,7)");
 
         builder
             .Property(s => s.Longitude)
             .HasColumnName("longitude")
             .HasColumnType("decimal(10,7)");
 
-        builder
-            .Property(s => s.ManagerId)
-            .HasColumnName("manager_id");
+        builder.Property(s => s.ManagerId).HasColumnName("manager_id");
 
-        builder
-            .Property(s => s.OpeningHours)
-            .HasColumnName("opening_hours")
-            .HasColumnType("jsonb");
+        builder.Property(s => s.OpeningHours).HasColumnName("opening_hours").HasColumnType("jsonb");
 
         builder
             .Property(s => s.Timezone)
@@ -142,10 +132,7 @@ internal sealed class StoreEntityConfiguration : IEntityTypeConfiguration<StoreE
             .HasMaxLength(500)
             .IsUnicode(false);
 
-        builder
-            .Property(s => s.IsDefault)
-            .HasColumnName("is_default")
-            .HasDefaultValue(false);
+        builder.Property(s => s.IsDefault).HasColumnName("is_default").HasDefaultValue(false);
 
         builder
             .Property(s => s.SupportsPickup)
@@ -157,20 +144,11 @@ internal sealed class StoreEntityConfiguration : IEntityTypeConfiguration<StoreE
             .HasColumnName("supports_delivery")
             .HasDefaultValue(true);
 
-        builder
-            .Property(s => s.IsActive)
-            .HasColumnName("is_active")
-            .HasDefaultValue(true);
+        builder.Property(s => s.IsActive).HasColumnName("is_active").HasDefaultValue(true);
 
-        builder
-            .Property(s => s.DisplayOrder)
-            .HasColumnName("display_order")
-            .HasDefaultValue(0);
+        builder.Property(s => s.DisplayOrder).HasColumnName("display_order").HasDefaultValue(0);
 
-        builder
-            .Property(s => s.IsDeleted)
-            .HasColumnName("is_deleted")
-            .HasDefaultValue(false);
+        builder.Property(s => s.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false);
 
         builder
             .Property(s => s.CreatedAt)

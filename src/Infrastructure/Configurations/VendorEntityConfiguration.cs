@@ -12,7 +12,7 @@ internal sealed class VendorEntityConfiguration : IEntityTypeConfiguration<Vendo
 {
     public void Configure(EntityTypeBuilder<VendorEntity> builder)
     {
-        builder.ToTable("vendors", schema: "public");
+        builder.ToTable("Vendors", schema: "public");
 
         builder.HasKey(v => v.Id);
         builder.Property(v => v.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();

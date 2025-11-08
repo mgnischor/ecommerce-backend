@@ -12,7 +12,7 @@ internal sealed class ShipmentEntityConfiguration : IEntityTypeConfiguration<Shi
 {
     public void Configure(EntityTypeBuilder<ShipmentEntity> builder)
     {
-        builder.ToTable("shipments", schema: "public");
+        builder.ToTable("Shipments", schema: "public");
 
         builder.HasKey(s => s.Id);
         builder.Property(s => s.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();

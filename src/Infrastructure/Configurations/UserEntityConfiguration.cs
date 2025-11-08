@@ -12,7 +12,8 @@ internal sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEnt
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
-        builder.ToTable("users", schema: "public");
+        // Table configuration
+        builder.ToTable("Users", schema: "public");
 
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();

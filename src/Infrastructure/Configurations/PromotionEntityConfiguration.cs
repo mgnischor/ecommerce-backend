@@ -12,7 +12,7 @@ internal sealed class PromotionEntityConfiguration : IEntityTypeConfiguration<Pr
 {
     public void Configure(EntityTypeBuilder<PromotionEntity> builder)
     {
-        builder.ToTable("promotions", schema: "public");
+        builder.ToTable("Promotions", schema: "public");
 
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();

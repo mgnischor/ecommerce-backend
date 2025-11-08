@@ -8,11 +8,12 @@ namespace ECommerce.Infrastructure.Configurations;
 /// Configuration for the ProductVariantEntity.
 /// Maps the ProductVariantEntity properties to the corresponding database columns and sets up constraints and indexes.
 /// </summary>
-internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfiguration<ProductVariantEntity>
+internal sealed class ProductVariantEntityConfiguration
+    : IEntityTypeConfiguration<ProductVariantEntity>
 {
     public void Configure(EntityTypeBuilder<ProductVariantEntity> builder)
     {
-        builder.ToTable("product_variants", schema: "public");
+        builder.ToTable("ProductVariants", schema: "public");
 
         builder.HasKey(pv => pv.Id);
         builder.Property(pv => pv.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
@@ -22,14 +23,9 @@ internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfigurati
             .HasColumnName("created_by")
             .HasDefaultValue(Guid.Parse("ce06e1a8-f688-44b6-b616-4badf09d9153"));
 
-        builder
-            .Property(pv => pv.UpdatedBy)
-            .HasColumnName("updated_by");
+        builder.Property(pv => pv.UpdatedBy).HasColumnName("updated_by");
 
-        builder
-            .Property(pv => pv.ProductId)
-            .HasColumnName("product_id")
-            .IsRequired();
+        builder.Property(pv => pv.ProductId).HasColumnName("product_id").IsRequired();
 
         builder
             .Property(pv => pv.Name)
@@ -68,10 +64,7 @@ internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfigurati
             .IsRequired()
             .HasDefaultValue(0);
 
-        builder
-            .Property(pv => pv.Weight)
-            .HasColumnName("weight")
-            .HasColumnType("decimal(10,2)");
+        builder.Property(pv => pv.Weight).HasColumnName("weight").HasColumnType("decimal(10,2)");
 
         builder
             .Property(pv => pv.ImageUrl)
@@ -91,25 +84,13 @@ internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfigurati
             .HasColumnType("jsonb")
             .HasDefaultValueSql("'{}'");
 
-        builder
-            .Property(pv => pv.IsDefault)
-            .HasColumnName("is_default")
-            .HasDefaultValue(false);
+        builder.Property(pv => pv.IsDefault).HasColumnName("is_default").HasDefaultValue(false);
 
-        builder
-            .Property(pv => pv.IsAvailable)
-            .HasColumnName("is_available")
-            .HasDefaultValue(true);
+        builder.Property(pv => pv.IsAvailable).HasColumnName("is_available").HasDefaultValue(true);
 
-        builder
-            .Property(pv => pv.DisplayOrder)
-            .HasColumnName("display_order")
-            .HasDefaultValue(0);
+        builder.Property(pv => pv.DisplayOrder).HasColumnName("display_order").HasDefaultValue(0);
 
-        builder
-            .Property(pv => pv.IsDeleted)
-            .HasColumnName("is_deleted")
-            .HasDefaultValue(false);
+        builder.Property(pv => pv.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false);
 
         builder
             .Property(pv => pv.CreatedAt)
@@ -129,6 +110,8 @@ internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfigurati
         builder.HasIndex(pv => pv.Sku).IsUnique().HasDatabaseName("ix_product_variants_sku");
         builder.HasIndex(pv => pv.IsDefault).HasDatabaseName("ix_product_variants_is_default");
         builder.HasIndex(pv => pv.IsAvailable).HasDatabaseName("ix_product_variants_is_available");
-        builder.HasIndex(pv => pv.DisplayOrder).HasDatabaseName("ix_product_variants_display_order");
+        builder
+            .HasIndex(pv => pv.DisplayOrder)
+            .HasDatabaseName("ix_product_variants_display_order");
     }
 }

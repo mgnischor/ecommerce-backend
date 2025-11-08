@@ -12,7 +12,7 @@ internal sealed class ShippingZoneEntityConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<ShippingZoneEntity> builder)
     {
-        builder.ToTable("shipping_zones", schema: "public");
+        builder.ToTable("ShippingZones", schema: "public");
 
         builder.HasKey(sz => sz.Id);
         builder.Property(sz => sz.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
@@ -22,9 +22,7 @@ internal sealed class ShippingZoneEntityConfiguration : IEntityTypeConfiguration
             .HasColumnName("created_by")
             .HasDefaultValue(Guid.Parse("ce06e1a8-f688-44b6-b616-4badf09d9153"));
 
-        builder
-            .Property(sz => sz.UpdatedBy)
-            .HasColumnName("updated_by");
+        builder.Property(sz => sz.UpdatedBy).HasColumnName("updated_by");
 
         builder
             .Property(sz => sz.Name)
@@ -106,25 +104,13 @@ internal sealed class ShippingZoneEntityConfiguration : IEntityTypeConfiguration
             .HasColumnType("text[]")
             .HasDefaultValueSql("'{}'");
 
-        builder
-            .Property(sz => sz.TaxRate)
-            .HasColumnName("tax_rate")
-            .HasColumnType("decimal(5,2)");
+        builder.Property(sz => sz.TaxRate).HasColumnName("tax_rate").HasColumnType("decimal(5,2)");
 
-        builder
-            .Property(sz => sz.Priority)
-            .HasColumnName("priority")
-            .HasDefaultValue(0);
+        builder.Property(sz => sz.Priority).HasColumnName("priority").HasDefaultValue(0);
 
-        builder
-            .Property(sz => sz.IsActive)
-            .HasColumnName("is_active")
-            .HasDefaultValue(true);
+        builder.Property(sz => sz.IsActive).HasColumnName("is_active").HasDefaultValue(true);
 
-        builder
-            .Property(sz => sz.IsDeleted)
-            .HasColumnName("is_deleted")
-            .HasDefaultValue(false);
+        builder.Property(sz => sz.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false);
 
         builder
             .Property(sz => sz.CreatedAt)
