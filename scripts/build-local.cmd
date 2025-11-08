@@ -66,14 +66,14 @@ echo.
 
 echo [5/8] Building project...
 echo Building Release configuration...
-dotnet build -c Release --no-incremental
+dotnet build ECommerce.Backend.csproj -c Release --no-incremental
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Release build failed
     exit /b 1
 )
 
 echo Building Debug configuration...
-dotnet build -c Debug --no-incremental
+dotnet build ECommerce.Backend.csproj -c Debug --no-incremental
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Debug build failed
     exit /b 1
@@ -82,14 +82,14 @@ echo.
 
 echo [6/8] Publishing project...
 echo Publishing Release configuration...
-dotnet publish -c Release --no-build
+dotnet publish ECommerce.Backend.csproj -c Release --no-build
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Release publish failed
     exit /b 1
 )
 
 echo Publishing Debug configuration...
-dotnet publish -c Debug --no-build
+dotnet publish ECommerce.Backend.csproj -c Debug --no-build
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Debug publish failed
     exit /b 1
