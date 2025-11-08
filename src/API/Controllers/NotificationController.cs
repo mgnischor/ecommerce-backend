@@ -271,7 +271,7 @@ public sealed class NotificationController : ControllerBase
                 _logger.LogWarning(
                     "Unauthorized access attempt to user notifications: {UserId}, User: {CurrentUserId}",
                     userId,
-                    currentUserId
+                    currentUserId ?? "Unknown"
                 );
                 return Forbid();
             }
@@ -634,7 +634,7 @@ public sealed class NotificationController : ControllerBase
                 _logger.LogWarning(
                     "Unauthorized attempt to mark notification as read: {NotificationId}, User: {UserId}",
                     id,
-                    currentUserId
+                    currentUserId ?? "Unknown"
                 );
                 return Forbid();
             }
@@ -648,7 +648,7 @@ public sealed class NotificationController : ControllerBase
                 _logger.LogInformation(
                     "Notification marked as read: {NotificationId}, User: {UserId}",
                     id,
-                    currentUserId
+                    currentUserId ?? "Unknown"
                 );
             }
 
@@ -777,7 +777,7 @@ public sealed class NotificationController : ControllerBase
                 _logger.LogWarning(
                     "Unauthorized attempt to mark all notifications as read: {UserId}, User: {CurrentUserId}",
                     userId,
-                    currentUserId
+                    currentUserId ?? "Unknown"
                 );
                 return Forbid();
             }
