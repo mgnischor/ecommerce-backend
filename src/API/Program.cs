@@ -56,6 +56,7 @@ builder.Services.AddScoped<IChartOfAccountsRepository, ChartOfAccountsRepository
 builder.Services.AddScoped<IJournalEntryRepository, JournalEntryRepository>();
 builder.Services.AddScoped<IAccountingEntryRepository, AccountingEntryRepository>();
 builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
+builder.Services.AddScoped<IFinancialTransactionRepository, FinancialTransactionRepository>();
 
 // Register logging service
 builder.Services.AddScoped<ILoggingService, LoggingService>();
@@ -65,6 +66,7 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAccountingService, AccountingService>();
 builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();
+builder.Services.AddScoped<IFinancialService, FinancialService>();
 
 // Configure JWT Authentication
 var jwtSecretKey =
