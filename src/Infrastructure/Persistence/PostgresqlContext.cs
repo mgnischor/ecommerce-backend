@@ -31,6 +31,9 @@ public class PostgresqlContext : DbContext
     // Inventory
     public DbSet<InventoryTransactionEntity> InventoryTransactions { get; set; }
 
+    // Financial
+    public DbSet<FinancialTransactionEntity> FinancialTransactions { get; set; }
+
     // Shipping & Refunds
     public DbSet<ShipmentEntity> Shipments { get; set; }
     public DbSet<RefundEntity> Refunds { get; set; }
