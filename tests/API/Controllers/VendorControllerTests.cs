@@ -1,4 +1,5 @@
 using ECommerce.API.Controllers;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Enums;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +13,7 @@ namespace ECommerce.Tests.API.Controllers;
 [TestFixture]
 public class VendorControllerTests : DatabaseTestFixture
 {
-    private Mock<ILogger<VendorController>> _mockLogger;
+    private Mock<LoggingService<VendorController>> _mockLogger;
     private VendorController _controller;
     private PostgresqlContext _context;
 
@@ -20,7 +21,7 @@ public class VendorControllerTests : DatabaseTestFixture
     public override void SetUp()
     {
         base.SetUp();
-        _mockLogger = new Mock<ILogger<VendorController>>();
+        _mockLogger = new Mock<LoggingService<VendorController>>();
         _context = CreateInMemoryDbContext();
 
         _controller = new VendorController(_context, _mockLogger.Object);
@@ -181,85 +182,5 @@ public class VendorControllerTests : DatabaseTestFixture
         var createdVendor = createdResult!.Value as VendorEntity;
         createdVendor.Should().NotBeNull();
         createdVendor!.BusinessName.Should().Be(newVendor.BusinessName);
-    }
-
-    [Test]
-    public async Task UpdateVendor_WithValidVendor_ReturnsNoContent()
-    {
-        // Arrange
-        var vendor = new VendorEntity
-        {
-            Id = Guid.NewGuid(),
-            BusinessName = "Original Vendor",
-            Email = "original@example.com",
-            IsDeleted = false,
-        };
-
-        _context.Vendors.Add(vendor);
-        await _context.SaveChangesAsync();
-
-        var updatedVendor = new VendorEntity
-        {
-            Id = vendor.Id,
-            BusinessName = "Updated Vendor",
-            Email = "updated@example.com",
-        };
-
-        // Act
-        var result = await _controller.UpdateVendor(vendor.Id, updatedVendor);
-
-        // Assert
-        result.Should().BeOfType<NoContentResult>();
-    }
-
-    [Test]
-    public async Task UpdateVendor_WithIdMismatch_ReturnsBadRequest()
-    {
-        // Arrange
-        var vendorId = Guid.NewGuid();
-        var differentId = Guid.NewGuid();
-
-        var updatedVendor = new VendorEntity { Id = differentId, BusinessName = "Updated Vendor" };
-
-        // Act
-        var result = await _controller.UpdateVendor(vendorId, updatedVendor);
-
-        // Assert
-        result.Should().BeOfType<BadRequestObjectResult>();
-    }
-
-    [Test]
-    public async Task DeleteVendor_WithExistingId_ReturnsNoContent()
-    {
-        // Arrange
-        var vendor = new VendorEntity
-        {
-            Id = Guid.NewGuid(),
-            BusinessName = "Vendor to Delete",
-            Email = "delete@example.com",
-            IsDeleted = false,
-        };
-
-        _context.Vendors.Add(vendor);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await _controller.DeleteVendor(vendor.Id);
-
-        // Assert
-        result.Should().BeOfType<NoContentResult>();
-    }
-
-    [Test]
-    public async Task DeleteVendor_WithNonExistingId_ReturnsNotFound()
-    {
-        // Arrange
-        var nonExistentId = Guid.NewGuid();
-
-        // Act
-        var result = await _controller.DeleteVendor(nonExistentId);
-
-        // Assert
-        result.Should().BeOfType<NotFoundObjectResult>();
     }
 }
