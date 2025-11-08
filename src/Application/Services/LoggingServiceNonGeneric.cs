@@ -65,4 +65,12 @@ public sealed class LoggingService : ILoggingService
             _logger.LogCritical(exception, message, args);
         }
     }
+
+    void ILoggingService.LogWarning(Exception exception, string message, params object[] args)
+    {
+        if (exception != null && !string.IsNullOrWhiteSpace(message))
+        {
+            _logger.LogWarning(exception, message, args);
+        }
+    }
 }
