@@ -376,6 +376,177 @@ namespace ECommerce.src.Infrastructure.Migrations
                     b.ToTable("Coupons");
                 });
 
+            modelBuilder.Entity("ECommerce.Domain.Entities.FinancialTransactionEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<string>("Counterparty")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("counterparty");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
+                        .HasDefaultValue("USD")
+                        .HasColumnName("currency");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<decimal>("FeeAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("fee_amount");
+
+                    b.Property<Guid?>("InventoryTransactionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("inventory_transaction_id");
+
+                    b.Property<bool>("IsReconciled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_reconciled");
+
+                    b.Property<Guid?>("JournalEntryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journal_entry_id");
+
+                    b.Property<decimal>("NetAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("net_amount");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.Property<Guid?>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
+                    b.Property<Guid?>("PaymentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("payment_id");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("payment_method");
+
+                    b.Property<string>("PaymentProvider")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("payment_provider");
+
+                    b.Property<Guid?>("ProductId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_id");
+
+                    b.Property<DateTime?>("ReconciledAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("reconciled_at");
+
+                    b.Property<Guid?>("ReconciledBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("reconciled_by");
+
+                    b.Property<string>("ReferenceNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("reference_number");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("Pending")
+                        .HasColumnName("status");
+
+                    b.Property<decimal>("TaxAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("tax_amount");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("transaction_date");
+
+                    b.Property<string>("TransactionNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("transaction_number");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("transaction_type");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Counterparty")
+                        .HasDatabaseName("ix_financial_transactions_counterparty");
+
+                    b.HasIndex("InventoryTransactionId")
+                        .HasDatabaseName("ix_financial_transactions_inventory_transaction_id");
+
+                    b.HasIndex("IsReconciled")
+                        .HasDatabaseName("ix_financial_transactions_is_reconciled");
+
+                    b.HasIndex("JournalEntryId");
+
+                    b.HasIndex("OrderId")
+                        .HasDatabaseName("ix_financial_transactions_order_id");
+
+                    b.HasIndex("PaymentId")
+                        .HasDatabaseName("ix_financial_transactions_payment_id");
+
+                    b.HasIndex("TransactionDate")
+                        .HasDatabaseName("ix_financial_transactions_transaction_date");
+
+                    b.HasIndex("TransactionNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_financial_transactions_transaction_number");
+
+                    b.HasIndex("TransactionType")
+                        .HasDatabaseName("ix_financial_transactions_transaction_type");
+
+                    b.HasIndex("TransactionDate", "TransactionType")
+                        .HasDatabaseName("ix_financial_transactions_date_type");
+
+                    b.ToTable("financial_transactions", (string)null);
+                });
+
             modelBuilder.Entity("ECommerce.Domain.Entities.InventoryEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2963,6 +3134,30 @@ namespace ECommerce.src.Infrastructure.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("JournalEntry");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.FinancialTransactionEntity", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Entities.InventoryTransactionEntity", "InventoryTransaction")
+                        .WithMany()
+                        .HasForeignKey("InventoryTransactionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ECommerce.Domain.Entities.JournalEntryEntity", "JournalEntry")
+                        .WithMany()
+                        .HasForeignKey("JournalEntryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ECommerce.Domain.Entities.PaymentEntity", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("InventoryTransaction");
+
+                    b.Navigation("JournalEntry");
+
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.InventoryTransactionEntity", b =>
