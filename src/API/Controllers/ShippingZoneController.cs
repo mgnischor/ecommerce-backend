@@ -387,7 +387,7 @@ public sealed class ShippingZoneController : ControllerBase
                 "Shipping zone created: {ZoneId}, Name: {Name}, User: {UserId}",
                 newZone.Id,
                 newZone.Name,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
 
             return CreatedAtAction(nameof(GetShippingZoneById), new { id = newZone.Id }, newZone);
@@ -564,7 +564,7 @@ public sealed class ShippingZoneController : ControllerBase
             _logger.LogInformation(
                 "Shipping zone updated: {ZoneId}, User: {UserId}",
                 id,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
             return NoContent();
         }
@@ -696,7 +696,7 @@ public sealed class ShippingZoneController : ControllerBase
                 "Shipping zone deleted: {ZoneId}, Name: {Name}, User: {UserId}",
                 id,
                 zone.Name,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
             return NoContent();
         }
