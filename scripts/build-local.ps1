@@ -85,14 +85,14 @@ Write-Host ""
 
 Write-Host "[5/8] Building project..." -ForegroundColor Yellow
 Write-Host "Building Release configuration..." -ForegroundColor Cyan
-dotnet build -c Release --no-incremental
+dotnet build ECommerce.Backend.csproj -c Release --no-incremental
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Release build failed" -ForegroundColor Red
     exit 1
 }
 
 Write-Host "Building Debug configuration..." -ForegroundColor Cyan
-dotnet build -c Debug --no-incremental
+dotnet build ECommerce.Backend.csproj -c Debug --no-incremental
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Debug build failed" -ForegroundColor Red
     exit 1
@@ -101,14 +101,14 @@ Write-Host ""
 
 Write-Host "[6/8] Publishing project..." -ForegroundColor Yellow
 Write-Host "Publishing Release configuration..." -ForegroundColor Cyan
-dotnet publish -c Release --no-build
+dotnet publish ECommerce.Backend.csproj -c Release --no-build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Release publish failed" -ForegroundColor Red
     exit 1
 }
 
 Write-Host "Publishing Debug configuration..." -ForegroundColor Cyan
-dotnet publish -c Debug --no-build
+dotnet publish ECommerce.Backend.csproj -c Debug --no-build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Debug publish failed" -ForegroundColor Red
     exit 1
