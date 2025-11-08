@@ -6,12 +6,17 @@ using ECommerce.Domain.Interfaces;
 namespace ECommerce.Application.Services;
 
 /// <summary>
-/// Service for managing inventory transactions with accounting integration
+/// Service for managing inventory transactions with accounting and financial integration
 /// </summary>
+/// <remarks>
+/// Automatically creates corresponding accounting journal entries and financial transactions
+/// when inventory movements occur, providing complete traceability and financial impact tracking.
+/// </remarks>
 public class InventoryTransactionService : IInventoryTransactionService
 {
     private readonly IInventoryTransactionRepository _transactionRepository;
     private readonly IAccountingService _accountingService;
+    private readonly IFinancialService _financialService;
     private readonly ILoggingService _logger;
     private static int _transactionCounter = 0;
     private static readonly object _lock = new object();
@@ -19,6 +24,7 @@ public class InventoryTransactionService : IInventoryTransactionService
     public InventoryTransactionService(
         IInventoryTransactionRepository transactionRepository,
         IAccountingService accountingService,
+        IFinancialService financialService,
         ILoggingService logger
     )
     {
@@ -26,6 +32,8 @@ public class InventoryTransactionService : IInventoryTransactionService
             transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
         _accountingService =
             accountingService ?? throw new ArgumentNullException(nameof(accountingService));
+        _financialService =
+            financialService ?? throw new ArgumentNullException(nameof(financialService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -131,6 +139,52 @@ public class InventoryTransactionService : IInventoryTransactionService
             {
                 transaction.JournalEntryId = journalEntry.Id;
                 await _transactionRepository.UpdateAsync(transaction, cancellationToken);
+
+                // Create corresponding financial transaction(s)
+                try
+                {
+                    switch (transactionType)
+                    {
+                        case InventoryTransactionType.Purchase:
+                            await _financialService.RecordPurchaseTransactionAsync(
+                                transaction,
+                                journalEntry,
+                                createdBy,
+                                cancellationToken
+                            );
+                            _logger.LogInformation(
+                                "Financial transaction created for purchase: {TransactionId}",
+                                transaction.Id
+                            );
+                            break;
+
+                        case InventoryTransactionType.Sale:
+                        case InventoryTransactionType.Fulfillment:
+                            await _financialService.RecordSaleTransactionAsync(
+                                transaction,
+                                journalEntry,
+                                createdBy,
+                                cancellationToken
+                            );
+                            _logger.LogInformation(
+                                "Financial transaction created for sale: {TransactionId}",
+                                transaction.Id
+                            );
+                            break;
+
+                        // Other transaction types (returns, adjustments, losses) may also
+                        // generate financial transactions if needed
+                    }
+                }
+                catch (Exception financialEx)
+                {
+                    // Log error but don't fail the main transaction
+                    _logger.LogError(
+                        financialEx,
+                        "Error creating financial transaction for inventory transaction: {TransactionId}",
+                        transaction.Id
+                    );
+                }
             }
         }
         catch (Exception ex)
