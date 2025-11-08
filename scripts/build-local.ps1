@@ -32,7 +32,7 @@ $newVersion | Out-File -FilePath $versionFile -Encoding utf8 -NoNewline
 Write-Host "New version: $newVersion" -ForegroundColor Green
 
 Write-Host "Updating .csproj file..." -ForegroundColor Cyan
-& "$PSScriptRoot\update-version.ps1" -VersionFile $versionFile -CsprojFile "ecommerce-backend.csproj"
+& "$PSScriptRoot\update-version.ps1" -VersionFile $versionFile -CsprojFile "ECommerce.Backend.csproj"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Failed to update .csproj file" -ForegroundColor Red
     $version | Out-File -FilePath $versionFile -Encoding utf8 -NoNewline
@@ -67,10 +67,10 @@ Write-Host "Migration name: $migrationName" -ForegroundColor Green
 
 try {
     dotnet ef migrations add $migrationName `
-        --project ecommerce-backend.csproj `
+        --project ECommerce.Backend.csproj `
         --output-dir src\Infrastructure\Migrations `
         --context PostgresqlContext
-    
+
     if ($LASTEXITCODE -ne 0) {
         throw "Migration creation failed"
     }
@@ -135,7 +135,7 @@ Write-Host ""
 Write-Host "[8/8] Applying database migrations..." -ForegroundColor Yellow
 Write-Host "Updating database with latest migrations..." -ForegroundColor Cyan
 dotnet ef database update `
-    --project ecommerce-backend.csproj `
+    --project ECommerce.Backend.csproj `
     --context PostgresqlContext
 
 if ($LASTEXITCODE -ne 0) {
