@@ -517,7 +517,7 @@ public sealed class PromotionController : ControllerBase
                 "Promotion created: {PromotionId}, Code: {Code}, User: {UserId}",
                 newPromotion.Id,
                 newPromotion.Code,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
 
             return CreatedAtAction(
@@ -655,7 +655,7 @@ public sealed class PromotionController : ControllerBase
                 {
                     _logger.LogWarning(
                         "Duplicate promotion code in update: {Code}",
-                        promotion.Code
+                        promotion.Code ?? "null"
                     );
                     return Conflict(new { Message = "Promotion code already exists" });
                 }
@@ -687,7 +687,7 @@ public sealed class PromotionController : ControllerBase
             _logger.LogInformation(
                 "Promotion updated: {PromotionId}, User: {UserId}",
                 id,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
             return NoContent();
         }
@@ -793,8 +793,8 @@ public sealed class PromotionController : ControllerBase
             _logger.LogWarning(
                 "Promotion deleted: {PromotionId}, Code: {Code}, User: {UserId}",
                 id,
-                promotion.Code,
-                GetCurrentUserId()
+                promotion.Code ?? "null",
+                GetCurrentUserId() ?? "Unknown"
             );
             return NoContent();
         }
