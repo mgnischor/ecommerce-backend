@@ -38,7 +38,7 @@ public class JwtServiceTests : BaseTestFixture
     public void Constructor_WithNullConfiguration_ThrowsException()
     {
         // Act
-        Action act = () => new JwtService(null, _mockLogger.Object);
+        Action act = () => new JwtService(null!, _mockLogger.Object);
 
         // Assert
         act.Should().Throw<ArgumentNullException>().WithParameterName("configuration");
@@ -48,7 +48,7 @@ public class JwtServiceTests : BaseTestFixture
     public void Constructor_WithNullLogger_ThrowsException()
     {
         // Act
-        Action act = () => new JwtService(_mockConfiguration.Object, null);
+        Action act = () => new JwtService(_mockConfiguration.Object, null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>().WithParameterName("logger");
@@ -59,7 +59,7 @@ public class JwtServiceTests : BaseTestFixture
     {
         // Arrange
         var mockConfig = new Mock<IConfiguration>();
-        mockConfig.Setup(c => c["Jwt:SecretKey"]).Returns((string)null);
+        mockConfig.Setup(c => c["Jwt:SecretKey"]).Returns((string?)null);
         mockConfig.Setup(c => c["Jwt:Issuer"]).Returns("TestIssuer");
         mockConfig.Setup(c => c["Jwt:Audience"]).Returns("TestAudience");
 
@@ -96,7 +96,7 @@ public class JwtServiceTests : BaseTestFixture
     public void GenerateToken_WithNullUser_ThrowsException()
     {
         // Act
-        Action act = () => _jwtService.GenerateToken(null);
+        Action act = () => _jwtService.GenerateToken(null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>().WithParameterName("user");
