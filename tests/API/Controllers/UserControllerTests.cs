@@ -13,7 +13,7 @@ namespace ECommerce.Tests.API.Controllers;
 public class UserControllerTests : DatabaseTestFixture
 {
     private Mock<IUserRepository> _mockUserRepository;
-    private Mock<ILogger<UserController>> _mockLogger;
+    private Mock<LoggingService<UserController>> _mockLogger;
     private UserController _controller;
     private PostgresqlContext _context;
 
@@ -22,7 +22,7 @@ public class UserControllerTests : DatabaseTestFixture
     {
         base.SetUp();
         _mockUserRepository = new Mock<IUserRepository>();
-        _mockLogger = new Mock<ILogger<UserController>>();
+        _mockLogger = new Mock<LoggingService<UserController>>();
         _context = CreateInMemoryDbContext();
 
         _controller = new UserController(_mockUserRepository.Object, _context, _mockLogger.Object);
