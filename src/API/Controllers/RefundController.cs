@@ -322,7 +322,7 @@ public sealed class RefundController : ControllerBase
                 _logger.LogWarning(
                     "Unauthorized access attempt to customer refunds: {CustomerId}, User: {UserId}",
                     customerId,
-                    currentUserId
+                    currentUserId ?? "Unknown"
                 );
                 return Forbid();
             }
@@ -700,7 +700,7 @@ public sealed class RefundController : ControllerBase
             _logger.LogWarning(
                 "Refund rejected: {RefundId}, User: {UserId}, Reason: {Reason}",
                 id,
-                GetCurrentUserId(),
+                GetCurrentUserId() ?? "Unknown",
                 reason
             );
 
