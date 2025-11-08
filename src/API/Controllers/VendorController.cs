@@ -25,7 +25,7 @@ public sealed class VendorController : ControllerBase
     private readonly PostgresqlContext _context;
     private readonly ILoggingService _logger;
 
-    public VendorController(PostgresqlContext context, LoggingService<VendorController> logger)
+    public VendorController(PostgresqlContext context, ILoggingService logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

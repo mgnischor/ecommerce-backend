@@ -13,7 +13,7 @@ namespace ECommerce.Tests.API.Controllers;
 [TestFixture]
 public class VendorControllerTests : DatabaseTestFixture
 {
-    private Mock<LoggingService<VendorController>> _mockLogger;
+    private Mock<ILoggingService> _mockLogger;
     private VendorController _controller;
     private PostgresqlContext _context;
 
@@ -21,7 +21,7 @@ public class VendorControllerTests : DatabaseTestFixture
     public override void SetUp()
     {
         base.SetUp();
-        _mockLogger = new Mock<LoggingService<VendorController>>();
+        _mockLogger = new Mock<ILoggingService>();
         _context = CreateInMemoryDbContext();
 
         _controller = new VendorController(_context, _mockLogger.Object);

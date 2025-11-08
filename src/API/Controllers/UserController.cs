@@ -29,7 +29,7 @@ public sealed class UserController : ControllerBase
     public UserController(
         IUserRepository userRepository,
         PostgresqlContext context,
-        LoggingService<UserController> logger
+        ILoggingService logger
     )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));

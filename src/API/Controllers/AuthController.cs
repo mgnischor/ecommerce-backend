@@ -112,7 +112,7 @@ public sealed class AuthController : ControllerBase
         IUserRepository userRepository,
         IJwtService jwtService,
         IPasswordService passwordService,
-        LoggingService<AuthController> logger
+        ILoggingService logger
     )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));

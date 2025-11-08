@@ -142,7 +142,7 @@ public sealed class ProductController : ControllerBase
     public ProductController(
         IProductRepository productRepository,
         PostgresqlContext context,
-        LoggingService<ProductController> logger
+        ILoggingService logger
     )
     {
         _productRepository =

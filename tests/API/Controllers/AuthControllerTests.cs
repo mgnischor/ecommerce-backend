@@ -15,7 +15,7 @@ public class AuthControllerTests : BaseTestFixture
     private Mock<IUserRepository> _mockUserRepository;
     private Mock<IJwtService> _mockJwtService;
     private Mock<IPasswordService> _mockPasswordService;
-    private Mock<LoggingService<AuthController>> _mockLogger;
+    private Mock<ILoggingService> _mockLogger;
     private AuthController _controller;
 
     [SetUp]
@@ -25,7 +25,7 @@ public class AuthControllerTests : BaseTestFixture
         _mockUserRepository = new Mock<IUserRepository>();
         _mockJwtService = new Mock<IJwtService>();
         _mockPasswordService = new Mock<IPasswordService>();
-        _mockLogger = new Mock<LoggingService<AuthController>>();
+        _mockLogger = new Mock<ILoggingService>();
 
         _controller = new AuthController(
             _mockUserRepository.Object,
