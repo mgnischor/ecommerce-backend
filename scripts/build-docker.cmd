@@ -93,7 +93,7 @@ docker run -d ^
 
 echo Applying migrations to PostgreSQL via temporary container...
 docker exec ecommerce-migration-temp dotnet ef database update ^
-  --project /src/ecommerce-backend.csproj ^
+  --project /src/ECommerce.Backend.csproj ^
   --context PostgresqlContext ^
   --connection "Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432"
 
@@ -106,7 +106,7 @@ if %ERRORLEVEL% NEQ 0 (
     echo The containers are running but database update failed.
     echo You can try running migrations manually with:
     echo   docker run -d --name ecommerce-migration-temp --network ecommerce-network --entrypoint tail ecommerce-backend:dev -f /dev/null
-    echo   docker exec ecommerce-migration-temp dotnet ef database update --project /src/ecommerce-backend.csproj --context PostgresqlContext --connection "Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432"
+    echo   docker exec ecommerce-migration-temp dotnet ef database update --project /src/ECommerce.Backend.csproj --context PostgresqlContext --connection "Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432"
     echo   docker rm -f ecommerce-migration-temp
     echo.
 ) else (
