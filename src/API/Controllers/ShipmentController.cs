@@ -187,7 +187,7 @@ public sealed class ShipmentController : ControllerBase
             {
                 _logger.LogWarning(
                     "Attempt to retrieve data beyond limit. User: {UserId}",
-                    GetCurrentUserId()
+                    GetCurrentUserId() ?? "Unknown"
                 );
                 return BadRequest(
                     new { Message = "Result set too large. Please refine your query" }
@@ -213,14 +213,18 @@ public sealed class ShipmentController : ControllerBase
                 "Retrieved {Count} shipments. Page: {Page}, User: {UserId}",
                 shipments.Count,
                 pageNumber,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
 
             return Ok(shipments);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving shipments. User: {UserId}", GetCurrentUserId());
+            _logger.LogError(
+                ex,
+                "Error retrieving shipments. User: {UserId}",
+                GetCurrentUserId() ?? "Unknown"
+            );
             return StatusCode(
                 500,
                 new { Message = "An error occurred while processing your request" }
@@ -291,7 +295,7 @@ public sealed class ShipmentController : ControllerBase
                 _logger.LogWarning(
                     "Shipment not found: {ShipmentId}, User: {UserId}",
                     id,
-                    GetCurrentUserId()
+                    GetCurrentUserId() ?? "Unknown"
                 );
                 return NotFound(new { Message = "Shipment not found" });
             }
@@ -309,7 +313,7 @@ public sealed class ShipmentController : ControllerBase
                     _logger.LogWarning(
                         "Unauthorized access attempt to shipment: {ShipmentId}, User: {UserId}",
                         id,
-                        currentUserId
+                        currentUserId ?? "Unknown"
                     );
                     return Forbid();
                 }
@@ -318,7 +322,7 @@ public sealed class ShipmentController : ControllerBase
             _logger.LogInformation(
                 "Shipment retrieved: {ShipmentId}, User: {UserId}",
                 id,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
             return Ok(shipment);
         }
@@ -401,7 +405,7 @@ public sealed class ShipmentController : ControllerBase
                 _logger.LogWarning(
                     "Order not found: {OrderId}, User: {UserId}",
                     orderId,
-                    GetCurrentUserId()
+                    GetCurrentUserId() ?? "Unknown"
                 );
                 return NotFound(new { Message = "Order not found" });
             }
@@ -413,7 +417,7 @@ public sealed class ShipmentController : ControllerBase
                 _logger.LogWarning(
                     "Unauthorized access attempt to order shipments: {OrderId}, User: {UserId}",
                     orderId,
-                    currentUserId
+                    currentUserId ?? "Unknown"
                 );
                 return Forbid();
             }
@@ -429,7 +433,7 @@ public sealed class ShipmentController : ControllerBase
                 "Retrieved {Count} shipments for order: {OrderId}, User: {UserId}",
                 shipments.Count,
                 orderId,
-                currentUserId
+                currentUserId ?? "Unknown"
             );
 
             return Ok(shipments);
@@ -709,7 +713,7 @@ public sealed class ShipmentController : ControllerBase
                 "Shipment created: {ShipmentId}, Order: {OrderId}, User: {UserId}",
                 newShipment.Id,
                 newShipment.OrderId,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
 
             return CreatedAtAction(
@@ -884,7 +888,7 @@ public sealed class ShipmentController : ControllerBase
             _logger.LogInformation(
                 "Shipment updated: {ShipmentId}, User: {UserId}",
                 id,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
             return NoContent();
         }
@@ -1012,7 +1016,7 @@ public sealed class ShipmentController : ControllerBase
             _logger.LogWarning(
                 "Shipment deleted: {ShipmentId}, User: {UserId}",
                 id,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
             return NoContent();
         }
