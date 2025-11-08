@@ -33,7 +33,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
-        await DbContext.Products.AddAsync(product);
+        await DbContext!.Products.AddAsync(product);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -72,7 +72,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
-        await DbContext.Products.AddAsync(product);
+        await DbContext!.Products.AddAsync(product);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -120,7 +120,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
                 UpdatedAt = DateTime.UtcNow,
             },
         };
-        await DbContext.Products.AddRangeAsync(products);
+        await DbContext!.Products.AddRangeAsync(products);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -148,7 +148,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
                 UpdatedAt = DateTime.UtcNow,
             })
             .ToArray();
-        await DbContext.Products.AddRangeAsync(products);
+        await DbContext!.Products.AddRangeAsync(products);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -187,7 +187,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
                 UpdatedAt = DateTime.UtcNow,
             },
         };
-        await DbContext.Products.AddRangeAsync(products);
+        await DbContext!.Products.AddRangeAsync(products);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -229,7 +229,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
                 UpdatedAt = DateTime.UtcNow,
             },
         };
-        await DbContext.Products.AddRangeAsync(products);
+        await DbContext!.Products.AddRangeAsync(products);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -271,7 +271,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
                 UpdatedAt = DateTime.UtcNow,
             },
         };
-        await DbContext.Products.AddRangeAsync(products);
+        await DbContext!.Products.AddRangeAsync(products);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -319,7 +319,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
                 UpdatedAt = DateTime.UtcNow,
             },
         };
-        await DbContext.Products.AddRangeAsync(products);
+        await DbContext!.Products.AddRangeAsync(products);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -347,7 +347,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
                 UpdatedAt = DateTime.UtcNow,
             })
             .ToArray();
-        await DbContext.Products.AddRangeAsync(products);
+        await DbContext!.Products.AddRangeAsync(products);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -370,7 +370,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
-        await DbContext.Products.AddAsync(product);
+        await DbContext!.Products.AddAsync(product);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -407,7 +407,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
 
         // Act
         await _repository.AddAsync(product);
-        await DbContext.SaveChangesAsync();
+        await DbContext!.SaveChangesAsync();
 
         // Assert
         var savedProduct = await DbContext.Products.FindAsync(product.Id);
@@ -419,7 +419,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
     public void AddAsync_WithNullProduct_ThrowsException()
     {
         // Act
-        Func<Task> act = async () => await _repository.AddAsync(null);
+        Func<Task> act = async () => await _repository.AddAsync(null!);
 
         // Assert
         act.Should().ThrowAsync<ArgumentNullException>();
@@ -438,7 +438,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
-        await DbContext.Products.AddAsync(product);
+        await DbContext!.Products.AddAsync(product);
         await DbContext.SaveChangesAsync();
         DbContext.ChangeTracker.Clear();
 
@@ -449,14 +449,14 @@ public class ProductRepositoryTests : DatabaseTestFixture
 
         // Assert
         var updatedProduct = await DbContext.Products.FindAsync(product.Id);
-        updatedProduct.Name.Should().Be("Updated Name");
+        updatedProduct!.Name.Should().Be("Updated Name");
     }
 
     [Test]
     public void Update_WithNullProduct_ThrowsException()
     {
         // Act
-        Action act = () => _repository.Update(null);
+        Action act = () => _repository.Update(null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>();
@@ -475,7 +475,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
-        await DbContext.Products.AddAsync(product);
+        await DbContext!.Products.AddAsync(product);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -491,7 +491,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
     public void Remove_WithNullProduct_ThrowsException()
     {
         // Act
-        Action act = () => _repository.Remove(null);
+        Action act = () => _repository.Remove(null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>();
@@ -511,7 +511,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
-        await DbContext.Products.AddAsync(product);
+        await DbContext!.Products.AddAsync(product);
         await DbContext.SaveChangesAsync();
 
         // Act
@@ -521,7 +521,7 @@ public class ProductRepositoryTests : DatabaseTestFixture
         // Assert
         result.Should().BeTrue();
         var softDeletedProduct = await DbContext.Products.FindAsync(product.Id);
-        softDeletedProduct.IsDeleted.Should().BeTrue();
+        softDeletedProduct!.IsDeleted.Should().BeTrue();
     }
 
     [Test]
