@@ -51,7 +51,7 @@ set MIGRATION_NAME=Migration_v%MAJOR%_%MINOR%_%BUILD%
 echo Migration name: %MIGRATION_NAME%
 
 dotnet ef migrations add %MIGRATION_NAME% ^
-    --project ecommerce-backend.csproj ^
+    --project ECommerce.Backend.csproj ^
     --output-dir src\Infrastructure\Migrations ^
     --context PostgresqlContext
 
@@ -109,7 +109,7 @@ echo.
 echo [8/8] Applying database migrations...
 echo Updating database with latest migrations...
 dotnet ef database update ^
-    --project ecommerce-backend.csproj ^
+    --project ECommerce.Backend.csproj ^
     --context PostgresqlContext
 
 if %ERRORLEVEL% NEQ 0 (
