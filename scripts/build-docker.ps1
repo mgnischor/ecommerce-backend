@@ -120,7 +120,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "Applying migrations to PostgreSQL via temporary container..." -ForegroundColor Cyan
 docker exec ecommerce-migration-temp dotnet ef database update `
-  --project /src/ecommerce-backend.csproj `
+  --project /src/ECommerce.Backend.csproj `
   --context PostgresqlContext `
   --connection "Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432"
 
@@ -133,7 +133,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "The containers are running but database update failed." -ForegroundColor Yellow
     Write-Host "You can try running migrations manually with:" -ForegroundColor White
     Write-Host "  docker run -d --name ecommerce-migration-temp --network ecommerce-network --entrypoint tail ecommerce-backend:dev -f /dev/null" -ForegroundColor Gray
-    Write-Host "  docker exec ecommerce-migration-temp dotnet ef database update --project /src/ecommerce-backend.csproj --context PostgresqlContext --connection 'Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432'" -ForegroundColor Gray
+    Write-Host "  docker exec ecommerce-migration-temp dotnet ef database update --project /src/ECommerce.Backend.csproj --context PostgresqlContext --connection 'Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432'" -ForegroundColor Gray
     Write-Host "  docker rm -f ecommerce-migration-temp" -ForegroundColor Gray
     Write-Host ""
 } else {
