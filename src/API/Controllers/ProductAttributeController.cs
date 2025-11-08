@@ -803,7 +803,7 @@ public sealed class ProductAttributeController : ControllerBase
                 "Product attribute created: {AttributeId}, Code: {Code}, User: {UserId}",
                 newAttribute.Id,
                 newAttribute.Code,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
 
             return CreatedAtAction(
@@ -1046,7 +1046,7 @@ public sealed class ProductAttributeController : ControllerBase
             _logger.LogInformation(
                 "Product attribute updated: {AttributeId}, User: {UserId}",
                 id,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
             return NoContent();
         }
@@ -1211,7 +1211,7 @@ public sealed class ProductAttributeController : ControllerBase
                 "Product attribute deleted: {AttributeId}, Code: {Code}, User: {UserId}",
                 id,
                 attribute.Code,
-                GetCurrentUserId()
+                GetCurrentUserId() ?? "Unknown"
             );
             return NoContent();
         }
