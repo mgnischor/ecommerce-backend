@@ -20,6 +20,36 @@
         <RootNamespace>ECommerce</RootNamespace>
         <TargetFramework>net9.0</TargetFramework>
         <Version>0.0.1</Version>
+
+        <!-- Memory and Performance Optimization Settings -->
+        <UseSharedCompilation>true</UseSharedCompilation>
+        <Deterministic>true</Deterministic>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <DebugType>portable</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+
+        <!-- Reduce memory usage during compilation -->
+        <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+
+        <!-- Optimize build performance -->
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <GenerateDependencyFile>true</GenerateDependencyFile>
+    </PropertyGroup>
+
+    <!-- Build Configuration for Debug -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <Optimize>false</Optimize>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+
+    <!-- Build Configuration for Release -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <Optimize>true</Optimize>
+        <DefineConstants>TRACE</DefineConstants>
+        <WarningLevel>4</WarningLevel>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
