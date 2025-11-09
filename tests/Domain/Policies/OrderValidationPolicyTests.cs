@@ -13,7 +13,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderAmount_WithValidAmount_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderAmount(100m);
+        var isValid = OrderValidationPolicy.IsValidOrderAmount(100m);
 
         // Assert
         isValid.Should().BeTrue();
@@ -23,7 +23,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderAmount_WithMinimumAmount_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderAmount(0.01m);
+        var isValid = OrderValidationPolicy.IsValidOrderAmount(0.01m);
 
         // Assert
         isValid.Should().BeTrue();
@@ -33,7 +33,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderAmount_WithMaximumAmount_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderAmount(999999.99m);
+        var isValid = OrderValidationPolicy.IsValidOrderAmount(999999.99m);
 
         // Assert
         isValid.Should().BeTrue();
@@ -43,7 +43,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderAmount_WithZeroAmount_ReturnsFalse()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderAmount(0m);
+        var isValid = OrderValidationPolicy.IsValidOrderAmount(0m);
 
         // Assert
         isValid.Should().BeFalse();
@@ -53,7 +53,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderAmount_WithNegativeAmount_ReturnsFalse()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderAmount(-10m);
+        var isValid = OrderValidationPolicy.IsValidOrderAmount(-10m);
 
         // Assert
         isValid.Should().BeFalse();
@@ -63,7 +63,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderAmount_ExceedsMaximum_ReturnsFalse()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderAmount(1000000m);
+        var isValid = OrderValidationPolicy.IsValidOrderAmount(1000000m);
 
         // Assert
         isValid.Should().BeFalse();
@@ -73,7 +73,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidItemCount_WithValidCount_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidItemCount(50);
+        var isValid = OrderValidationPolicy.IsValidItemCount(50);
 
         // Assert
         isValid.Should().BeTrue();
@@ -83,7 +83,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidItemCount_WithOneItem_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidItemCount(1);
+        var isValid = OrderValidationPolicy.IsValidItemCount(1);
 
         // Assert
         isValid.Should().BeTrue();
@@ -93,7 +93,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidItemCount_AtMaximum_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidItemCount(100);
+        var isValid = OrderValidationPolicy.IsValidItemCount(100);
 
         // Assert
         isValid.Should().BeTrue();
@@ -103,7 +103,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidItemCount_WithZeroItems_ReturnsFalse()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidItemCount(0);
+        var isValid = OrderValidationPolicy.IsValidItemCount(0);
 
         // Assert
         isValid.Should().BeFalse();
@@ -113,7 +113,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidItemCount_ExceedsMaximum_ReturnsFalse()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidItemCount(150);
+        var isValid = OrderValidationPolicy.IsValidItemCount(150);
 
         // Assert
         isValid.Should().BeFalse();
@@ -123,7 +123,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanCancelOrder_WithPendingStatus_ReturnsTrue()
     {
         // Act
-        var canCancel = Domain.Policies.OrderValidationPolicy.CanCancelOrder(OrderStatus.Pending);
+        var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Pending);
 
         // Assert
         canCancel.Should().BeTrue();
@@ -133,9 +133,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanCancelOrder_WithProcessingStatus_ReturnsTrue()
     {
         // Act
-        var canCancel = Domain.Policies.OrderValidationPolicy.CanCancelOrder(
-            OrderStatus.Processing
-        );
+        var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Processing);
 
         // Assert
         canCancel.Should().BeTrue();
@@ -145,7 +143,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanCancelOrder_WithConfirmedStatus_ReturnsTrue()
     {
         // Act
-        var canCancel = Domain.Policies.OrderValidationPolicy.CanCancelOrder(OrderStatus.Confirmed);
+        var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Confirmed);
 
         // Assert
         canCancel.Should().BeTrue();
@@ -155,7 +153,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanCancelOrder_WithShippedStatus_ReturnsFalse()
     {
         // Act
-        var canCancel = Domain.Policies.OrderValidationPolicy.CanCancelOrder(OrderStatus.Shipped);
+        var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Shipped);
 
         // Assert
         canCancel.Should().BeFalse();
@@ -165,7 +163,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanCancelOrder_WithDeliveredStatus_ReturnsFalse()
     {
         // Act
-        var canCancel = Domain.Policies.OrderValidationPolicy.CanCancelOrder(OrderStatus.Delivered);
+        var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Delivered);
 
         // Assert
         canCancel.Should().BeFalse();
@@ -175,7 +173,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanCancelOrder_WithCancelledStatus_ReturnsFalse()
     {
         // Act
-        var canCancel = Domain.Policies.OrderValidationPolicy.CanCancelOrder(OrderStatus.Cancelled);
+        var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Cancelled);
 
         // Assert
         canCancel.Should().BeFalse();
@@ -185,7 +183,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanCancelOrder_WithRefundedStatus_ReturnsFalse()
     {
         // Act
-        var canCancel = Domain.Policies.OrderValidationPolicy.CanCancelOrder(OrderStatus.Refunded);
+        var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Refunded);
 
         // Assert
         canCancel.Should().BeFalse();
@@ -198,9 +196,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var orderCreatedAt = DateTime.UtcNow.AddHours(-10);
 
         // Act
-        var isWithinWindow = Domain.Policies.OrderValidationPolicy.IsWithinCancellationWindow(
-            orderCreatedAt
-        );
+        var isWithinWindow = OrderValidationPolicy.IsWithinCancellationWindow(orderCreatedAt);
 
         // Assert
         isWithinWindow.Should().BeTrue();
@@ -213,9 +209,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var orderCreatedAt = DateTime.UtcNow.AddHours(-23.5);
 
         // Act
-        var isWithinWindow = Domain.Policies.OrderValidationPolicy.IsWithinCancellationWindow(
-            orderCreatedAt
-        );
+        var isWithinWindow = OrderValidationPolicy.IsWithinCancellationWindow(orderCreatedAt);
 
         // Assert
         isWithinWindow.Should().BeTrue();
@@ -228,9 +222,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var orderCreatedAt = DateTime.UtcNow.AddHours(-30);
 
         // Act
-        var isWithinWindow = Domain.Policies.OrderValidationPolicy.IsWithinCancellationWindow(
-            orderCreatedAt
-        );
+        var isWithinWindow = OrderValidationPolicy.IsWithinCancellationWindow(orderCreatedAt);
 
         // Assert
         isWithinWindow.Should().BeFalse();
@@ -240,7 +232,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanModifyOrder_WithPendingStatus_ReturnsTrue()
     {
         // Act
-        var canModify = Domain.Policies.OrderValidationPolicy.CanModifyOrder(OrderStatus.Pending);
+        var canModify = OrderValidationPolicy.CanModifyOrder(OrderStatus.Pending);
 
         // Assert
         canModify.Should().BeTrue();
@@ -250,9 +242,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanModifyOrder_WithProcessingStatus_ReturnsFalse()
     {
         // Act
-        var canModify = Domain.Policies.OrderValidationPolicy.CanModifyOrder(
-            OrderStatus.Processing
-        );
+        var canModify = OrderValidationPolicy.CanModifyOrder(OrderStatus.Processing);
 
         // Assert
         canModify.Should().BeFalse();
@@ -262,7 +252,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanModifyOrder_WithShippedStatus_ReturnsFalse()
     {
         // Act
-        var canModify = Domain.Policies.OrderValidationPolicy.CanModifyOrder(OrderStatus.Shipped);
+        var canModify = OrderValidationPolicy.CanModifyOrder(OrderStatus.Shipped);
 
         // Assert
         canModify.Should().BeFalse();
@@ -275,10 +265,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var deliveredAt = DateTime.UtcNow.AddDays(-10);
 
         // Act
-        var canRefund = Domain.Policies.OrderValidationPolicy.CanRefundOrder(
-            OrderStatus.Delivered,
-            deliveredAt
-        );
+        var canRefund = OrderValidationPolicy.CanRefundOrder(OrderStatus.Delivered, deliveredAt);
 
         // Assert
         canRefund.Should().BeTrue();
@@ -291,10 +278,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var deliveredAt = DateTime.UtcNow.AddDays(-40);
 
         // Act
-        var canRefund = Domain.Policies.OrderValidationPolicy.CanRefundOrder(
-            OrderStatus.Delivered,
-            deliveredAt
-        );
+        var canRefund = OrderValidationPolicy.CanRefundOrder(OrderStatus.Delivered, deliveredAt);
 
         // Assert
         canRefund.Should().BeFalse();
@@ -307,10 +291,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var deliveredAt = DateTime.UtcNow.AddDays(-10);
 
         // Act
-        var canRefund = Domain.Policies.OrderValidationPolicy.CanRefundOrder(
-            OrderStatus.Pending,
-            deliveredAt
-        );
+        var canRefund = OrderValidationPolicy.CanRefundOrder(OrderStatus.Pending, deliveredAt);
 
         // Assert
         canRefund.Should().BeFalse();
@@ -320,10 +301,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void CanRefundOrder_WithNullDeliveryDate_ReturnsFalse()
     {
         // Act
-        var canRefund = Domain.Policies.OrderValidationPolicy.CanRefundOrder(
-            OrderStatus.Delivered,
-            null
-        );
+        var canRefund = OrderValidationPolicy.CanRefundOrder(OrderStatus.Delivered, null);
 
         // Assert
         canRefund.Should().BeFalse();
@@ -333,7 +311,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderTotal_WithCorrectCalculation_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderTotal(
+        var isValid = OrderValidationPolicy.IsValidOrderTotal(
             subtotal: 100m,
             taxAmount: 10m,
             shippingCost: 5m,
@@ -349,7 +327,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderTotal_WithRoundingTolerance_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderTotal(
+        var isValid = OrderValidationPolicy.IsValidOrderTotal(
             subtotal: 100m,
             taxAmount: 10m,
             shippingCost: 5m,
@@ -365,7 +343,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderTotal_WithIncorrectCalculation_ReturnsFalse()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderTotal(
+        var isValid = OrderValidationPolicy.IsValidOrderTotal(
             subtotal: 100m,
             taxAmount: 10m,
             shippingCost: 5m,
@@ -381,7 +359,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderTotal_WithNegativeSubtotal_ReturnsFalse()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderTotal(
+        var isValid = OrderValidationPolicy.IsValidOrderTotal(
             subtotal: -100m,
             taxAmount: 10m,
             shippingCost: 5m,
@@ -397,7 +375,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidOrderTotal_WithNegativeTax_ReturnsFalse()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidOrderTotal(
+        var isValid = OrderValidationPolicy.IsValidOrderTotal(
             subtotal: 100m,
             taxAmount: -10m,
             shippingCost: 5m,
@@ -413,7 +391,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidStatusTransition_PendingToProcessing_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidStatusTransition(
+        var isValid = OrderValidationPolicy.IsValidStatusTransition(
             OrderStatus.Pending,
             OrderStatus.Processing
         );
@@ -426,7 +404,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidStatusTransition_ProcessingToConfirmed_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidStatusTransition(
+        var isValid = OrderValidationPolicy.IsValidStatusTransition(
             OrderStatus.Processing,
             OrderStatus.Confirmed
         );
@@ -439,7 +417,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidStatusTransition_ConfirmedToShipped_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidStatusTransition(
+        var isValid = OrderValidationPolicy.IsValidStatusTransition(
             OrderStatus.Confirmed,
             OrderStatus.Shipped
         );
@@ -452,7 +430,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidStatusTransition_ShippedToDelivered_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidStatusTransition(
+        var isValid = OrderValidationPolicy.IsValidStatusTransition(
             OrderStatus.Shipped,
             OrderStatus.Delivered
         );
@@ -465,7 +443,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidStatusTransition_DeliveredToRefunded_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidStatusTransition(
+        var isValid = OrderValidationPolicy.IsValidStatusTransition(
             OrderStatus.Delivered,
             OrderStatus.Refunded
         );
@@ -478,7 +456,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidStatusTransition_PendingToCancelled_ReturnsTrue()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidStatusTransition(
+        var isValid = OrderValidationPolicy.IsValidStatusTransition(
             OrderStatus.Pending,
             OrderStatus.Cancelled
         );
@@ -491,7 +469,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidStatusTransition_ShippedToCancelled_ReturnsFalse()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidStatusTransition(
+        var isValid = OrderValidationPolicy.IsValidStatusTransition(
             OrderStatus.Shipped,
             OrderStatus.Cancelled
         );
@@ -504,7 +482,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void IsValidStatusTransition_DeliveredToPending_ReturnsFalse()
     {
         // Act
-        var isValid = Domain.Policies.OrderValidationPolicy.IsValidStatusTransition(
+        var isValid = OrderValidationPolicy.IsValidStatusTransition(
             OrderStatus.Delivered,
             OrderStatus.Pending
         );
@@ -517,9 +495,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void RequiresShippingAddress_WithStandardShipping_ReturnsTrue()
     {
         // Act
-        var requires = Domain.Policies.OrderValidationPolicy.RequiresShippingAddress(
-            ShippingMethod.Standard
-        );
+        var requires = OrderValidationPolicy.RequiresShippingAddress(ShippingMethod.Standard);
 
         // Assert
         requires.Should().BeTrue();
@@ -529,9 +505,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void RequiresShippingAddress_WithExpressShipping_ReturnsTrue()
     {
         // Act
-        var requires = Domain.Policies.OrderValidationPolicy.RequiresShippingAddress(
-            ShippingMethod.Express
-        );
+        var requires = OrderValidationPolicy.RequiresShippingAddress(ShippingMethod.Express);
 
         // Assert
         requires.Should().BeTrue();
@@ -541,9 +515,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void RequiresShippingAddress_WithStorePickup_ReturnsFalse()
     {
         // Act
-        var requires = Domain.Policies.OrderValidationPolicy.RequiresShippingAddress(
-            ShippingMethod.StorePickup
-        );
+        var requires = OrderValidationPolicy.RequiresShippingAddress(ShippingMethod.StorePickup);
 
         // Assert
         requires.Should().BeFalse();
@@ -553,9 +525,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
     public void RequiresShippingAddress_WithNotSpecified_ReturnsFalse()
     {
         // Act
-        var requires = Domain.Policies.OrderValidationPolicy.RequiresShippingAddress(
-            ShippingMethod.NotSpecified
-        );
+        var requires = OrderValidationPolicy.RequiresShippingAddress(ShippingMethod.NotSpecified);
 
         // Assert
         requires.Should().BeFalse();
