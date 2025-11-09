@@ -1,0 +1,51 @@
+<Project>
+    <PropertyGroup>
+        <!-- Global Build Optimization Settings -->
+        <LangVersion>latest</LangVersion>
+        <Features>strict</Features>
+        
+        <!-- Memory Management -->
+      <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+  <RetainOnDelete>false</RetainOnDelete>
+        
+     <!-- Build Performance -->
+     <UseSharedCompilation>true</UseSharedCompilation>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
+        
+        <!-- Deterministic Builds -->
+        <Deterministic>true</Deterministic>
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+        
+   <!-- Code Quality -->
+ <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <AnalysisLevel>latest</AnalysisLevel>
+     <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+        
+        <!-- Output Control -->
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+        
+   <!-- Disable unnecessary features for faster builds -->
+        <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+        <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    </PropertyGroup>
+    
+    <!-- Conditional settings for Debug builds -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <DebugType>portable</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+        <Optimize>false</Optimize>
+    </PropertyGroup>
+    
+    <!-- Conditional settings for Release builds -->
+<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <DebugType>embedded</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+ <Optimize>true</Optimize>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    </PropertyGroup>
+</Project>
