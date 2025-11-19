@@ -48,5 +48,15 @@ public enum OrderStatus
     /// <summary>
     /// Payment failed for this order
     /// </summary>
-    PaymentFailed = 8
+    PaymentFailed = 8,
+
+    /// <summary>
+    /// Order has been completed successfully
+    /// </summary>
+    Completed = 9,
+
+    /// <summary>
+    /// Order has been returned by the customer
+    /// </summary>
+    Returned = 10,
 }
