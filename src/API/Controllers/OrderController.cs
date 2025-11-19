@@ -72,7 +72,7 @@ public sealed class OrderController : ControllerBase
 
         // Load order items from database to validate business rules
         var orderItems = await _context
-            .OrderItems.Where(item => order.ItemIds.Contains(item.Id))
+            .OrderItems.Where(item => item.OrderId == order.Id)
             .ToListAsync(cancellationToken);
 
         var itemCount = orderItems.Count;
@@ -279,7 +279,7 @@ public sealed class OrderController : ControllerBase
         {
             // Load order items for inventory fulfillment
             var orderItems = await _context
-                .OrderItems.Where(item => order.ItemIds.Contains(item.Id))
+                .OrderItems.Where(item => item.OrderId == order.Id)
                 .ToListAsync(cancellationToken);
 
             foreach (var item in orderItems)
@@ -381,7 +381,7 @@ public sealed class OrderController : ControllerBase
 
         // Release inventory reservations for cancelled order
         var orderItems = await _context
-            .OrderItems.Where(item => order.ItemIds.Contains(item.Id))
+            .OrderItems.Where(item => item.OrderId == order.Id)
             .ToListAsync(cancellationToken);
 
         foreach (var item in orderItems)
