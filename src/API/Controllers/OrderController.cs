@@ -70,9 +70,12 @@ public sealed class OrderController : ControllerBase
         if (userId == Guid.Empty)
             return Unauthorized(new { Message = "User ID not found in authentication token" });
 
-        // Note: OrderEntity doesn't have Items navigation property
-        // Items should be loaded separately as OrderItemEntity collection
-        var itemCount = 0; // TODO: Load items from OrderItems table
+        // Load order items from database to validate business rules
+        var orderItems = await _context
+            .OrderItems.Where(item => order.ItemIds.Contains(item.Id))
+            .ToListAsync(cancellationToken);
+
+        var itemCount = orderItems.Count;
 
         // Apply business rules validation
         var (isValid, errorMessage) = OrderProcessingPolicy.CanCreateOrder(
@@ -92,8 +95,24 @@ public sealed class OrderController : ControllerBase
             return BadRequest(new { Message = errorMessage });
         }
 
-        // TODO: Validate each order item when items are properly loaded from database
-        // For now, skip item-level validation
+        // Validate each order item against business rules
+        foreach (var item in orderItems)
+        {
+            if (item.Quantity <= 0)
+            {
+                _logger.LogWarning(
+                    "Invalid item quantity: ProductId={ProductId}, Quantity={Quantity}",
+                    item.ProductId,
+                    item.Quantity
+                );
+                return BadRequest(
+                    new
+                    {
+                        Message = $"Item quantity must be positive for product {item.ProductName}",
+                    }
+                );
+            }
+        }
 
         // Validate order total calculation using SubTotal from entity
         var itemsTotal = order.SubTotal;
@@ -120,8 +139,47 @@ public sealed class OrderController : ControllerBase
         order.CreatedAt = DateTime.UtcNow;
         order.UpdatedAt = DateTime.UtcNow;
 
-        // TODO: Reserve inventory for order items when items are loaded from database
-        // This requires loading OrderItemEntity collection separately
+        // Reserve inventory for each order item
+        foreach (var item in orderItems)
+        {
+            try
+            {
+                await _inventoryService.RecordTransactionAsync(
+                    Domain.Enums.InventoryTransactionType.Reservation,
+                    item.ProductId,
+                    item.ProductSku,
+                    item.ProductName,
+                    item.Quantity,
+                    item.UnitPrice,
+                    "Reserved",
+                    userId,
+                    null,
+                    order.Id,
+                    order.OrderNumber,
+                    $"Inventory reservation for order {order.OrderNumber}",
+                    cancellationToken
+                );
+
+                _logger.LogInformation(
+                    "Inventory reserved: OrderId={OrderId}, ProductId={ProductId}, Quantity={Quantity}",
+                    order.Id,
+                    item.ProductId,
+                    item.Quantity
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to reserve inventory: ProductId={ProductId}, OrderId={OrderId}",
+                    item.ProductId,
+                    order.Id
+                );
+                return BadRequest(
+                    new { Message = $"Failed to reserve inventory for {item.ProductName}" }
+                );
+            }
+        }
 
         _context.Orders.Add(order);
         await _context.SaveChangesAsync(cancellationToken);
@@ -216,8 +274,54 @@ public sealed class OrderController : ControllerBase
         order.Status = newStatus;
         order.UpdatedAt = DateTime.UtcNow;
 
-        // TODO: Handle status-specific actions (e.g., inventory fulfillment on ship)
-        // This requires loading OrderItemEntity collection separately
+        // Handle status-specific actions based on transition
+        if (newStatus == OrderStatus.Shipped || newStatus == OrderStatus.Processing)
+        {
+            // Load order items for inventory fulfillment
+            var orderItems = await _context
+                .OrderItems.Where(item => order.ItemIds.Contains(item.Id))
+                .ToListAsync(cancellationToken);
+
+            foreach (var item in orderItems)
+            {
+                try
+                {
+                    // Record inventory fulfillment transaction
+                    await _inventoryService.RecordTransactionAsync(
+                        Domain.Enums.InventoryTransactionType.Fulfillment,
+                        item.ProductId,
+                        item.ProductSku,
+                        item.ProductName,
+                        item.Quantity,
+                        item.UnitPrice,
+                        "Shipped",
+                        userId,
+                        "Reserved",
+                        order.Id,
+                        order.OrderNumber,
+                        $"Inventory fulfillment for order {order.OrderNumber} - Status: {newStatus}",
+                        cancellationToken
+                    );
+
+                    _logger.LogInformation(
+                        "Inventory fulfilled: OrderId={OrderId}, ProductId={ProductId}, Status={Status}",
+                        order.Id,
+                        item.ProductId,
+                        newStatus
+                    );
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(
+                        ex,
+                        "Failed to record inventory fulfillment: ProductId={ProductId}, OrderId={OrderId}",
+                        item.ProductId,
+                        order.Id
+                    );
+                    // Continue with other items even if one fails
+                }
+            }
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -275,8 +379,49 @@ public sealed class OrderController : ControllerBase
         order.Status = OrderStatus.Cancelled;
         order.UpdatedAt = DateTime.UtcNow;
 
-        // TODO: Release inventory reservations when items are loaded from database
-        // This requires loading OrderItemEntity collection separately
+        // Release inventory reservations for cancelled order
+        var orderItems = await _context
+            .OrderItems.Where(item => order.ItemIds.Contains(item.Id))
+            .ToListAsync(cancellationToken);
+
+        foreach (var item in orderItems)
+        {
+            try
+            {
+                await _inventoryService.RecordTransactionAsync(
+                    Domain.Enums.InventoryTransactionType.ReservationRelease,
+                    item.ProductId,
+                    item.ProductSku,
+                    item.ProductName,
+                    item.Quantity,
+                    item.UnitPrice,
+                    "Available",
+                    userId,
+                    "Reserved",
+                    order.Id,
+                    order.OrderNumber,
+                    $"Inventory reservation released - Order cancelled: {order.OrderNumber}",
+                    cancellationToken
+                );
+
+                _logger.LogInformation(
+                    "Inventory reservation released: OrderId={OrderId}, ProductId={ProductId}, Quantity={Quantity}",
+                    order.Id,
+                    item.ProductId,
+                    item.Quantity
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Failed to release inventory reservation: ProductId={ProductId}, OrderId={OrderId}",
+                    item.ProductId,
+                    order.Id
+                );
+                // Continue with other items even if one fails
+            }
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
 
