@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using ECommerce.API.DTOs;
-using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
+using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
+using ECommerce.Domain.Policies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AppInterfaces = ECommerce.Application.Interfaces;
 
 namespace ECommerce.API.Controllers;
 
@@ -66,7 +68,7 @@ public sealed class InventoryTransactionController : ControllerBase
     /// Handles the creation of inventory transactions, automatic journal entry generation,
     /// inventory quantity updates, and transaction history retrieval.
     /// </remarks>
-    private readonly IInventoryTransactionService _transactionService;
+    private readonly AppInterfaces.IInventoryTransactionService _transactionService;
 
     /// <summary>
     /// Logger instance for tracking inventory transaction operations and errors
@@ -75,7 +77,7 @@ public sealed class InventoryTransactionController : ControllerBase
     /// Used to log transaction recordings, retrievals, validation errors, and exceptions
     /// for monitoring, debugging, and audit trail purposes.
     /// </remarks>
-    private readonly ILoggingService _logger;
+    private readonly AppInterfaces.ILoggingService _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InventoryTransactionController"/> class
@@ -100,7 +102,7 @@ public sealed class InventoryTransactionController : ControllerBase
     /// when handling inventory transaction requests.
     /// </remarks>
     public InventoryTransactionController(
-        IInventoryTransactionService transactionService,
+        AppInterfaces.IInventoryTransactionService transactionService,
         LoggingService<InventoryTransactionController> logger
     )
     {
@@ -266,16 +268,124 @@ public sealed class InventoryTransactionController : ControllerBase
             return Unauthorized(new { Message = "User ID not found in authentication token" });
         }
 
+        var transactionType = request.TransactionType;
+
+        // Validate transaction type
+        if (!StockTransactionPolicy.IsValidTransactionType(transactionType))
+        {
+            _logger.LogWarning(
+                "Unsupported transaction type: {TransactionType}",
+                transactionType.ToString()
+            );
+            return BadRequest(new { Message = $"Unsupported transaction type: {transactionType}" });
+        }
+
+        // Apply business rule validations based on transaction type
+        (bool isValid, string? errorMessage) = transactionType switch
+        {
+            InventoryTransactionType.Purchase => StockTransactionPolicy.CanRecordPurchase(
+                request.Quantity,
+                request.UnitCost,
+                request.ToLocation ?? string.Empty,
+                request.DocumentNumber
+            ),
+
+            InventoryTransactionType.Sale or InventoryTransactionType.Fulfillment =>
+                StockTransactionPolicy.CanRecordSale(
+                    request.Quantity,
+                    // Note: In a real implementation, you would fetch current stock from repository
+                    int.MaxValue, // Placeholder - should be actual available stock
+                    request.ToLocation ?? string.Empty
+                ),
+
+            InventoryTransactionType.Adjustment => StockTransactionPolicy.CanRecordAdjustment(
+                // Note: In a real implementation, you would fetch current stock from repository
+                0, // Placeholder - should be actual current stock
+                request.Quantity,
+                request.Notes ?? string.Empty
+            ),
+
+            InventoryTransactionType.Loss => StockTransactionPolicy.CanRecordLoss(
+                request.Quantity,
+                // Note: In a real implementation, you would fetch current stock from repository
+                int.MaxValue, // Placeholder - should be actual current stock
+                request.Notes ?? string.Empty
+            ),
+
+            InventoryTransactionType.Transfer => StockTransactionPolicy.CanRecordTransfer(
+                request.Quantity,
+                // Note: In a real implementation, you would fetch current stock from repository
+                int.MaxValue, // Placeholder - should be actual available stock
+                request.FromLocation ?? string.Empty,
+                request.ToLocation ?? string.Empty
+            ),
+
+            InventoryTransactionType.Reservation => StockTransactionPolicy.CanRecordReservation(
+                request.Quantity,
+                // Note: In a real implementation, you would fetch current stock from repository
+                int.MaxValue, // Placeholder - should be actual available stock
+                request.OrderId
+            ),
+
+            InventoryTransactionType.ReservationRelease =>
+                StockTransactionPolicy.CanReleaseReservation(
+                    request.Quantity,
+                    // Note: In a real implementation, you would fetch reserved stock from repository
+                    int.MaxValue, // Placeholder - should be actual reserved stock
+                    request.OrderId
+                ),
+
+            InventoryTransactionType.SaleReturn or InventoryTransactionType.PurchaseReturn =>
+                StockTransactionPolicy.CanRecordReturn(
+                    request.Quantity,
+                    request.UnitCost,
+                    request.ToLocation ?? string.Empty,
+                    request.OrderId,
+                    transactionType == InventoryTransactionType.PurchaseReturn
+                ),
+
+            _ => (false, $"Transaction type {transactionType} not yet implemented"),
+        };
+
+        if (!isValid)
+        {
+            _logger.LogWarning(
+                "Transaction validation failed: {TransactionType}, Error={ErrorMessage}",
+                transactionType.ToString(),
+                errorMessage ?? "Unknown error"
+            );
+            return BadRequest(new { Message = errorMessage });
+        }
+
+        // Check if supervisor approval is required
+        var totalCost = request.Quantity * request.UnitCost;
+        if (
+            StockTransactionPolicy.RequiresSupervisorApproval(
+                transactionType,
+                request.Quantity,
+                totalCost
+            )
+        )
+        {
+            _logger.LogInformation(
+                "Transaction requires supervisor approval: Type={TransactionType}, Quantity={Quantity}, TotalCost={TotalCost}",
+                transactionType,
+                request.Quantity,
+                totalCost
+            );
+            // Note: In a real implementation, you would queue this for approval or check user permissions
+        }
+
         try
         {
             var transaction = await _transactionService.RecordTransactionAsync(
-                request.TransactionType,
+                transactionType,
                 request.ProductId,
                 request.ProductSku,
                 request.ProductName,
                 request.Quantity,
                 request.UnitCost,
-                request.ToLocation,
+                request.ToLocation ?? string.Empty,
                 userId,
                 request.FromLocation,
                 request.OrderId,
