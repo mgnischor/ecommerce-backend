@@ -1,4 +1,7 @@
+using System.Security.Cryptography;
+using System.Text;
 using ECommerce.API.DTOs;
+using ECommerce.API.Filters;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Interfaces;
@@ -218,47 +221,112 @@ public sealed class AuthController : ControllerBase
     /// Check server logs for detailed error information.
     /// </response>
     [HttpPost("login")]
+    [TypeFilter(typeof(RateLimitingFilter), Arguments = new object[] { 5, 300 })]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<LoginResponseDto>> Login(
         [FromBody] LoginRequestDto loginRequest,
         CancellationToken cancellationToken = default
     )
     {
-        _logger.LogInformation("Login attempt for email: {Email}", loginRequest?.Email ?? "null");
+        // Add security headers
+        Response.Headers.Append("X-Content-Type-Options", "nosniff");
+        Response.Headers.Append("X-Frame-Options", "DENY");
+        Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
 
         if (loginRequest == null)
         {
-            _logger.LogWarning("Login request is null");
+            _logger.LogWarning("Login request is null from IP: {IpAddress}", ipAddress);
             return BadRequest(new { Message = "Login request is required" });
         }
 
+        // Hash email for secure logging (LGPD/GDPR compliance)
+        var emailHash = ComputeSha256Hash(loginRequest.Email ?? "unknown");
+
+        _logger.LogInformation(
+            "Login attempt - EmailHash: {EmailHash}, IP: {IpAddress}",
+            emailHash,
+            ipAddress
+        );
+
         if (!ModelState.IsValid)
         {
-            _logger.LogWarning("Invalid model state for login request");
+            _logger.LogWarning(
+                "Invalid model state - EmailHash: {EmailHash}, IP: {IpAddress}",
+                emailHash,
+                ipAddress
+            );
             return BadRequest(ModelState);
         }
 
         // Find user by email
         var user = await _userRepository.GetByEmailAsync(loginRequest.Email, cancellationToken);
 
-        if (user == null)
+        // Check account lockout (before password verification)
+        if (user != null && user.LockedUntil.HasValue && user.LockedUntil.Value > DateTime.UtcNow)
         {
+            var lockTimeRemaining = (user.LockedUntil.Value - DateTime.UtcNow).TotalMinutes;
             _logger.LogWarning(
-                "Login failed: User not found for email: {Email}",
-                loginRequest.Email
+                "Login blocked - Account locked. UserId: {UserId}, IP: {IpAddress}, TimeRemaining: {Minutes}min",
+                user.Id,
+                ipAddress,
+                Math.Ceiling(lockTimeRemaining)
             );
-            return Unauthorized(new { Message = "Invalid email or password" });
+            return Unauthorized(
+                new
+                {
+                    Message = $"Account temporarily locked. Try again in {Math.Ceiling(lockTimeRemaining)} minutes.",
+                }
+            );
         }
 
-        // Verify password
-        if (!_passwordService.VerifyPassword(loginRequest.Password, user.PasswordHash))
+        // Use dummy hash for timing attack protection when user doesn't exist
+        var passwordHash =
+            user?.PasswordHash ?? "$2a$11$dummyhashfortimingattackprotection1234567890123456789012";
+        var isPasswordValid = _passwordService.VerifyPassword(loginRequest.Password, passwordHash);
+
+        // Authentication failed
+        if (user == null || !isPasswordValid)
         {
+            // Record failed attempt if user exists
+            if (user != null)
+            {
+                user.FailedLoginAttempts++;
+                user.LastFailedLoginAt = DateTime.UtcNow;
+                user.LastLoginIpAddress = ipAddress;
+
+                // Lock account after 5 failed attempts
+                if (user.FailedLoginAttempts >= 5)
+                {
+                    user.LockedUntil = DateTime.UtcNow.AddMinutes(15);
+                    _logger.LogWarning(
+                        "Account locked - Too many failed attempts. UserId: {UserId}, IP: {IpAddress}, Attempts: {Attempts}",
+                        user.Id,
+                        ipAddress,
+                        user.FailedLoginAttempts
+                    );
+                }
+
+                _userRepository.Update(user);
+                await _userRepository.SaveChangesAsync(cancellationToken);
+            }
+
+            // Add random delay to prevent timing attacks
+            await Task.Delay(Random.Shared.Next(100, 300), cancellationToken);
+
             _logger.LogWarning(
-                "Login failed: Invalid password for email: {Email}",
-                loginRequest.Email
+                "Login failed - Invalid credentials. EmailHash: {EmailHash}, IP: {IpAddress}, UserAgent: {UserAgent}",
+                emailHash,
+                ipAddress,
+                userAgent
             );
+
             return Unauthorized(new { Message = "Invalid email or password" });
         }
 
@@ -266,19 +334,32 @@ public sealed class AuthController : ControllerBase
         if (!user.IsActive || user.IsBanned || user.IsDeleted)
         {
             _logger.LogWarning(
-                "Login failed: User account is not active for email: {Email}",
-                loginRequest.Email
+                "Login failed - Account not active. UserId: {UserId}, IP: {IpAddress}, IsActive: {IsActive}, IsBanned: {IsBanned}, IsDeleted: {IsDeleted}",
+                user.Id,
+                ipAddress,
+                user.IsActive,
+                user.IsBanned,
+                user.IsDeleted
             );
             return Unauthorized(new { Message = "User account is not active" });
         }
+
+        // Successful login - Reset failed attempts and update login info
+        user.FailedLoginAttempts = 0;
+        user.LastSuccessfulLoginAt = DateTime.UtcNow;
+        user.LastLoginIpAddress = ipAddress;
+        user.LockedUntil = null;
+
+        _userRepository.Update(user);
+        await _userRepository.SaveChangesAsync(cancellationToken);
 
         // Generate JWT token
         var token = _jwtService.GenerateToken(user);
 
         _logger.LogInformation(
-            "Login successful for user: {Email}, UserId: {UserId}",
-            user.Email,
-            user.Id
+            "Login successful - UserId: {UserId}, IP: {IpAddress}",
+            user.Id,
+            ipAddress
         );
 
         var response = new LoginResponseDto
@@ -409,4 +490,23 @@ public sealed class AuthController : ControllerBase
         Response.Headers.Append("Allow", "POST, GET, OPTIONS");
         return NoContent();
     }
+
+    #region Private Methods
+
+    /// <summary>
+    /// Computes SHA256 hash of a string for secure logging
+    /// </summary>
+    /// <param name="input">Input string to hash</param>
+    /// <returns>Hexadecimal representation of the hash</returns>
+    /// <remarks>
+    /// Used to hash emails and other PII before logging to comply with LGPD/GDPR.
+    /// Allows correlation of events without exposing sensitive data in logs.
+    /// </remarks>
+    private static string ComputeSha256Hash(string input)
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
+        return Convert.ToHexString(bytes).ToLowerInvariant();
+    }
+
+    #endregion
 }
