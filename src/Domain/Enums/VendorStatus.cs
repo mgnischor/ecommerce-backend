@@ -28,5 +28,5 @@ public enum VendorStatus
     /// <summary>
     /// Vendor account is rejected
     /// </summary>
-    Rejected = 4
+    Rejected = 4,
 }

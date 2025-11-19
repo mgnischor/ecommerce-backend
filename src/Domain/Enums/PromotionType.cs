@@ -38,5 +38,5 @@ public enum PromotionType
     /// <summary>
     /// Clearance sale
     /// </summary>
-    Clearance = 6
+    Clearance = 6,
 }

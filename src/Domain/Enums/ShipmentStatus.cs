@@ -53,5 +53,5 @@ public enum ShipmentStatus
     /// <summary>
     /// Shipment was cancelled
     /// </summary>
-    Cancelled = 9
+    Cancelled = 9,
 }

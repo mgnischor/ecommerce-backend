@@ -43,5 +43,5 @@ public enum ShippingMethod
     /// <summary>
     /// International shipping
     /// </summary>
-    International = 7
+    International = 7,
 }
