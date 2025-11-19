@@ -163,6 +163,17 @@
                     "OpenTelemetry.Api.ProviderBuilderExtensions": "[1.14.0, 2.0.0)"
                 }
             },
+            "OpenTelemetry.Instrumentation.EntityFrameworkCore": {
+                "type": "Direct",
+                "requested": "[1.14.0-beta.2, )",
+                "resolved": "1.14.0-beta.2",
+                "contentHash": "XsxsKgMuwi84TWkPN98H8FLOO/yW8vWIo/lxXQ8kWXastTI58+A4nmlFderFPmpLc+tvyhOGjHDlTK/AXWWOpQ==",
+                "dependencies": {
+                    "Microsoft.Extensions.Configuration": "8.0.0",
+                    "Microsoft.Extensions.Options": "8.0.0",
+                    "OpenTelemetry.Api.ProviderBuilderExtensions": "[1.14.0, 2.0.0)"
+                }
+            },
             "OpenTelemetry.Instrumentation.Http": {
                 "type": "Direct",
                 "requested": "[1.14.0, )",
