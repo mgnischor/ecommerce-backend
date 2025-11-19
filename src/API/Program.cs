@@ -65,7 +65,10 @@ builder.Services.AddScoped<ILoggingService, LoggingService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAccountingService, AccountingService>();
-builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();
+builder.Services.AddScoped<
+    ECommerce.Application.Interfaces.IInventoryTransactionService,
+    InventoryTransactionService
+>();
 builder.Services.AddScoped<IFinancialService, FinancialService>();
 
 // Configure JWT Authentication
