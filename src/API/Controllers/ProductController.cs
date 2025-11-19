@@ -1004,7 +1004,7 @@ public sealed class ProductController : ControllerBase
     /// Check server logs for detailed error information.
     /// </response>
     [HttpPost]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(typeof(ProductEntity), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -1191,7 +1191,7 @@ public sealed class ProductController : ControllerBase
     /// Check server logs for detailed error information.
     /// </response>
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -1366,7 +1366,7 @@ public sealed class ProductController : ControllerBase
     /// Check server logs for detailed error information.
     /// </response>
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -1511,7 +1511,7 @@ public sealed class ProductController : ControllerBase
     /// Check server logs for detailed error information.
     /// </response>
     [HttpPatch("{id:guid}/soft-delete")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

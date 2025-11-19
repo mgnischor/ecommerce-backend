@@ -204,7 +204,7 @@ public sealed class ProductVariantController : ControllerBase
     /// Requires Admin or Manager role.
     /// </remarks>
     [HttpPost]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(typeof(ProductVariantEntity), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProductVariantEntity>> CreateVariant(
@@ -255,7 +255,7 @@ public sealed class ProductVariantController : ControllerBase
     /// Requires Admin or Manager role.
     /// </remarks>
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -304,7 +304,7 @@ public sealed class ProductVariantController : ControllerBase
     /// Requires Admin role.
     /// </remarks>
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteVariant(

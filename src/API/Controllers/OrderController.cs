@@ -175,7 +175,7 @@ public sealed class OrderController : ControllerBase
     /// <response code="403">Insufficient permissions</response>
     /// <response code="404">Order not found</response>
     [HttpPatch("{id:guid}/status")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(typeof(OrderEntity), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
