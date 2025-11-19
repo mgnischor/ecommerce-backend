@@ -52,9 +52,8 @@ public sealed class UserRepository : IUserRepository
         CancellationToken cancellationToken = default
     )
     {
-        return await _context
-            .Users.AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+        // Not using AsNoTracking for authentication scenarios where we need to track changes
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
     public async Task<UserEntity?> GetByUsernameAsync(
@@ -187,5 +186,18 @@ public sealed class UserRepository : IUserRepository
 
         _context.Users.Remove(user);
         return true;
+    }
+
+    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error saving changes to database");
+            throw;
+        }
     }
 }
