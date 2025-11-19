@@ -479,6 +479,16 @@
                     "OpenTelemetry.Api.ProviderBuilderExtensions": "[1.14.0, 2.0.0)"
                 }
             },
+            "OpenTelemetry.Instrumentation.EntityFrameworkCore": {
+                "type": "Transitive",
+                "resolved": "1.14.0-beta.2",
+                "contentHash": "XsxsKgMuwi84TWkPN98H8FLOO/yW8vWIo/lxXQ8kWXastTI58+A4nmlFderFPmpLc+tvyhOGjHDlTK/AXWWOpQ==",
+                "dependencies": {
+                    "Microsoft.Extensions.Configuration": "8.0.0",
+                    "Microsoft.Extensions.Options": "8.0.0",
+                    "OpenTelemetry.Api.ProviderBuilderExtensions": "[1.14.0, 2.0.0)"
+                }
+            },
             "OpenTelemetry.Instrumentation.Http": {
                 "type": "Transitive",
                 "resolved": "1.14.0",
@@ -543,7 +553,7 @@
                     "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.14.0, )",
                     "OpenTelemetry.Extensions.Hosting": "[1.14.0, )",
                     "OpenTelemetry.Instrumentation.AspNetCore": "[1.14.0, )",
-                    "OpenTelemetry.Instrumentation.EntityFrameworkCore": "[1.14.0, )",
+                    "OpenTelemetry.Instrumentation.EntityFrameworkCore": "[1.14.0-beta.2, )",
                     "OpenTelemetry.Instrumentation.Http": "[1.14.0, )",
                     "OpenTelemetry.Instrumentation.Runtime": "[1.14.0, )",
                     "Scalar.AspNetCore": "[2.10.1, )"
