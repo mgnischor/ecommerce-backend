@@ -2,6 +2,8 @@ using System.Security.Claims;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Enums;
+using ECommerce.Domain.Policies;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -413,12 +415,32 @@ public sealed class RefundController : ControllerBase
         if (refund == null)
             return BadRequest("Refund data is required");
 
+        // Basic validation of refund reason
+        if (string.IsNullOrWhiteSpace(refund.Reason))
+        {
+            _logger.LogWarning("Refund reason is required");
+            return BadRequest(new { Message = "Refund reason is required" });
+        }
+
+        _logger.LogInformation(
+            "Creating refund: Amount={Amount}, OrderId={OrderId}, Reason={Reason}",
+            refund.RefundAmount,
+            refund.OrderId,
+            refund.Reason
+        );
+
         refund.Id = Guid.NewGuid();
         refund.CreatedAt = DateTime.UtcNow;
         refund.UpdatedAt = DateTime.UtcNow;
 
         _context.Refunds.Add(refund);
         await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation(
+            "Refund created successfully: RefundId={RefundId}, Amount={Amount}",
+            refund.Id,
+            refund.RefundAmount
+        );
 
         return CreatedAtAction(nameof(GetRefundById), new { id = refund.Id }, refund);
     }
