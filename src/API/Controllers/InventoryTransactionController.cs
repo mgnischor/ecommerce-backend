@@ -80,6 +80,11 @@ public sealed class InventoryTransactionController : ControllerBase
     private readonly AppInterfaces.ILoggingService _logger;
 
     /// <summary>
+    /// Repository for accessing inventory data
+    /// </summary>
+    private readonly IInventoryRepository _inventoryRepository;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="InventoryTransactionController"/> class
     /// </summary>
     /// <param name="transactionService">
@@ -92,8 +97,12 @@ public sealed class InventoryTransactionController : ControllerBase
     /// Used for operational monitoring and audit trails.
     /// Cannot be null.
     /// </param>
+    /// <param name="inventoryRepository">
+    /// Repository for accessing inventory data.
+    /// Cannot be null.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when either transactionService or logger parameter is null.
+    /// Thrown when transactionService, logger, or inventoryRepository parameter is null.
     /// </exception>
     /// <remarks>
     /// This constructor uses dependency injection to provide all required services.
@@ -103,12 +112,15 @@ public sealed class InventoryTransactionController : ControllerBase
     /// </remarks>
     public InventoryTransactionController(
         AppInterfaces.IInventoryTransactionService transactionService,
-        LoggingService<InventoryTransactionController> logger
+        LoggingService<InventoryTransactionController> logger,
+        IInventoryRepository inventoryRepository
     )
     {
         _transactionService =
             transactionService ?? throw new ArgumentNullException(nameof(transactionService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _inventoryRepository =
+            inventoryRepository ?? throw new ArgumentNullException(nameof(inventoryRepository));
     }
 
     /// <summary>
@@ -280,6 +292,12 @@ public sealed class InventoryTransactionController : ControllerBase
             return BadRequest(new { Message = $"Unsupported transaction type: {transactionType}" });
         }
 
+        // Fetch current inventory for validation
+        var inventory = await _inventoryRepository.GetByProductIdAsync(
+            request.ProductId,
+            cancellationToken
+        );
+
         // Apply business rule validations based on transaction type
         (bool isValid, string? errorMessage) = transactionType switch
         {
@@ -293,45 +311,39 @@ public sealed class InventoryTransactionController : ControllerBase
             InventoryTransactionType.Sale or InventoryTransactionType.Fulfillment =>
                 StockTransactionPolicy.CanRecordSale(
                     request.Quantity,
-                    // Note: In a real implementation, you would fetch current stock from repository
-                    int.MaxValue, // Placeholder - should be actual available stock
+                    inventory?.QuantityAvailable ?? 0,
                     request.ToLocation ?? string.Empty
                 ),
 
             InventoryTransactionType.Adjustment => StockTransactionPolicy.CanRecordAdjustment(
-                // Note: In a real implementation, you would fetch current stock from repository
-                0, // Placeholder - should be actual current stock
+                inventory?.QuantityInStock ?? 0,
                 request.Quantity,
                 request.Notes ?? string.Empty
             ),
 
             InventoryTransactionType.Loss => StockTransactionPolicy.CanRecordLoss(
                 request.Quantity,
-                // Note: In a real implementation, you would fetch current stock from repository
-                int.MaxValue, // Placeholder - should be actual current stock
+                inventory?.QuantityInStock ?? 0,
                 request.Notes ?? string.Empty
             ),
 
             InventoryTransactionType.Transfer => StockTransactionPolicy.CanRecordTransfer(
                 request.Quantity,
-                // Note: In a real implementation, you would fetch current stock from repository
-                int.MaxValue, // Placeholder - should be actual available stock
+                inventory?.QuantityAvailable ?? 0,
                 request.FromLocation ?? string.Empty,
                 request.ToLocation ?? string.Empty
             ),
 
             InventoryTransactionType.Reservation => StockTransactionPolicy.CanRecordReservation(
                 request.Quantity,
-                // Note: In a real implementation, you would fetch current stock from repository
-                int.MaxValue, // Placeholder - should be actual available stock
+                inventory?.QuantityAvailable ?? 0,
                 request.OrderId
             ),
 
             InventoryTransactionType.ReservationRelease =>
                 StockTransactionPolicy.CanReleaseReservation(
                     request.Quantity,
-                    // Note: In a real implementation, you would fetch reserved stock from repository
-                    int.MaxValue, // Placeholder - should be actual reserved stock
+                    inventory?.QuantityReserved ?? 0,
                     request.OrderId
                 ),
 
