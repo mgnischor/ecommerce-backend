@@ -110,6 +110,7 @@ public static class OrderValidationPolicy
             (OrderStatus.Pending, OrderStatus.Cancelled) => true,
             (OrderStatus.Processing, OrderStatus.Confirmed) => true,
             (OrderStatus.Processing, OrderStatus.Cancelled) => true,
+            (OrderStatus.Processing, OrderStatus.Shipped) => true,
             (OrderStatus.Confirmed, OrderStatus.Shipped) => true,
             (OrderStatus.Confirmed, OrderStatus.Cancelled) => true,
             (OrderStatus.Shipped, OrderStatus.Delivered) => true,
