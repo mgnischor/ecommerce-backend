@@ -189,4 +189,49 @@ public class UserEntity
     /// Updated whenever any user information is changed.
     /// </value>
     public DateTime UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of consecutive failed login attempts.
+    /// </summary>
+    /// <value>
+    /// An <see cref="int"/> tracking failed login attempts. Resets to 0 on successful login.
+    /// Used for account lockout protection against brute force attacks.
+    /// </value>
+    public int FailedLoginAttempts { get; set; } = 0;
+
+    /// <summary>
+    /// Gets or sets the date and time when the account was locked due to failed login attempts.
+    /// </summary>
+    /// <value>
+    /// A nullable <see cref="DateTime"/> in UTC format indicating when the account was locked.
+    /// Null if the account is not locked.
+    /// </value>
+    public DateTime? LockedUntil { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time of the last failed login attempt.
+    /// </summary>
+    /// <value>
+    /// A nullable <see cref="DateTime"/> in UTC format of the last authentication failure.
+    /// Used for security monitoring and forensics.
+    /// </value>
+    public DateTime? LastFailedLoginAt { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time of the last successful login.
+    /// </summary>
+    /// <value>
+    /// A nullable <see cref="DateTime"/> in UTC format of the last successful authentication.
+    /// Used for security monitoring and user activity tracking.
+    /// </value>
+    public DateTime? LastSuccessfulLoginAt { get; set; }
+
+    /// <summary>
+    /// Gets or sets the IP address of the last login attempt.
+    /// </summary>
+    /// <value>
+    /// A <see cref="string"/> containing the IP address from the last login.
+    /// Used for security monitoring and anomaly detection.
+    /// </value>
+    public string? LastLoginIpAddress { get; set; }
 }
