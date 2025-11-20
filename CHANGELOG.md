@@ -11,15 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
--   **Entity Framework Core Design-Time Support**: Enhanced EF Core tooling integration
-    -   Created `PostgresqlContextFactory` implementing `IDesignTimeDbContextFactory<PostgresqlContext>`
-    -   Enables EF Core migrations and scaffolding commands to work properly
-    -   Automatic configuration loading from `appsettings.json` and `appsettings.Development.json`
-    -   Smart path resolution for different working directory scenarios
-    -   Moved connection string from hardcoded value to configuration in `Program.cs`
-    -   Ensures consistency between runtime and design-time database configurations
-
 ### Fixed
+
+## [0.1.17] - 2025-11-20
+
+### Added
+
+-   **Unit Testing Project**: Complete test suite implementation
+    -   Added `tests/` project using NUnit, Moq, and FluentAssertions
+    -   Implemented tests for Domain, Application, Infrastructure, and API layers
+    -   Added test scripts in `tests/scripts/` for running tests and generating coverage reports
+-   **Documentation Updates**:
+    -   Updated README.md with testing instructions and current version
+    -   Updated OpenTelemetry configuration version
+
+### Changed
+
+-   Updated project version to 0.1.17
+-   Refined build and deployment scripts
 
 ## [0.0.10] - 2025-10-27
 
@@ -398,6 +407,7 @@ CREATE TABLE users (
 
 ## Version History
 
+-   **0.1.17** - Unit Tests & Documentation Updates
 -   **0.0.10** - Complete E-Commerce Domain Entities
 -   **0.0.9** - Integrated Accounting System
 -   **0.0.8** - Comprehensive Logging System
@@ -409,7 +419,8 @@ CREATE TABLE users (
 -   **0.0.2** - User Management & Authentication
 -   **0.0.1** - Initial Setup
 
-[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.10...HEAD
+[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.17...HEAD
+[0.1.17]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.10...v0.1.17
 [0.0.10]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.7...v0.0.8
