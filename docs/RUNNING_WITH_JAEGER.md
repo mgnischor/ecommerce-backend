@@ -98,7 +98,7 @@ Ensure the configuration points to localhost:
     },
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend.Dev",
-        "ServiceVersion": "0.0.10",
+        "ServiceVersion": "0.1.17",
         "EnableConsoleExporter": true,
         "OtlpEndpoint": "http://localhost:4317"
     }
@@ -160,7 +160,7 @@ For production, configure your OTLP endpoint to point to your observability back
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.0.10",
+        "ServiceVersion": "0.1.17",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": "https://otlp-gateway-prod-us-central-0.grafana.net/otlp"
     }
@@ -173,7 +173,7 @@ For production, configure your OTLP endpoint to point to your observability back
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.0.10",
+        "ServiceVersion": "0.1.17",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": "https://api.honeycomb.io:443"
     }
@@ -186,7 +186,7 @@ For production, configure your OTLP endpoint to point to your observability back
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.0.10",
+        "ServiceVersion": "0.1.17",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": "http://jaeger-collector:4317"
     }
@@ -199,7 +199,7 @@ You can also configure OpenTelemetry via environment variables:
 
 ```powershell
 $env:OpenTelemetry__ServiceName="ECommerce.Backend"
-$env:OpenTelemetry__ServiceVersion="0.0.10"
+$env:OpenTelemetry__ServiceVersion="0.1.17"
 $env:OpenTelemetry__EnableConsoleExporter="true"
 $env:OpenTelemetry__OtlpEndpoint="http://localhost:4317"
 
