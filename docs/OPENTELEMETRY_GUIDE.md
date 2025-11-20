@@ -18,7 +18,7 @@ OpenTelemetry provides comprehensive observability for the application through:
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.0.10",
+        "ServiceVersion": "0.1.17",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": ""
     }
@@ -31,7 +31,7 @@ OpenTelemetry provides comprehensive observability for the application through:
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend.Dev",
-        "ServiceVersion": "0.0.10",
+        "ServiceVersion": "0.1.17",
         "EnableConsoleExporter": true,
         "OtlpEndpoint": "http://localhost:4317"
     }
