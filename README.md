@@ -44,12 +44,12 @@ The **E-Commerce Backend API** is a robust, scalable solution designed for moder
 
 ### Key Highlights
 
-✅ **Clean Architecture** - Layered design with clear separation of concerns (API, Application, Domain, Infrastructure)  
-✅ **Domain-Driven Design** - Rich domain model with aggregates, value objects, policies, specifications, and domain events  
-✅ **Automated Accounting** - Double-entry bookkeeping system compliant with Brazilian GAAP (NBC TG)  
-✅ **Enterprise Observability** - Full OpenTelemetry integration for distributed tracing and metrics  
-✅ **Production Ready** - Docker support, health checks, graceful shutdown, structured logging  
-✅ **Developer Experience** - Interactive API documentation with Scalar UI, automated database seeding  
+✅ **Clean Architecture** - Layered design with clear separation of concerns (API, Application, Domain, Infrastructure)
+✅ **Domain-Driven Design** - Rich domain model with aggregates, value objects, policies, specifications, and domain events
+✅ **Automated Accounting** - Double-entry bookkeeping system compliant with Brazilian GAAP (NBC TG)
+✅ **Enterprise Observability** - Full OpenTelemetry integration for distributed tracing and metrics
+✅ **Production Ready** - Docker support, health checks, graceful shutdown, structured logging
+✅ **Developer Experience** - Interactive API documentation with Scalar UI, automated database seeding
 ✅ **Security First** - JWT authentication, role-based authorization, password hashing with BCrypt
 
 ---
@@ -455,7 +455,7 @@ $env:Jwt__ExpirationMinutes = "60"
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.0.10",
+        "ServiceVersion": "0.1.17",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": ""
     }
@@ -466,7 +466,7 @@ $env:Jwt__ExpirationMinutes = "60"
 
 ```powershell
 $env:OpenTelemetry__ServiceName = "ECommerce.Backend"
-$env:OpenTelemetry__ServiceVersion = "0.0.10"
+$env:OpenTelemetry__ServiceVersion = "0.1.17"
 $env:OpenTelemetry__EnableConsoleExporter = "true"
 $env:OpenTelemetry__OtlpEndpoint = "http://localhost:4317"
 ```
@@ -805,31 +805,48 @@ _logger.LogInformation(
 
 ### Unit Tests
 
-> ⚠️ **Note**: Unit test project is planned but not yet implemented.
+The project includes a comprehensive unit test suite located in the `tests/` directory.
 
-Recommended structure:
+**Tech Stack:**
+
+-   **NUnit** - Testing framework
+-   **FluentAssertions** - Fluent assertion library
+-   **Moq** - Mocking library
+-   **EF Core InMemory** - For database testing
+
+**Structure:**
 
 ```
 tests/
-├── ECommerce.UnitTests/
-│   ├── Domain/
-│   │   ├── Policies/
-│   │   ├── Services/
-│   │   └── ValueObjects/
-│   └── Application/
-│       └── Services/
+├── API/              # Controller and Middleware tests
+├── Application/      # Service and Validator tests
+├── Domain/           # Entity and Value Object tests
+└── Infrastructure/   # Repository tests
 ```
 
-### Integration Tests
+### Running Tests
 
-> ⚠️ **Note**: Integration test project is planned but not yet implemented.
+You can run the tests using the .NET CLI or the provided PowerShell scripts.
 
-Recommended tools:
+**Using .NET CLI:**
 
--   **xUnit** - Test framework
--   **FluentAssertions** - Assertion library
--   **Testcontainers** - Docker-based integration tests
--   **WebApplicationFactory** - In-memory API testing
+```powershell
+dotnet test
+```
+
+**Using Scripts:**
+
+```powershell
+cd tests/scripts
+.\run-tests.ps1
+```
+
+**With Coverage:**
+
+```powershell
+cd tests/scripts
+.\run-tests-with-coverage.ps1
+```
 
 ### Manual Testing
 
@@ -870,13 +887,13 @@ Comprehensive documentation is available in the `docs/` directory:
 
 ### Best Practices
 
-✅ **Never commit secrets** - Use environment variables or secure vaults  
-✅ **Strong JWT secret** - Minimum 32 characters, randomly generated  
-✅ **HTTPS in production** - Enable SSL/TLS certificates  
-✅ **Input validation** - All DTOs use data annotations  
-✅ **SQL injection protection** - EF Core parameterized queries  
-✅ **CORS configuration** - Configure allowed origins in production  
-✅ **Rate limiting** - Implement rate limiting middleware (planned)  
+✅ **Never commit secrets** - Use environment variables or secure vaults
+✅ **Strong JWT secret** - Minimum 32 characters, randomly generated
+✅ **HTTPS in production** - Enable SSL/TLS certificates
+✅ **Input validation** - All DTOs use data annotations
+✅ **SQL injection protection** - EF Core parameterized queries
+✅ **CORS configuration** - Configure allowed origins in production
+✅ **Rate limiting** - Implement rate limiting middleware (planned)
 ✅ **Security headers** - Add HSTS, CSP, X-Frame-Options (planned)
 
 ### Production Checklist
