@@ -169,6 +169,17 @@ Your support helps us:
 -   Maintain test coverage above 80%
 -   Name tests descriptively: `Should_Return_Product_When_Valid_Id`
 
+**Running Tests:**
+
+```bash
+# Run all tests
+dotnet test
+
+# Run with coverage report
+cd tests/scripts
+./run-tests-with-coverage.ps1
+```
+
 ### Commits
 
 Follow [Conventional Commits](https://conventionalcommits.org/):
