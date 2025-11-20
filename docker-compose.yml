@@ -51,7 +51,7 @@ services:
             - ASPNETCORE_URLS=http://+:80
             - ConnectionStrings__DefaultConnection=Host=postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432
             - OpenTelemetry__ServiceName=ECommerce.Backend
-            - OpenTelemetry__ServiceVersion=0.0.10
+            - OpenTelemetry__ServiceVersion=0.1.17
             - OpenTelemetry__EnableConsoleExporter=false
             - OpenTelemetry__OtlpEndpoint=http://jaeger:4317
         ports:
