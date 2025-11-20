@@ -493,7 +493,7 @@ public sealed class NotificationController : ControllerBase
     /// Check server logs for detailed error information.
     /// </response>
     [HttpPost]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(typeof(NotificationEntity), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

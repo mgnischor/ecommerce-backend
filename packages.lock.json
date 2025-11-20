@@ -86,6 +86,12 @@
                     "Microsoft.EntityFrameworkCore.Design": "9.0.10"
                 }
             },
+            "Microsoft.NET.ILLink.Tasks": {
+                "type": "Direct",
+                "requested": "[9.0.9, )",
+                "resolved": "9.0.9",
+                "contentHash": "cHi1os/s6aobEgNkbOh/jW+ru//rHuedvj4PmTh2mMY7et/mJjqphBeXeKCesDvMd0+E2JyX9EPZZC4VRKslXg=="
+            },
             "Npgsql": {
                 "type": "Direct",
                 "requested": "[9.0.4, )",

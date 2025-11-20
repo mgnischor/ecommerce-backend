@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using ECommerce.API.DTOs;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
@@ -850,8 +851,7 @@ public sealed class FinanceController : ControllerBase
 
         try
         {
-            // TODO: Get actual user ID from authentication context
-            var userId = Guid.NewGuid(); // Placeholder
+            var userId = GetCurrentUserId();
 
             var transaction = await _financialService.ReconcileTransactionAsync(
                 id,
@@ -914,6 +914,20 @@ public sealed class FinanceController : ControllerBase
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,
         };
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    /// <summary>
+    /// Gets the current authenticated user's ID from JWT claims
+    /// </summary>
+    /// <returns>User ID from claims, or Guid.Empty if not found</returns>
+    private Guid GetCurrentUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
     }
 
     #endregion

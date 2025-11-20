@@ -71,7 +71,7 @@ namespace ECommerce.API.Controllers;
 [ApiController]
 [Route("api/v1/product-attributes")]
 [Produces("application/json")]
-[Authorize(Roles = "Admin,Manager")]
+[Authorize(Roles = "Admin,Manager,Developer")]
 public sealed class ProductAttributeController : ControllerBase
 {
     /// <summary>
@@ -1168,7 +1168,7 @@ public sealed class ProductAttributeController : ControllerBase
     /// Check server logs for detailed error information.
     /// </response>
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

@@ -151,7 +151,7 @@ public sealed class ShipmentController : ControllerBase
     /// <response code="403">Insufficient permissions - Admin or Manager role required.</response>
     /// <response code="500">Internal server error occurred while processing the request.</response>
     [HttpGet]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(typeof(IEnumerable<ShipmentEntity>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -618,7 +618,7 @@ public sealed class ShipmentController : ControllerBase
     /// <response code="409">Tracking number already exists (duplicate shipment).</response>
     /// <response code="500">Internal server error occurred while processing the request.</response>
     [HttpPost]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(typeof(ShipmentEntity), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -799,7 +799,7 @@ public sealed class ShipmentController : ControllerBase
     /// <response code="409">Conflict - tracking number already exists or concurrent modification detected.</response>
     /// <response code="500">Internal server error occurred while processing the request.</response>
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -974,7 +974,7 @@ public sealed class ShipmentController : ControllerBase
     /// <response code="404">Shipment not found or already deleted.</response>
     /// <response code="500">Internal server error occurred while processing the request.</response>
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

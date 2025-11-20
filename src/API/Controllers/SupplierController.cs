@@ -20,7 +20,7 @@ namespace ECommerce.API.Controllers;
 [ApiController]
 [Route("api/v1/suppliers")]
 [Produces("application/json")]
-[Authorize(Roles = "Admin,Manager")]
+[Authorize(Roles = "Admin,Manager,Developer")]
 public sealed class SupplierController : ControllerBase
 {
     private readonly PostgresqlContext _context;
@@ -370,7 +370,7 @@ public sealed class SupplierController : ControllerBase
     /// <response code="403">If the user does not have Admin role</response>
     /// <response code="404">If the supplier with the specified ID is not found or has already been deleted</response>
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSupplier(

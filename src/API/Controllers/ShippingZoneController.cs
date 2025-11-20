@@ -38,7 +38,7 @@ namespace ECommerce.API.Controllers;
 [ApiController]
 [Route("api/v1/shipping-zones")]
 [Produces("application/json")]
-[Authorize(Roles = "Admin,Manager")]
+[Authorize(Roles = "Admin,Manager,Developer")]
 public sealed class ShippingZoneController : ControllerBase
 {
     /// <summary>
@@ -653,7 +653,7 @@ public sealed class ShippingZoneController : ControllerBase
     /// <response code="404">Shipping zone not found or already deleted.</response>
     /// <response code="500">Internal server error occurred while processing the request.</response>
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

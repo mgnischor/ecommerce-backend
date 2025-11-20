@@ -38,5 +38,5 @@ public enum RefundStatus
     /// <summary>
     /// Refund was cancelled
     /// </summary>
-    Cancelled = 6
+    Cancelled = 6,
 }

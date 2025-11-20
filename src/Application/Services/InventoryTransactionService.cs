@@ -2,6 +2,7 @@ using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
+using AppInterfaces = ECommerce.Application.Interfaces;
 
 namespace ECommerce.Application.Services;
 
@@ -12,7 +13,7 @@ namespace ECommerce.Application.Services;
 /// Automatically creates corresponding accounting journal entries and financial transactions
 /// when inventory movements occur, providing complete traceability and financial impact tracking.
 /// </remarks>
-public class InventoryTransactionService : IInventoryTransactionService
+public class InventoryTransactionService : AppInterfaces.IInventoryTransactionService
 {
     private readonly IInventoryTransactionRepository _transactionRepository;
     private readonly IAccountingService _accountingService;

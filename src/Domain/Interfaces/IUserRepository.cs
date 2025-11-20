@@ -35,4 +35,9 @@ public interface IUserRepository
     void Update(Domain.Entities.UserEntity user);
     void Remove(Domain.Entities.UserEntity user);
     Task<bool> RemoveByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Updates the user entity in the database
+    /// </summary>
+    Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

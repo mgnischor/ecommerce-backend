@@ -231,7 +231,7 @@ public sealed class StoreController : ControllerBase
     /// <response code="401">If the user is not authenticated</response>
     /// <response code="403">If the user does not have Admin role</response>
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(typeof(StoreEntity), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<StoreEntity>> CreateStore(
@@ -287,7 +287,7 @@ public sealed class StoreController : ControllerBase
     /// <response code="403">If the user does not have Admin or Manager role</response>
     /// <response code="404">If the store with the specified ID is not found or has been deleted</response>
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -338,7 +338,7 @@ public sealed class StoreController : ControllerBase
     /// <response code="403">If the user does not have Admin role</response>
     /// <response code="404">If the store with the specified ID is not found or has already been deleted</response>
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteStore(

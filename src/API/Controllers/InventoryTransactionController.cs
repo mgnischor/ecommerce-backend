@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using ECommerce.API.DTOs;
-using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
+using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
+using ECommerce.Domain.Policies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AppInterfaces = ECommerce.Application.Interfaces;
 
 namespace ECommerce.API.Controllers;
 
@@ -66,7 +68,7 @@ public sealed class InventoryTransactionController : ControllerBase
     /// Handles the creation of inventory transactions, automatic journal entry generation,
     /// inventory quantity updates, and transaction history retrieval.
     /// </remarks>
-    private readonly IInventoryTransactionService _transactionService;
+    private readonly AppInterfaces.IInventoryTransactionService _transactionService;
 
     /// <summary>
     /// Logger instance for tracking inventory transaction operations and errors
@@ -75,7 +77,12 @@ public sealed class InventoryTransactionController : ControllerBase
     /// Used to log transaction recordings, retrievals, validation errors, and exceptions
     /// for monitoring, debugging, and audit trail purposes.
     /// </remarks>
-    private readonly ILoggingService _logger;
+    private readonly AppInterfaces.ILoggingService _logger;
+
+    /// <summary>
+    /// Repository for accessing inventory data
+    /// </summary>
+    private readonly IInventoryRepository _inventoryRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InventoryTransactionController"/> class
@@ -90,8 +97,12 @@ public sealed class InventoryTransactionController : ControllerBase
     /// Used for operational monitoring and audit trails.
     /// Cannot be null.
     /// </param>
+    /// <param name="inventoryRepository">
+    /// Repository for accessing inventory data.
+    /// Cannot be null.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when either transactionService or logger parameter is null.
+    /// Thrown when transactionService, logger, or inventoryRepository parameter is null.
     /// </exception>
     /// <remarks>
     /// This constructor uses dependency injection to provide all required services.
@@ -100,13 +111,16 @@ public sealed class InventoryTransactionController : ControllerBase
     /// when handling inventory transaction requests.
     /// </remarks>
     public InventoryTransactionController(
-        IInventoryTransactionService transactionService,
-        LoggingService<InventoryTransactionController> logger
+        AppInterfaces.IInventoryTransactionService transactionService,
+        LoggingService<InventoryTransactionController> logger,
+        IInventoryRepository inventoryRepository
     )
     {
         _transactionService =
             transactionService ?? throw new ArgumentNullException(nameof(transactionService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _inventoryRepository =
+            inventoryRepository ?? throw new ArgumentNullException(nameof(inventoryRepository));
     }
 
     /// <summary>
@@ -266,16 +280,124 @@ public sealed class InventoryTransactionController : ControllerBase
             return Unauthorized(new { Message = "User ID not found in authentication token" });
         }
 
+        var transactionType = request.TransactionType;
+
+        // Validate transaction type
+        if (!StockTransactionPolicy.IsValidTransactionType(transactionType))
+        {
+            _logger.LogWarning(
+                "Unsupported transaction type: {TransactionType}",
+                transactionType.ToString()
+            );
+            return BadRequest(new { Message = $"Unsupported transaction type: {transactionType}" });
+        }
+
+        // Fetch current inventory for validation
+        var inventory = await _inventoryRepository.GetByProductIdAsync(
+            request.ProductId,
+            cancellationToken
+        );
+
+        // Apply business rule validations based on transaction type
+        (bool isValid, string? errorMessage) = transactionType switch
+        {
+            InventoryTransactionType.Purchase => StockTransactionPolicy.CanRecordPurchase(
+                request.Quantity,
+                request.UnitCost,
+                request.ToLocation ?? string.Empty,
+                request.DocumentNumber
+            ),
+
+            InventoryTransactionType.Sale or InventoryTransactionType.Fulfillment =>
+                StockTransactionPolicy.CanRecordSale(
+                    request.Quantity,
+                    inventory?.QuantityAvailable ?? 0,
+                    request.ToLocation ?? string.Empty
+                ),
+
+            InventoryTransactionType.Adjustment => StockTransactionPolicy.CanRecordAdjustment(
+                inventory?.QuantityInStock ?? 0,
+                request.Quantity,
+                request.Notes ?? string.Empty
+            ),
+
+            InventoryTransactionType.Loss => StockTransactionPolicy.CanRecordLoss(
+                request.Quantity,
+                inventory?.QuantityInStock ?? 0,
+                request.Notes ?? string.Empty
+            ),
+
+            InventoryTransactionType.Transfer => StockTransactionPolicy.CanRecordTransfer(
+                request.Quantity,
+                inventory?.QuantityAvailable ?? 0,
+                request.FromLocation ?? string.Empty,
+                request.ToLocation ?? string.Empty
+            ),
+
+            InventoryTransactionType.Reservation => StockTransactionPolicy.CanRecordReservation(
+                request.Quantity,
+                inventory?.QuantityAvailable ?? 0,
+                request.OrderId
+            ),
+
+            InventoryTransactionType.ReservationRelease =>
+                StockTransactionPolicy.CanReleaseReservation(
+                    request.Quantity,
+                    inventory?.QuantityReserved ?? 0,
+                    request.OrderId
+                ),
+
+            InventoryTransactionType.SaleReturn or InventoryTransactionType.PurchaseReturn =>
+                StockTransactionPolicy.CanRecordReturn(
+                    request.Quantity,
+                    request.UnitCost,
+                    request.ToLocation ?? string.Empty,
+                    request.OrderId,
+                    transactionType == InventoryTransactionType.PurchaseReturn
+                ),
+
+            _ => (false, $"Transaction type {transactionType} not yet implemented"),
+        };
+
+        if (!isValid)
+        {
+            _logger.LogWarning(
+                "Transaction validation failed: {TransactionType}, Error={ErrorMessage}",
+                transactionType.ToString(),
+                errorMessage ?? "Unknown error"
+            );
+            return BadRequest(new { Message = errorMessage });
+        }
+
+        // Check if supervisor approval is required
+        var totalCost = request.Quantity * request.UnitCost;
+        if (
+            StockTransactionPolicy.RequiresSupervisorApproval(
+                transactionType,
+                request.Quantity,
+                totalCost
+            )
+        )
+        {
+            _logger.LogInformation(
+                "Transaction requires supervisor approval: Type={TransactionType}, Quantity={Quantity}, TotalCost={TotalCost}",
+                transactionType,
+                request.Quantity,
+                totalCost
+            );
+            // Note: In a real implementation, you would queue this for approval or check user permissions
+        }
+
         try
         {
             var transaction = await _transactionService.RecordTransactionAsync(
-                request.TransactionType,
+                transactionType,
                 request.ProductId,
                 request.ProductSku,
                 request.ProductName,
                 request.Quantity,
                 request.UnitCost,
-                request.ToLocation,
+                request.ToLocation ?? string.Empty,
                 userId,
                 request.FromLocation,
                 request.OrderId,

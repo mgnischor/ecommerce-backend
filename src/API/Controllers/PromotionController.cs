@@ -415,7 +415,7 @@ public sealed class PromotionController : ControllerBase
     /// <response code="409">Promotion code already exists.</response>
     /// <response code="500">Internal server error occurred while processing the request.</response>
     [HttpPost]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(typeof(PromotionEntity), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -587,7 +587,7 @@ public sealed class PromotionController : ControllerBase
     /// <response code="409">Conflict - promotion code already exists or concurrent modification detected.</response>
     /// <response code="500">Internal server error occurred while processing the request.</response>
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -751,7 +751,7 @@ public sealed class PromotionController : ControllerBase
     /// <response code="404">Promotion not found or already deleted.</response>
     /// <response code="500">Internal server error occurred while processing the request.</response>
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
