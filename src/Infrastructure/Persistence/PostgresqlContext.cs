@@ -27,6 +27,7 @@ public class PostgresqlContext : DbContext
     public DbSet<ChartOfAccountsEntity> ChartOfAccounts { get; set; }
     public DbSet<JournalEntryEntity> JournalEntries { get; set; }
     public DbSet<AccountingEntryEntity> AccountingEntries { get; set; }
+    public DbSet<AccountingRuleEntity> AccountingRules { get; set; }
 
     // Inventory
     public DbSet<InventoryTransactionEntity> InventoryTransactions { get; set; }
@@ -57,5 +58,8 @@ public class PostgresqlContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PostgresqlContext).Assembly);
+
+        // Seed accounting data
+        modelBuilder.SeedAccountingData();
     }
 }
