@@ -55,6 +55,7 @@ builder.Services.AddScoped<ICouponRepository, CouponRepository>();
 builder.Services.AddScoped<IChartOfAccountsRepository, ChartOfAccountsRepository>();
 builder.Services.AddScoped<IJournalEntryRepository, JournalEntryRepository>();
 builder.Services.AddScoped<IAccountingEntryRepository, AccountingEntryRepository>();
+builder.Services.AddScoped<IAccountingRuleRepository, AccountingRuleRepository>();
 builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
 builder.Services.AddScoped<IFinancialTransactionRepository, FinancialTransactionRepository>();
 
