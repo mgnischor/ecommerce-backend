@@ -1,24 +1,41 @@
 namespace ECommerce.Domain.Entities;
 
 /// <summary>
-/// Represents a product attribute in the e-commerce system.
-/// Defines dynamic attributes that can be assigned to products (e.g., color, size, material).
+/// Represents a product attribute definition in the e-commerce system.
 /// </summary>
+/// <remarks>
+/// Product attributes define dynamic properties that can be assigned to products
+/// such as color, size, material, weight, dimensions, etc.
+/// Attributes support type validation, filtering, search functionality, and product variants.
+/// This entity defines the attribute schema, while actual values are stored per product or variant.
+/// </remarks>
 public class ProductAttributeEntity
 {
     /// <summary>
-    /// Unique identifier for the attribute
+    /// Gets or sets the unique identifier for this product attribute.
     /// </summary>
+    /// <value>A <see cref="Guid"/> that uniquely identifies the attribute definition.</value>
+    /// <example>3fa85f64-5717-4562-b3fc-2c963f66afa6</example>
     public Guid Id { get; set; }
 
     /// <summary>
-    /// User who created this attribute
+    /// Gets or sets the identifier of the user who created this attribute.
     /// </summary>
+    /// <value>A <see cref="Guid"/> referencing the creating user.</value>
+    /// <remarks>
+    /// Typically an administrator or catalog manager who defines the attribute schema.
+    /// </remarks>
+    /// <example>7c9e6679-7425-40de-944b-e07fc1f90ae7</example>
     public Guid CreatedBy { get; set; }
 
     /// <summary>
-    /// User who last updated this attribute
+    /// Gets or sets the identifier of the user who last updated this attribute.
     /// </summary>
+    /// <value>
+    /// A <see cref="Guid"/> referencing the user who performed the last modification,
+    /// or <c>null</c> if never updated since creation.
+    /// </value>
+    /// <example>8b3c8d7a-9c4e-4f5a-8d3c-9e5f8a7b6c5d</example>
     public Guid? UpdatedBy { get; set; }
 
     /// <summary>
