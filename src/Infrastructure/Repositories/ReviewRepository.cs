@@ -7,19 +7,35 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Infrastructure.Repositories;
 
 /// <summary>
-/// Repository for managing ReviewEntity data access.
+/// Repository implementation for managing product review data access operations.
 /// </summary>
+/// <remarks>
+/// Provides comprehensive data access methods for <see cref="ReviewEntity"/> including
+/// product-based queries, customer review history, approval filtering, rating calculations,
+/// and review counting. Supports review moderation workflows with approval status tracking.
+/// Calculates average product ratings for display on product pages. All query operations
+/// use AsNoTracking for optimal read performance. Reviews are sorted by creation date in
+/// descending order to show most recent feedback first. Essential for customer feedback
+/// management and product quality insights.
+/// </remarks>
 public sealed class ReviewRepository : IReviewRepository
 {
     private readonly PostgresqlContext _context;
     private readonly ILoggingService _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReviewRepository"/> class.
+    /// </summary>
+    /// <param name="context">The database context for data access operations.</param>
+    /// <param name="logger">The logging service for diagnostic information.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> or <paramref name="logger"/> is null.</exception>
     public ReviewRepository(PostgresqlContext context, ILoggingService logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <inheritdoc />
     public async Task<ReviewEntity?> GetByIdAsync(
         Guid reviewId,
         CancellationToken cancellationToken = default
@@ -30,6 +46,7 @@ public sealed class ReviewRepository : IReviewRepository
             .FirstOrDefaultAsync(r => r.Id == reviewId, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ReviewEntity>> GetAllAsync(
         CancellationToken cancellationToken = default
     )
@@ -40,6 +57,7 @@ public sealed class ReviewRepository : IReviewRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ReviewEntity>> GetByProductIdAsync(
         Guid productId,
         CancellationToken cancellationToken = default
@@ -52,6 +70,7 @@ public sealed class ReviewRepository : IReviewRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ReviewEntity>> GetByUserIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default
@@ -64,6 +83,7 @@ public sealed class ReviewRepository : IReviewRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ReviewEntity>> GetApprovedByProductIdAsync(
         Guid productId,
         CancellationToken cancellationToken = default
@@ -76,6 +96,7 @@ public sealed class ReviewRepository : IReviewRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ReviewEntity>> GetPagedAsync(
         int pageNumber,
         int pageSize,
@@ -90,6 +111,7 @@ public sealed class ReviewRepository : IReviewRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<double> GetAverageRatingByProductIdAsync(
         Guid productId,
         CancellationToken cancellationToken = default
@@ -103,11 +125,13 @@ public sealed class ReviewRepository : IReviewRepository
         return reviews.Any() ? reviews.Average(r => r.Rating) : 0.0;
     }
 
+    /// <inheritdoc />
     public async Task<int> GetCountAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Reviews.CountAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<int> GetCountByProductIdAsync(
         Guid productId,
         CancellationToken cancellationToken = default
@@ -116,6 +140,7 @@ public sealed class ReviewRepository : IReviewRepository
         return await _context.Reviews.CountAsync(r => r.ProductId == productId, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task AddAsync(ReviewEntity review, CancellationToken cancellationToken = default)
     {
         if (review == null)
@@ -126,6 +151,7 @@ public sealed class ReviewRepository : IReviewRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public void Update(ReviewEntity review)
     {
         if (review == null)
@@ -135,6 +161,7 @@ public sealed class ReviewRepository : IReviewRepository
         _context.Reviews.Update(review);
     }
 
+    /// <inheritdoc />
     public void Remove(ReviewEntity review)
     {
         if (review == null)
@@ -144,6 +171,7 @@ public sealed class ReviewRepository : IReviewRepository
         _context.Reviews.Remove(review);
     }
 
+    /// <inheritdoc />
     public async Task<bool> RemoveByIdAsync(
         Guid reviewId,
         CancellationToken cancellationToken = default
