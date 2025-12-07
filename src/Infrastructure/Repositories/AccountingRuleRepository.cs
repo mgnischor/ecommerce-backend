@@ -6,17 +6,29 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Infrastructure.Repositories;
 
 /// <summary>
-/// Repository implementation for AccountingRuleEntity
+/// Repository implementation for managing accounting rule data access operations.
 /// </summary>
+/// <remarks>
+/// Provides data access methods for <see cref="AccountingRuleEntity"/> including
+/// queries by transaction type, rule code, and condition-based rule selection.
+/// Accounting rules define the chart of accounts mapping for double-entry bookkeeping
+/// based on inventory transaction types.
+/// </remarks>
 public class AccountingRuleRepository : IAccountingRuleRepository
 {
     private readonly Persistence.PostgresqlContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AccountingRuleRepository"/> class.
+    /// </summary>
+    /// <param name="context">The database context for data access operations.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> is null.</exception>
     public AccountingRuleRepository(Persistence.PostgresqlContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
+    /// <inheritdoc />
     public async Task<AccountingRuleEntity?> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken = default
@@ -28,6 +40,7 @@ public class AccountingRuleRepository : IAccountingRuleRepository
         );
     }
 
+    /// <inheritdoc />
     public async Task<AccountingRuleEntity?> GetByRuleCodeAsync(
         string ruleCode,
         CancellationToken cancellationToken = default
@@ -39,6 +52,7 @@ public class AccountingRuleRepository : IAccountingRuleRepository
         );
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<AccountingRuleEntity>> GetByTransactionTypeAsync(
         InventoryTransactionType transactionType,
         CancellationToken cancellationToken = default
@@ -50,6 +64,7 @@ public class AccountingRuleRepository : IAccountingRuleRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<AccountingRuleEntity>> GetActiveRulesAsync(
         CancellationToken cancellationToken = default
     )
@@ -61,6 +76,7 @@ public class AccountingRuleRepository : IAccountingRuleRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<AccountingRuleEntity>> GetAllAsync(
         CancellationToken cancellationToken = default
     )
@@ -71,6 +87,7 @@ public class AccountingRuleRepository : IAccountingRuleRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task AddAsync(
         AccountingRuleEntity rule,
         CancellationToken cancellationToken = default
@@ -80,17 +97,20 @@ public class AccountingRuleRepository : IAccountingRuleRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public void Update(AccountingRuleEntity rule)
     {
         rule.UpdatedAt = DateTime.UtcNow;
         _context.AccountingRules.Update(rule);
     }
 
+    /// <inheritdoc />
     public void Remove(AccountingRuleEntity rule)
     {
         _context.AccountingRules.Remove(rule);
     }
 
+    /// <inheritdoc />
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         await _context.SaveChangesAsync(cancellationToken);
