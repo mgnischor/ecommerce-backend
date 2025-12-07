@@ -7,19 +7,33 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Infrastructure.Repositories;
 
 /// <summary>
-/// Repository for managing AccountingEntryEntity data access.
+/// Repository implementation for managing accounting entry data access operations.
 /// </summary>
+/// <remarks>
+/// Provides data access methods for <see cref="AccountingEntryEntity"/>, which represents
+/// individual debit and credit lines within journal entries. Supports queries by journal entry,
+/// account, date range, and provides aggregation capabilities for balance calculations.
+/// Each accounting entry is part of the double-entry bookkeeping system where debits equal credits.
+/// All query operations use AsNoTracking for optimal read performance.
+/// </remarks>
 public sealed class AccountingEntryRepository : IAccountingEntryRepository
 {
     private readonly PostgresqlContext _context;
     private readonly ILoggingService _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AccountingEntryRepository"/> class.
+    /// </summary>
+    /// <param name="context">The database context for data access operations.</param>
+    /// <param name="logger">The logging service for diagnostic information.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> or <paramref name="logger"/> is null.</exception>
     public AccountingEntryRepository(PostgresqlContext context, ILoggingService logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <inheritdoc />
     public async Task<AccountingEntryEntity?> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken = default
@@ -30,6 +44,7 @@ public sealed class AccountingEntryRepository : IAccountingEntryRepository
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<AccountingEntryEntity>> GetAllAsync(
         CancellationToken cancellationToken = default
     )
@@ -40,6 +55,7 @@ public sealed class AccountingEntryRepository : IAccountingEntryRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<AccountingEntryEntity>> GetByJournalEntryIdAsync(
         Guid journalEntryId,
         CancellationToken cancellationToken = default
@@ -52,6 +68,7 @@ public sealed class AccountingEntryRepository : IAccountingEntryRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<AccountingEntryEntity>> GetByAccountIdAsync(
         Guid accountId,
         CancellationToken cancellationToken = default
@@ -64,6 +81,7 @@ public sealed class AccountingEntryRepository : IAccountingEntryRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<AccountingEntryEntity>> GetByDateRangeAsync(
         DateTime startDate,
         DateTime endDate,
@@ -77,11 +95,13 @@ public sealed class AccountingEntryRepository : IAccountingEntryRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<int> GetCountAsync(CancellationToken cancellationToken = default)
     {
         return await _context.AccountingEntries.CountAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task AddAsync(
         AccountingEntryEntity entry,
         CancellationToken cancellationToken = default
@@ -95,6 +115,7 @@ public sealed class AccountingEntryRepository : IAccountingEntryRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public void Update(AccountingEntryEntity entry)
     {
         if (entry == null)
@@ -104,6 +125,7 @@ public sealed class AccountingEntryRepository : IAccountingEntryRepository
         _context.AccountingEntries.Update(entry);
     }
 
+    /// <inheritdoc />
     public void Remove(AccountingEntryEntity entry)
     {
         if (entry == null)
@@ -113,6 +135,7 @@ public sealed class AccountingEntryRepository : IAccountingEntryRepository
         _context.AccountingEntries.Remove(entry);
     }
 
+    /// <inheritdoc />
     public async Task<bool> RemoveByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var entry = await _context.AccountingEntries.FirstOrDefaultAsync(
