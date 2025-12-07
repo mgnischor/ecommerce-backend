@@ -1,8 +1,6 @@
 using ECommerce.API.DTOs;
+using ECommerce.API.Services;
 using ECommerce.Application.Interfaces;
-using ECommerce.Application.Services;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,28 +36,9 @@ namespace ECommerce.API.Controllers;
 public sealed class AccountingController : ControllerBase
 {
     /// <summary>
-    /// Repository for managing chart of accounts entities
+    /// Read-only accounting query service used by this controller.
     /// </summary>
-    /// <remarks>
-    /// Provides data access operations for account definitions including account codes, names, types, and balances.
-    /// </remarks>
-    private readonly IRepository<ChartOfAccountsEntity> _chartOfAccountsRepository;
-
-    /// <summary>
-    /// Repository for managing journal entry entities
-    /// </summary>
-    /// <remarks>
-    /// Provides data access operations for journal entries which represent complete accounting transactions.
-    /// </remarks>
-    private readonly IRepository<JournalEntryEntity> _journalEntryRepository;
-
-    /// <summary>
-    /// Repository for managing accounting entry entities
-    /// </summary>
-    /// <remarks>
-    /// Provides data access operations for individual debit and credit entries within journal entries.
-    /// </remarks>
-    private readonly IRepository<AccountingEntryEntity> _accountingEntryRepository;
+    private readonly IAccountingQueryService _accountingQueryService;
 
     /// <summary>
     /// Logger instance for tracking controller operations and errors
@@ -72,33 +51,23 @@ public sealed class AccountingController : ControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="AccountingController"/> class
     /// </summary>
-    /// <param name="chartOfAccountsRepository">Repository for chart of accounts operations. Cannot be null.</param>
-    /// <param name="journalEntryRepository">Repository for journal entry operations. Cannot be null.</param>
-    /// <param name="accountingEntryRepository">Repository for accounting entry operations. Cannot be null.</param>
+    /// <param name="accountingQueryService">Service for accounting query operations. Cannot be null.</param>
     /// <param name="logger">Logger instance for recording controller activity. Cannot be null.</param>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when any of the required dependencies (repositories or logger) are null.
+    /// Thrown when any of the required dependencies are null.
     /// </exception>
     /// <remarks>
     /// This constructor uses dependency injection to provide all required services.
     /// All parameters are validated for null values to ensure the controller operates correctly.
     /// </remarks>
     public AccountingController(
-        IRepository<ChartOfAccountsEntity> chartOfAccountsRepository,
-        IRepository<JournalEntryEntity> journalEntryRepository,
-        IRepository<AccountingEntryEntity> accountingEntryRepository,
-        LoggingService<AccountingController> logger
+        IAccountingQueryService accountingQueryService,
+        ILoggingService logger
     )
     {
-        _chartOfAccountsRepository =
-            chartOfAccountsRepository
-            ?? throw new ArgumentNullException(nameof(chartOfAccountsRepository));
-        _journalEntryRepository =
-            journalEntryRepository
-            ?? throw new ArgumentNullException(nameof(journalEntryRepository));
-        _accountingEntryRepository =
-            accountingEntryRepository
-            ?? throw new ArgumentNullException(nameof(accountingEntryRepository));
+        _accountingQueryService =
+            accountingQueryService
+            ?? throw new ArgumentNullException(nameof(accountingQueryService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -164,29 +133,14 @@ public sealed class AccountingController : ControllerBase
 
         try
         {
-            var accounts = await _chartOfAccountsRepository.GetAllAsync(cancellationToken);
-
-            var response = accounts.Select(a => new ChartOfAccountsResponseDto
-            {
-                Id = a.Id,
-                AccountCode = a.AccountCode,
-                AccountName = a.AccountName,
-                AccountType = a.AccountType.ToString(),
-                ParentAccountId = a.ParentAccountId,
-                IsAnalytic = a.IsAnalytic,
-                IsActive = a.IsActive,
-                Balance = a.Balance,
-                Description = a.Description,
-                CreatedAt = a.CreatedAt,
-                UpdatedAt = a.UpdatedAt,
-            });
+            var accounts = await _accountingQueryService.GetChartOfAccountsAsync(cancellationToken);
 
             _logger.LogInformation(
                 "Retrieved {Count} accounts from chart of accounts",
-                response.Count()
+                accounts.Count
             );
 
-            return Ok(response);
+            return Ok(accounts);
         }
         catch (Exception ex)
         {
@@ -261,7 +215,7 @@ public sealed class AccountingController : ControllerBase
 
         try
         {
-            var account = await _chartOfAccountsRepository.GetByIdAsync(id, cancellationToken);
+            var account = await _accountingQueryService.GetAccountByIdAsync(id, cancellationToken);
 
             if (account == null)
             {
@@ -269,24 +223,9 @@ public sealed class AccountingController : ControllerBase
                 return NotFound(new { Message = $"Account with ID {id} not found" });
             }
 
-            var response = new ChartOfAccountsResponseDto
-            {
-                Id = account.Id,
-                AccountCode = account.AccountCode,
-                AccountName = account.AccountName,
-                AccountType = account.AccountType.ToString(),
-                ParentAccountId = account.ParentAccountId,
-                IsAnalytic = account.IsAnalytic,
-                IsActive = account.IsActive,
-                Balance = account.Balance,
-                Description = account.Description,
-                CreatedAt = account.CreatedAt,
-                UpdatedAt = account.UpdatedAt,
-            };
-
             _logger.LogDebug("Account retrieved successfully: AccountId={AccountId}", id);
 
-            return Ok(response);
+            return Ok(account);
         }
         catch (Exception ex)
         {
@@ -395,60 +334,11 @@ public sealed class AccountingController : ControllerBase
 
         try
         {
-            var entries = (await _journalEntryRepository.GetAllAsync(cancellationToken))
-                .OrderByDescending(e => e.EntryDate)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            var result = new List<JournalEntryResponseDto>();
-
-            foreach (var entry in entries)
-            {
-                var accountingEntries = (
-                    await _accountingEntryRepository.GetAllAsync(cancellationToken)
-                )
-                    .Where(ae => ae.JournalEntryId == entry.Id)
-                    .ToList();
-
-                var accounts = await _chartOfAccountsRepository.GetAllAsync(cancellationToken);
-
-                var entryDto = new JournalEntryResponseDto
-                {
-                    Id = entry.Id,
-                    EntryNumber = entry.EntryNumber,
-                    EntryDate = entry.EntryDate,
-                    DocumentType = entry.DocumentType,
-                    DocumentNumber = entry.DocumentNumber ?? string.Empty,
-                    History = entry.History,
-                    TotalAmount = entry.TotalAmount,
-                    IsPosted = entry.IsPosted,
-                    PostedAt = entry.PostedAt,
-                    ProductId = entry.ProductId,
-                    InventoryTransactionId = entry.InventoryTransactionId,
-                    OrderId = entry.OrderId,
-                    CreatedBy = entry.CreatedBy,
-                    CreatedAt = entry.CreatedAt,
-                    Entries = accountingEntries
-                        .Select(ae =>
-                        {
-                            var account = accounts.FirstOrDefault(a => a.Id == ae.AccountId);
-                            return new AccountingEntryResponseDto
-                            {
-                                Id = ae.Id,
-                                AccountId = ae.AccountId,
-                                AccountCode = account?.AccountCode ?? string.Empty,
-                                AccountName = account?.AccountName ?? string.Empty,
-                                Amount = ae.Amount,
-                                EntryType = ae.EntryType.ToString(),
-                                Description = ae.Description,
-                            };
-                        })
-                        .ToList(),
-                };
-
-                result.Add(entryDto);
-            }
+            var result = await _accountingQueryService.GetJournalEntriesAsync(
+                pageNumber,
+                pageSize,
+                cancellationToken
+            );
 
             _logger.LogInformation(
                 "Retrieved {Count} journal entries: Page={PageNumber}",
@@ -541,56 +431,16 @@ public sealed class AccountingController : ControllerBase
 
         try
         {
-            var entry = await _journalEntryRepository.GetByIdAsync(id, cancellationToken);
+            var response = await _accountingQueryService.GetJournalEntryByIdAsync(
+                id,
+                cancellationToken
+            );
 
-            if (entry == null)
+            if (response == null)
             {
                 _logger.LogWarning("Journal entry not found: JournalEntryId={JournalEntryId}", id);
                 return NotFound(new { Message = $"Journal entry with ID {id} not found" });
             }
-
-            var accountingEntries = (
-                await _accountingEntryRepository.GetAllAsync(cancellationToken)
-            )
-                .Where(ae => ae.JournalEntryId == entry.Id)
-                .ToList();
-
-            var accounts = await _chartOfAccountsRepository.GetAllAsync(cancellationToken);
-
-            var response = new JournalEntryResponseDto
-            {
-                Id = entry.Id,
-                EntryNumber = entry.EntryNumber,
-                EntryDate = entry.EntryDate,
-                DocumentType = entry.DocumentType,
-                DocumentNumber = entry.DocumentNumber ?? string.Empty,
-                History = entry.History,
-                TotalAmount = entry.TotalAmount,
-                IsPosted = entry.IsPosted,
-                PostedAt = entry.PostedAt,
-                ProductId = entry.ProductId,
-                InventoryTransactionId = entry.InventoryTransactionId,
-                OrderId = entry.OrderId,
-                CreatedBy = entry.CreatedBy,
-                CreatedAt = entry.CreatedAt,
-                Entries = accountingEntries
-                    .Select(ae =>
-                    {
-                        var account = accounts.FirstOrDefault(a => a.Id == ae.AccountId);
-                        return new AccountingEntryResponseDto
-                        {
-                            Id = ae.Id,
-                            AccountId = ae.AccountId,
-                            AccountCode = account?.AccountCode ?? "N/A",
-                            AccountName = account?.AccountName ?? "N/A",
-                            EntryType = ae.EntryType.ToString(),
-                            Amount = ae.Amount,
-                            Description = ae.Description,
-                            CostCenter = ae.CostCenter,
-                        };
-                    })
-                    .ToList(),
-            };
 
             _logger.LogDebug(
                 "Journal entry retrieved successfully: JournalEntryId={JournalEntryId}, EntriesCount={EntriesCount}",
@@ -694,60 +544,10 @@ public sealed class AccountingController : ControllerBase
 
         try
         {
-            var allEntries = await _journalEntryRepository.GetAllAsync(cancellationToken);
-            var entries = allEntries
-                .Where(je => je.ProductId == productId)
-                .OrderByDescending(je => je.EntryDate);
-
-            var response = new List<JournalEntryResponseDto>();
-
-            foreach (var entry in entries)
-            {
-                var accountingEntries = (
-                    await _accountingEntryRepository.GetAllAsync(cancellationToken)
-                )
-                    .Where(ae => ae.JournalEntryId == entry.Id)
-                    .ToList();
-
-                var accounts = await _chartOfAccountsRepository.GetAllAsync(cancellationToken);
-
-                var entryDto = new JournalEntryResponseDto
-                {
-                    Id = entry.Id,
-                    EntryNumber = entry.EntryNumber,
-                    EntryDate = entry.EntryDate,
-                    DocumentType = entry.DocumentType,
-                    DocumentNumber = entry.DocumentNumber ?? string.Empty,
-                    History = entry.History,
-                    TotalAmount = entry.TotalAmount,
-                    IsPosted = entry.IsPosted,
-                    PostedAt = entry.PostedAt,
-                    ProductId = entry.ProductId,
-                    InventoryTransactionId = entry.InventoryTransactionId,
-                    OrderId = entry.OrderId,
-                    CreatedBy = entry.CreatedBy,
-                    CreatedAt = entry.CreatedAt,
-                    Entries = accountingEntries
-                        .Select(ae =>
-                        {
-                            var account = accounts.FirstOrDefault(a => a.Id == ae.AccountId);
-                            return new AccountingEntryResponseDto
-                            {
-                                Id = ae.Id,
-                                AccountId = ae.AccountId,
-                                AccountCode = account?.AccountCode ?? "N/A",
-                                AccountName = account?.AccountName ?? "N/A",
-                                EntryType = ae.EntryType.ToString(),
-                                Amount = ae.Amount,
-                                Description = ae.Description,
-                                CostCenter = ae.CostCenter,
-                            };
-                        })
-                        .ToList(),
-                };
-
-                response.Add(entryDto);
-            }
+            var response = await _accountingQueryService.GetJournalEntriesByProductAsync(
+                productId,
+                cancellationToken
+            );
 
             _logger.LogInformation(
                 "Retrieved {Count} journal entries for product: ProductId={ProductId}",
