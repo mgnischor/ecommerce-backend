@@ -1,6 +1,7 @@
 using System.Text;
 using ECommerce.API.Extensions;
 using ECommerce.API.Middlewares;
+using ECommerce.API.Services;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
@@ -61,6 +62,9 @@ builder.Services.AddScoped<IFinancialTransactionRepository, FinancialTransaction
 
 // Register logging service
 builder.Services.AddScoped<ILoggingService, LoggingService>();
+
+// Register accounting query services
+builder.Services.AddScoped<IAccountingQueryService, AccountingQueryService>();
 
 // Register services
 builder.Services.AddScoped<IJwtService, JwtService>();
