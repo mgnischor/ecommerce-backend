@@ -7,19 +7,33 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Infrastructure.Repositories;
 
 /// <summary>
-/// Repository for managing OrderEntity data access.
+/// Repository implementation for managing order data access operations.
 /// </summary>
+/// <remarks>
+/// Provides comprehensive data access methods for <see cref="OrderEntity"/> including
+/// customer-based queries, status filtering, pagination support, and order counting.
+/// Supports order lifecycle management from creation through fulfillment. All query
+/// operations use AsNoTracking for optimal read performance. Orders are sorted by
+/// creation date in descending order by default to show most recent orders first.
+/// </remarks>
 public sealed class OrderRepository : IOrderRepository
 {
     private readonly PostgresqlContext _context;
     private readonly ILoggingService _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OrderRepository"/> class.
+    /// </summary>
+    /// <param name="context">The database context for data access operations.</param>
+    /// <param name="logger">The logging service for diagnostic information.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> or <paramref name="logger"/> is null.</exception>
     public OrderRepository(PostgresqlContext context, ILoggingService logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <inheritdoc />
     public async Task<OrderEntity?> GetByIdAsync(
         Guid orderId,
         CancellationToken cancellationToken = default
@@ -30,6 +44,7 @@ public sealed class OrderRepository : IOrderRepository
             .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<OrderEntity?> GetByIdWithItemsAsync(
         Guid orderId,
         CancellationToken cancellationToken = default
@@ -39,6 +54,7 @@ public sealed class OrderRepository : IOrderRepository
         return await GetByIdAsync(orderId, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<OrderEntity>> GetAllAsync(
         CancellationToken cancellationToken = default
     )
@@ -49,6 +65,7 @@ public sealed class OrderRepository : IOrderRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<OrderEntity>> GetByUserIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default
@@ -61,6 +78,7 @@ public sealed class OrderRepository : IOrderRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<OrderEntity>> GetByStatusAsync(
         int status,
         CancellationToken cancellationToken = default
@@ -73,6 +91,7 @@ public sealed class OrderRepository : IOrderRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<OrderEntity>> GetPagedAsync(
         int pageNumber,
         int pageSize,
@@ -87,11 +106,13 @@ public sealed class OrderRepository : IOrderRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<int> GetCountAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Orders.CountAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<int> GetCountByUserIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default
@@ -100,6 +121,7 @@ public sealed class OrderRepository : IOrderRepository
         return await _context.Orders.CountAsync(o => o.CustomerId == userId, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task AddAsync(OrderEntity order, CancellationToken cancellationToken = default)
     {
         if (order == null)
@@ -110,6 +132,7 @@ public sealed class OrderRepository : IOrderRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public void Update(OrderEntity order)
     {
         if (order == null)
@@ -119,6 +142,7 @@ public sealed class OrderRepository : IOrderRepository
         _context.Orders.Update(order);
     }
 
+    /// <inheritdoc />
     public void Remove(OrderEntity order)
     {
         if (order == null)
@@ -128,6 +152,7 @@ public sealed class OrderRepository : IOrderRepository
         _context.Orders.Remove(order);
     }
 
+    /// <inheritdoc />
     public async Task<bool> RemoveByIdAsync(
         Guid orderId,
         CancellationToken cancellationToken = default
