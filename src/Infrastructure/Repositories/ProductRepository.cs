@@ -7,20 +7,34 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Infrastructure.Repositories;
 
 /// <summary>
-/// Repository for managing ProductEntity data access.
-/// Provides methods for CRUD operations and querying product data.
+/// Repository implementation for managing product catalog data access operations.
 /// </summary>
+/// <remarks>
+/// Provides comprehensive data access methods for <see cref="ProductEntity"/> including
+/// SKU-based lookups, category filtering, featured/on-sale queries, search capabilities,
+/// pagination support, and soft delete functionality. Products marked as deleted are
+/// automatically excluded from standard queries. All query operations use AsNoTracking
+/// for optimal read performance. Implements extensive logging for audit trails and
+/// troubleshooting product catalog operations.
+/// </remarks>
 public sealed class ProductRepository : IProductRepository
 {
     private readonly PostgresqlContext _context;
     private readonly ILoggingService _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProductRepository"/> class.
+    /// </summary>
+    /// <param name="context">The database context for data access operations.</param>
+    /// <param name="logger">The logging service for diagnostic information.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> or <paramref name="logger"/> is null.</exception>
     public ProductRepository(PostgresqlContext context, ILoggingService logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <inheritdoc />
     public async Task<ProductEntity?> GetByIdAsync(
         Guid productId,
         CancellationToken cancellationToken = default
@@ -31,6 +45,7 @@ public sealed class ProductRepository : IProductRepository
             .FirstOrDefaultAsync(p => p.Id == productId, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<ProductEntity?> GetBySkuAsync(
         string sku,
         CancellationToken cancellationToken = default
@@ -41,6 +56,7 @@ public sealed class ProductRepository : IProductRepository
             .FirstOrDefaultAsync(p => p.Sku == sku, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ProductEntity>> GetAllAsync(
         CancellationToken cancellationToken = default
     )
@@ -52,6 +68,7 @@ public sealed class ProductRepository : IProductRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ProductEntity>> GetPagedAsync(
         int pageNumber,
         int pageSize,
@@ -67,6 +84,7 @@ public sealed class ProductRepository : IProductRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ProductEntity>> GetByCategoryAsync(
         int category,
         CancellationToken cancellationToken = default
@@ -79,6 +97,7 @@ public sealed class ProductRepository : IProductRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ProductEntity>> GetFeaturedAsync(
         CancellationToken cancellationToken = default
     )
@@ -90,6 +109,7 @@ public sealed class ProductRepository : IProductRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ProductEntity>> GetOnSaleAsync(
         CancellationToken cancellationToken = default
     )
@@ -101,6 +121,7 @@ public sealed class ProductRepository : IProductRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<ProductEntity>> SearchByNameAsync(
         string searchTerm,
         CancellationToken cancellationToken = default
@@ -113,11 +134,13 @@ public sealed class ProductRepository : IProductRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<int> GetCountAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Products.CountAsync(p => !p.IsDeleted, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<bool> ExistsBySkuAsync(
         string sku,
         CancellationToken cancellationToken = default
@@ -126,6 +149,7 @@ public sealed class ProductRepository : IProductRepository
         return await _context.Products.AnyAsync(p => p.Sku == sku, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task AddAsync(ProductEntity product, CancellationToken cancellationToken = default)
     {
         if (product == null)
@@ -147,6 +171,7 @@ public sealed class ProductRepository : IProductRepository
         }
     }
 
+    /// <inheritdoc />
     public void Update(ProductEntity product)
     {
         if (product == null)
@@ -168,6 +193,7 @@ public sealed class ProductRepository : IProductRepository
         }
     }
 
+    /// <inheritdoc />
     public void Remove(ProductEntity product)
     {
         if (product == null)
@@ -189,6 +215,7 @@ public sealed class ProductRepository : IProductRepository
         }
     }
 
+    /// <inheritdoc />
     public async Task<bool> RemoveByIdAsync(
         Guid productId,
         CancellationToken cancellationToken = default
@@ -219,6 +246,7 @@ public sealed class ProductRepository : IProductRepository
         }
     }
 
+    /// <inheritdoc />
     public async Task<bool> SoftDeleteAsync(
         Guid productId,
         CancellationToken cancellationToken = default
