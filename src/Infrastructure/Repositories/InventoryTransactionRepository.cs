@@ -8,14 +8,29 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Infrastructure.Repositories;
 
 /// <summary>
-/// Repository implementation for inventory transaction operations
+/// Repository implementation for managing inventory transaction data access operations.
 /// </summary>
+/// <remarks>
+/// Provides comprehensive data access methods for <see cref="InventoryTransactionEntity"/>
+/// which tracks all inventory movements including purchases, sales, returns, adjustments,
+/// transfers, and losses. Extends the generic repository pattern with specialized queries
+/// for product-based filtering, transaction type filtering, date range queries, location
+/// tracking, and relationship queries (orders, journal entries). Essential for inventory
+/// audit trails, stock reconciliation, and accounting integration. Supports eager loading
+/// of related entities (Product, JournalEntry) for complete transaction context.
+/// </remarks>
 public class InventoryTransactionRepository
     : Repository<InventoryTransactionEntity>,
         IInventoryTransactionRepository
 {
     private readonly ILoggingService _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InventoryTransactionRepository"/> class.
+    /// </summary>
+    /// <param name="context">The database context for data access operations.</param>
+    /// <param name="logger">The logging service for diagnostic and audit information.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="logger"/> is null.</exception>
     public InventoryTransactionRepository(PostgresqlContext context, ILoggingService logger)
         : base(context)
     {
