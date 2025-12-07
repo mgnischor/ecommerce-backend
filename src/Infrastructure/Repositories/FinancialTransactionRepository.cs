@@ -6,21 +6,27 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Infrastructure.Repositories;
 
 /// <summary>
-/// Repository implementation for financial transaction data access
+/// Repository implementation for managing financial transaction data access operations.
 /// </summary>
 /// <remarks>
-/// Provides specialized queries for financial transactions including period-based queries,
-/// reconciliation tracking, and relationship-based filtering (orders, payments, inventory).
-/// Extends the generic repository with financial-specific query methods.
+/// Provides comprehensive data access methods for <see cref="FinancialTransactionEntity"/>
+/// which tracks all monetary movements in the system. Includes specialized queries for
+/// period-based financial reporting, reconciliation tracking, counterparty filtering,
+/// and relationship-based filtering (orders, payments, inventory transactions). Supports
+/// financial audit trails, cash flow analysis, and accounting reconciliation processes.
+/// Extends the generic repository pattern with financial-specific query methods. Critical
+/// for financial reporting, bank reconciliation, and compliance with accounting standards.
+/// Transactions are sorted by date for chronological financial record keeping.
 /// </remarks>
 public class FinancialTransactionRepository
     : Repository<FinancialTransactionEntity>,
         IFinancialTransactionRepository
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="FinancialTransactionRepository"/> class
+    /// Initializes a new instance of the <see cref="FinancialTransactionRepository"/> class.
     /// </summary>
-    /// <param name="context">Database context for data access operations</param>
+    /// <param name="context">The database context for data access operations.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> is null (via base constructor).</exception>
     public FinancialTransactionRepository(PostgresqlContext context)
         : base(context) { }
 
