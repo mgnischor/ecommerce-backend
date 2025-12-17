@@ -664,4 +664,108 @@ public class AccountingService : IAccountingService
         await _accountingEntryRepository.AddAsync(entry, cancellationToken);
         return entry;
     }
+
+    public async Task<ChartOfAccountsEntity> GetOrCreateAccountAsync(
+        string accountCode,
+        string accountName,
+        AccountType accountType,
+        CancellationToken cancellationToken = default
+    )
+    {
+        using var activity = ActivitySource.StartActivity("GetOrCreateAccount", ActivityKind.Internal);
+        activity?.SetTag("account.code", accountCode);
+        activity?.SetTag("account.name", accountName);
+        activity?.SetTag("account.type", accountType.ToString());
+
+        _logger.LogInformation(
+            "Getting or creating account: Code={AccountCode}, Name={AccountName}, Type={AccountType}",
+            accountCode,
+            accountName,
+            accountType
+        );
+
+        try
+        {
+            // Try to get existing account
+            var existingAccount = await _chartOfAccountsRepository.GetByCodeAsync(
+                accountCode,
+                cancellationToken
+            );
+
+            if (existingAccount != null)
+            {
+                _logger.LogInformation(
+                    "Account already exists: Code={AccountCode}, Id={AccountId}",
+                    accountCode,
+                    existingAccount.Id
+                );
+                return existingAccount;
+            }
+
+            // Create new account
+            var newAccount = new ChartOfAccountsEntity
+            {
+                Id = Guid.NewGuid(),
+                AccountCode = accountCode,
+                AccountName = accountName,
+                AccountType = accountType,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            try
+            {
+                await _chartOfAccountsRepository.AddAsync(newAccount, cancellationToken);
+
+                _logger.LogInformation(
+                    "Created new account: Code={AccountCode}, Id={AccountId}",
+                    accountCode,
+                    newAccount.Id
+                );
+
+                activity?.SetTag("account.created", true);
+                activity?.SetTag("account.id", newAccount.Id);
+
+                return newAccount;
+            }
+            catch (Exception ex) when (ex.Message.Contains("IX_ChartOfAccounts_AccountCode") ||
+                                      ex.Message.Contains("duplicar valor da chave") ||
+                                      ex.Message.Contains("duplicate key"))
+            {
+                // Race condition: another thread created the account between our check and insert
+                // Retry getting the account
+                _logger.LogWarning(
+                    "Account was created by another process, retrying fetch: Code={AccountCode}",
+                    accountCode
+                );
+
+                var retryAccount = await _chartOfAccountsRepository.GetByCodeAsync(
+                    accountCode,
+                    cancellationToken
+                );
+
+                if (retryAccount != null)
+                {
+                    activity?.SetTag("account.created", false);
+                    activity?.SetTag("account.race_condition", true);
+                    return retryAccount;
+                }
+
+                // If still not found, rethrow original exception
+                throw;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error getting or creating account: Code={AccountCode}, Name={AccountName}",
+                accountCode,
+                accountName
+            );
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            throw;
+        }
+    }
 }
