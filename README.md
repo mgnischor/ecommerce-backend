@@ -2,13 +2,13 @@
 
 <div align="center">
 
-[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE.md)
 [![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-Enabled-FF6F00?logo=opentelemetry)](https://opentelemetry.io/)
 
-A production-ready, enterprise-grade e-commerce backend API built with ASP.NET Core 9, featuring clean architecture, double-entry accounting, and comprehensive observability.
+A production-ready, enterprise-grade e-commerce backend API built with ASP.NET Core 10, featuring clean architecture, double-entry accounting, and comprehensive observability.
 
 [Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [Documentation](#-documentation) • [API Reference](#-api-reference)
 
@@ -167,14 +167,14 @@ The solution follows **Clean Architecture** principles with four distinct layers
 
 ### Backend Framework
 
--   **ASP.NET Core 9.0** - High-performance web framework
--   **C# 12** - Latest language features
+-   **ASP.NET Core 10.0** - High-performance web framework
+-   **C# 13** - Latest language features
 
 ### Data & Persistence
 
 -   **PostgreSQL 16** - Robust relational database
--   **Entity Framework Core 9.0** - ORM with code-first migrations
--   **Npgsql 9.0** - PostgreSQL provider for EF Core
+-   **Entity Framework Core 10.0** - ORM with code-first migrations
+-   **Npgsql 10.0** - PostgreSQL provider for EF Core
 
 ### Authentication & Security
 
@@ -185,11 +185,11 @@ The solution follows **Clean Architecture** principles with four distinct layers
 ### API Documentation
 
 -   **Microsoft.AspNetCore.OpenApi** - OpenAPI 3.0 specification
--   **Scalar.AspNetCore 2.9** - Modern, interactive API documentation UI
+-   **Scalar.AspNetCore 2.10** - Modern, interactive API documentation UI
 
 ### Observability & Monitoring
 
--   **OpenTelemetry 1.13** - Distributed tracing and metrics
+-   **OpenTelemetry 1.14** - Distributed tracing and metrics
 -   **OpenTelemetry.Instrumentation.AspNetCore** - HTTP request tracing
 -   **OpenTelemetry.Instrumentation.EntityFrameworkCore** - Database query tracing
 -   **OpenTelemetry.Instrumentation.Http** - HTTP client tracing
@@ -216,7 +216,7 @@ The solution follows **Clean Architecture** principles with four distinct layers
 
 Ensure you have the following installed:
 
--   [.NET SDK 9.0+](https://dotnet.microsoft.com/download)
+-   [.NET SDK 10.0+](https://dotnet.microsoft.com/download)
 -   [Docker Desktop](https://www.docker.com/products/docker-desktop) (for Docker-based development)
 -   [PostgreSQL 16+](https://www.postgresql.org/download/) (for local development without Docker)
 -   [Git](https://git-scm.com/downloads)
@@ -977,6 +977,6 @@ See the [LICENSE.md](LICENSE.md) file for full license text.
 
 **⭐ If you find this project useful, please consider giving it a star! ⭐**
 
-Made with ❤️ using ASP.NET Core 9
+Made with ❤️ using ASP.NET Core 10
 
 </div>
