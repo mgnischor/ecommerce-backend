@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+-   **Upgraded to .NET 10**: Complete migration from .NET 9 to .NET 10
+    -   Updated `TargetFramework` to `net10.0` in all projects
+    -   Updated all Microsoft packages to version 10.0.0:
+        -   `Microsoft.AspNetCore.Authentication.JwtBearer`
+        -   `Microsoft.AspNetCore.OpenApi`
+        -   `Microsoft.EntityFrameworkCore` (all packages)
+    -   Updated Npgsql packages to version 10.0.0:
+        -   `Npgsql`
+        -   `Npgsql.EntityFrameworkCore.PostgreSQL`
+    -   Updated test project packages:
+        -   `Microsoft.EntityFrameworkCore.InMemory` to 10.0.0
+    -   Updated documentation to reflect .NET 10:
+        -   README.md badge and descriptions
+        -   Tech Stack section (ASP.NET Core 10.0, C# 13, EF Core 10.0)
+        -   Prerequisites section (.NET SDK 10.0+)
+    -   Maintained OpenTelemetry packages at version 1.14.0 (latest stable)
+    -   Build verification successful after upgrade
+
 ### Fixed
 
 ## [0.1.17] - 2025-11-20
