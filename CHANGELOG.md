@@ -11,6 +11,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+## [0.1.20] - 2025-12-16
+
+### Changed
+
+-   Empty migration (no database changes)
+-   Build version increment only
+
+## [0.1.19] - 2025-12-16
+
+### Changed
+
+-   Empty migration (no database changes)
+-   Build version increment only
+
+## [0.1.18] - 2025-12-16
+
+### Added
+
+-   **Accounting Rules System**: Database-driven accounting rules for automated journal entries
+
+    -   **AccountingRules Table**: Configurable accounting rules for transaction types
+        -   Maps inventory transaction types to chart of accounts
+        -   Defines debit and credit account codes for double-entry bookkeeping
+        -   Support for conditional rules (e.g., "Quantity > 0" for adjustments)
+        -   Rule activation/deactivation without code changes
+        -   Unique rule codes for easy identification (PURCHASE, SALE, SALE_RETURN, etc.)
+    -   **Pre-configured Rules**: 7 standard accounting rules inserted during migration:
+        -   `PURCHASE` - Debit: Inventory (1.1.03.001), Credit: Suppliers (2.1.01.001)
+        -   `SALE` - Debit: COGS (3.1.01.001), Credit: Inventory (1.1.03.001)
+        -   `SALE_RETURN` - Debit: Inventory (1.1.03.001), Credit: COGS (3.1.01.001)
+        -   `PURCHASE_RETURN` - Debit: Suppliers (2.1.01.001), Credit: Inventory (1.1.03.001)
+        -   `ADJUSTMENT_POSITIVE` - Debit: Inventory (1.1.03.001), Credit: Other Income (4.2.01.001)
+        -   `ADJUSTMENT_NEGATIVE` - Debit: Operating Expenses (3.2.01.002), Credit: Inventory (1.1.03.001)
+        -   `LOSS` - Debit: Inventory Loss (3.2.01.001), Credit: Inventory (1.1.03.001)
+    -   **Chart of Accounts Seed Data**: 7 essential accounts added during migration:
+        -   Asset accounts: Cash (1.1.01.001), Inventory (1.1.03.001)
+        -   Liability account: Accounts Payable - Suppliers (2.1.01.001)
+        -   Expense accounts: COGS (3.1.01.001), Inventory Loss (3.2.01.001), Operating Expenses (3.2.01.002)
+        -   Revenue account: Other Operating Income (4.2.01.001)
+    -   **Database Indexes**:
+        -   Unique index on `RuleCode` for rule identification
+        -   Index on `TransactionType` for fast lookups
+        -   Index on `IsActive` for filtering active rules
+        -   Composite index on `TransactionType` and `IsActive` for optimized queries
+
+-   **Enhanced User Security**: Account lockout and login tracking features
+
+    -   `FailedLoginAttempts` - Counter for failed login attempts
+    -   `LastFailedLoginAt` - Timestamp of last failed login
+    -   `LastSuccessfulLoginAt` - Timestamp of last successful login
+    -   `LastLoginIpAddress` - IP address of last login attempt
+    -   `LockedUntil` - Account lockout timestamp for temporary bans
+    -   Enables implementation of account lockout policies and security monitoring
+
 -   **Upgraded to .NET 10**: Complete migration from .NET 9 to .NET 10
     -   Updated `TargetFramework` to `net10.0` in all projects
     -   Updated all Microsoft packages to version 10.0.0:
@@ -28,6 +84,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         -   Prerequisites section (.NET SDK 10.0+)
     -   Maintained OpenTelemetry packages at version 1.14.0 (latest stable)
     -   Build verification successful after upgrade
+
+### Database Schema
+
+-   **AccountingRules Table**:
+
+    ```sql
+    CREATE TABLE AccountingRules (
+      Id uuid PRIMARY KEY,
+      TransactionType integer NOT NULL,
+      RuleCode varchar(50) NOT NULL UNIQUE,
+      Description varchar(500) NOT NULL,
+      DebitAccountCode varchar(20) NOT NULL,
+      CreditAccountCode varchar(20) NOT NULL,
+      Condition varchar(200),
+      IsActive boolean DEFAULT true,
+      CreatedAt timestamp with time zone NOT NULL,
+      UpdatedAt timestamp with time zone NOT NULL
+    );
+    ```
+
+-   **Users Table Enhancements**:
+    ```sql
+    ALTER TABLE Users
+      ADD COLUMN FailedLoginAttempts integer DEFAULT 0,
+      ADD COLUMN LastFailedLoginAt timestamp with time zone,
+      ADD COLUMN LastSuccessfulLoginAt timestamp with time zone,
+      ADD COLUMN LastLoginIpAddress text,
+      ADD COLUMN LockedUntil timestamp with time zone;
+    ```
+
+### Features
+
+-   **Flexible Accounting Configuration**: Rules can be modified in the database without code deployment
+-   **Conditional Rules**: Support for business logic in accounting rules (e.g., different treatments for positive/negative adjustments)
+-   **Audit Trail**: Complete tracking of rule changes with created/updated timestamps
+-   **Security Enhancement**: Foundation for implementing:
+    -   Account lockout after N failed login attempts
+    -   Time-based account unlocking
+    -   Login history and security monitoring
+    -   IP-based access tracking
+    -   Suspicious activity detection
+
+### Changed
 
 ### Fixed
 
@@ -425,6 +524,9 @@ CREATE TABLE users (
 
 ## Version History
 
+-   **0.1.20** - Build version increment
+-   **0.1.19** - Build version increment
+-   **0.1.18** - Accounting Rules System & Enhanced User Security
 -   **0.1.17** - Unit Tests & Documentation Updates
 -   **0.0.10** - Complete E-Commerce Domain Entities
 -   **0.0.9** - Integrated Accounting System
@@ -437,7 +539,10 @@ CREATE TABLE users (
 -   **0.0.2** - User Management & Authentication
 -   **0.0.1** - Initial Setup
 
-[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.17...HEAD
+[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.20...HEAD
+[0.1.20]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.19...v0.1.20
+[0.1.19]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.18...v0.1.19
+[0.1.18]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.17...v0.1.18
 [0.1.17]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.10...v0.1.17
 [0.0.10]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.8...v0.0.9
