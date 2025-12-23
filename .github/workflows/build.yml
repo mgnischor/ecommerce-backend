@@ -29,7 +29,7 @@ jobs:
 
             - name: Verify formatting
               if: matrix.configuration == 'Debug'
-              run: dotnet format --verify-no-changes --verbosity diagnostic
+              run: dotnet format --verify-no-changes --verbosity diagnostic ECommerce.sln
 
             - name: Build
               run: dotnet build ECommerce.sln --configuration ${{ matrix.configuration }} --no-restore
