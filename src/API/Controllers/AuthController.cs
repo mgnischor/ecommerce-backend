@@ -1,11 +1,7 @@
-using System.Security.Cryptography;
-using System.Text;
 using ECommerce.API.DTOs;
 using ECommerce.API.Filters;
 using ECommerce.Application.Interfaces;
-using ECommerce.Application.Services;
 using ECommerce.Domain.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
 
