@@ -6,7 +6,7 @@
 
 ```bash
 # In PowerShell
-cd e:\GITHUB\ecommerce-backend
+cd <your-project-path>
 dotnet ef migrations add AddAccountingSystem
 dotnet ef database update
 ```
