@@ -1,11 +1,7 @@
-using System.Security.Claims;
 using ECommerce.API.DTOs;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
-using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
 
