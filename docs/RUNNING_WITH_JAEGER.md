@@ -98,7 +98,7 @@ Ensure the configuration points to localhost:
     },
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend.Dev",
-        "ServiceVersion": "0.1.17",
+        "ServiceVersion": "0.1.20",
         "EnableConsoleExporter": true,
         "OtlpEndpoint": "http://localhost:4317"
     }
