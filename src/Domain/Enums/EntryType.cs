@@ -9,7 +9,7 @@ public enum EntryType
     /// Debit - Increases Asset/Expense, Decreases Liability/Revenue/Equity
     /// </summary>
     Debit = 1,
-    
+
     /// <summary>
     /// Credit - Decreases Asset/Expense, Increases Liability/Revenue/Equity
     /// </summary>

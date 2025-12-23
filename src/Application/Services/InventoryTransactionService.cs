@@ -173,8 +173,8 @@ public class InventoryTransactionService : AppInterfaces.IInventoryTransactionSe
                             );
                             break;
 
-                        // Other transaction types (returns, adjustments, losses) may also
-                        // generate financial transactions if needed
+                            // Other transaction types (returns, adjustments, losses) may also
+                            // generate financial transactions if needed
                     }
                 }
                 catch (Exception financialEx)

@@ -61,7 +61,7 @@ public static class DatabaseSeeder
             await context.SaveChangesAsync();
         }
     }
-    
+
     /// <summary>
     /// Seeds the chart of accounts if it doesn't exist
     /// Based on Brazilian GAAP (NBC TG) - Simplified structure for e-commerce
