@@ -1,10 +1,7 @@
 using ECommerce.Application.Interfaces;
-using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
 
