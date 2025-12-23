@@ -455,7 +455,7 @@ $env:Jwt__ExpirationMinutes = "60"
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.1.17",
+        "ServiceVersion": "0.1.20",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": ""
     }
@@ -466,7 +466,7 @@ $env:Jwt__ExpirationMinutes = "60"
 
 ```powershell
 $env:OpenTelemetry__ServiceName = "ECommerce.Backend"
-$env:OpenTelemetry__ServiceVersion = "0.1.17"
+$env:OpenTelemetry__ServiceVersion = "0.1.20"
 $env:OpenTelemetry__EnableConsoleExporter = "true"
 $env:OpenTelemetry__OtlpEndpoint = "http://localhost:4317"
 ```
