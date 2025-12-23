@@ -100,6 +100,72 @@ Business policies define the core business rules and constraints.
 -   Moderation triggers for flagged words and extreme ratings
 -   Helpful threshold: 60% with minimum 5 votes
 
+### CartPolicy
+
+**Location:** `src/Domain/Policies/CartPolicy.cs`
+
+**Purpose:** Defines business rules for shopping cart management
+
+**Key Rules:**
+
+-   Maximum items in cart: 50
+-   Maximum quantity per item: 99
+-   Cart expiration: 30 days (7 days for guest carts)
+-   Maximum cart value: $999,999.99
+-   Validates item additions and quantity updates
+-   Handles cart merging for duplicate items
+-   Enforces stock availability checks
+
+### SecurityPolicy
+
+**Location:** `src/Domain/Policies/SecurityPolicy.cs`
+
+**Purpose:** Defines security rules for authentication and authorization
+
+**Key Rules:**
+
+-   Session timeout: 30 minutes of inactivity
+-   Access token validity: 15 minutes
+-   Refresh token validity: 7 days
+-   Maximum concurrent sessions: 5
+-   Password reset token validity: 24 hours
+-   API rate limit: 100 requests per minute
+-   Permission validation based on user access levels
+-   Admin feature access control
+
+### ShipmentPolicy
+
+**Location:** `src/Domain/Policies/ShipmentPolicy.cs`
+
+**Purpose:** Defines business rules for shipment validation and tracking
+
+**Key Rules:**
+
+-   Tracking number length: 5-100 characters
+-   Maximum shipping cost: $999,999.99
+-   Maximum package weight: 500 kg
+-   Standard delivery: 7 days
+-   Express delivery: 3 days
+-   Valid status transitions enforcement
+-   Volumetric weight calculation
+-   Package dimension validation
+
+### Additional Policies
+
+The following policies are also implemented in the system:
+
+-   **CustomerPolicy**: Customer account management rules
+-   **NotificationPolicy**: Notification delivery and preferences rules
+-   **OrderProcessingPolicy**: Order processing workflow rules
+-   **PaymentPolicy**: Payment validation and processing rules
+-   **ProductAvailabilityPolicy**: Product availability and stock rules
+-   **PromotionPolicy**: Promotion and campaign validation rules
+-   **RefundPolicy**: Refund eligibility and processing rules
+-   **ShippingZonePolicy**: Shipping zone and rate calculation rules
+-   **StockTransactionPolicy**: Inventory transaction validation rules
+-   **VendorPolicy**: Vendor management and validation rules
+-   **WishlistPolicy**: Wishlist management rules
+
 ---
 
 ## Specifications
@@ -423,4 +489,4 @@ These business rules integrate with:
 
 ---
 
-_Last Updated: October 27, 2025_
+_Last Updated: December 23, 2025_
