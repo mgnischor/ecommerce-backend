@@ -16,7 +16,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidOrderAmount(100m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -26,7 +26,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidOrderAmount(0.01m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -36,7 +36,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidOrderAmount(999999.99m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidOrderAmount(0m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidOrderAmount(-10m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -66,7 +66,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidOrderAmount(1000000m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -76,7 +76,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidItemCount(50);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -86,7 +86,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidItemCount(1);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -96,7 +96,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidItemCount(100);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidItemCount(0);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -116,7 +116,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isValid = OrderValidationPolicy.IsValidItemCount(150);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -126,7 +126,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Pending);
 
         // Assert
-        canCancel.Should().BeTrue();
+        Assert.That(canCancel, Is.True);
     }
 
     [Test]
@@ -136,7 +136,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Processing);
 
         // Assert
-        canCancel.Should().BeTrue();
+        Assert.That(canCancel, Is.True);
     }
 
     [Test]
@@ -146,7 +146,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Confirmed);
 
         // Assert
-        canCancel.Should().BeTrue();
+        Assert.That(canCancel, Is.True);
     }
 
     [Test]
@@ -156,7 +156,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Shipped);
 
         // Assert
-        canCancel.Should().BeFalse();
+        Assert.That(canCancel, Is.False);
     }
 
     [Test]
@@ -166,7 +166,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Delivered);
 
         // Assert
-        canCancel.Should().BeFalse();
+        Assert.That(canCancel, Is.False);
     }
 
     [Test]
@@ -176,7 +176,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Cancelled);
 
         // Assert
-        canCancel.Should().BeFalse();
+        Assert.That(canCancel, Is.False);
     }
 
     [Test]
@@ -186,7 +186,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canCancel = OrderValidationPolicy.CanCancelOrder(OrderStatus.Refunded);
 
         // Assert
-        canCancel.Should().BeFalse();
+        Assert.That(canCancel, Is.False);
     }
 
     [Test]
@@ -199,7 +199,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isWithinWindow = OrderValidationPolicy.IsWithinCancellationWindow(orderCreatedAt);
 
         // Assert
-        isWithinWindow.Should().BeTrue();
+        Assert.That(isWithinWindow, Is.True);
     }
 
     [Test]
@@ -212,7 +212,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isWithinWindow = OrderValidationPolicy.IsWithinCancellationWindow(orderCreatedAt);
 
         // Assert
-        isWithinWindow.Should().BeTrue();
+        Assert.That(isWithinWindow, Is.True);
     }
 
     [Test]
@@ -225,7 +225,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var isWithinWindow = OrderValidationPolicy.IsWithinCancellationWindow(orderCreatedAt);
 
         // Assert
-        isWithinWindow.Should().BeFalse();
+        Assert.That(isWithinWindow, Is.False);
     }
 
     [Test]
@@ -235,7 +235,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canModify = OrderValidationPolicy.CanModifyOrder(OrderStatus.Pending);
 
         // Assert
-        canModify.Should().BeTrue();
+        Assert.That(canModify, Is.True);
     }
 
     [Test]
@@ -245,7 +245,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canModify = OrderValidationPolicy.CanModifyOrder(OrderStatus.Processing);
 
         // Assert
-        canModify.Should().BeFalse();
+        Assert.That(canModify, Is.False);
     }
 
     [Test]
@@ -255,7 +255,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canModify = OrderValidationPolicy.CanModifyOrder(OrderStatus.Shipped);
 
         // Assert
-        canModify.Should().BeFalse();
+        Assert.That(canModify, Is.False);
     }
 
     [Test]
@@ -268,7 +268,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canRefund = OrderValidationPolicy.CanRefundOrder(OrderStatus.Delivered, deliveredAt);
 
         // Assert
-        canRefund.Should().BeTrue();
+        Assert.That(canRefund, Is.True);
     }
 
     [Test]
@@ -281,7 +281,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canRefund = OrderValidationPolicy.CanRefundOrder(OrderStatus.Delivered, deliveredAt);
 
         // Assert
-        canRefund.Should().BeFalse();
+        Assert.That(canRefund, Is.False);
     }
 
     [Test]
@@ -294,7 +294,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canRefund = OrderValidationPolicy.CanRefundOrder(OrderStatus.Pending, deliveredAt);
 
         // Assert
-        canRefund.Should().BeFalse();
+        Assert.That(canRefund, Is.False);
     }
 
     [Test]
@@ -304,7 +304,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var canRefund = OrderValidationPolicy.CanRefundOrder(OrderStatus.Delivered, null);
 
         // Assert
-        canRefund.Should().BeFalse();
+        Assert.That(canRefund, Is.False);
     }
 
     [Test]
@@ -320,7 +320,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -336,7 +336,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -352,7 +352,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -368,7 +368,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -384,7 +384,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -397,7 +397,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -410,7 +410,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -423,7 +423,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -436,7 +436,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -449,7 +449,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -462,7 +462,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -475,7 +475,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -488,7 +488,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         );
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -498,7 +498,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var requires = OrderValidationPolicy.RequiresShippingAddress(ShippingMethod.Standard);
 
         // Assert
-        requires.Should().BeTrue();
+        Assert.That(requires, Is.True);
     }
 
     [Test]
@@ -508,7 +508,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var requires = OrderValidationPolicy.RequiresShippingAddress(ShippingMethod.Express);
 
         // Assert
-        requires.Should().BeTrue();
+        Assert.That(requires, Is.True);
     }
 
     [Test]
@@ -518,7 +518,7 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var requires = OrderValidationPolicy.RequiresShippingAddress(ShippingMethod.StorePickup);
 
         // Assert
-        requires.Should().BeFalse();
+        Assert.That(requires, Is.False);
     }
 
     [Test]
@@ -528,6 +528,6 @@ public class OrderValidationPolicyTests : BaseTestFixture
         var requires = OrderValidationPolicy.RequiresShippingAddress(ShippingMethod.NotSpecified);
 
         // Assert
-        requires.Should().BeFalse();
+        Assert.That(requires, Is.False);
     }
 }
