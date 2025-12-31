@@ -1,7 +1,11 @@
-using ECommerce.Application.Interfaces;
+using System.Security.Claims;
+using ECommerce.API.Constants;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -40,22 +44,7 @@ public sealed class RefundController : ControllerBase
     /// <summary>
     /// Logger instance for recording controller operations, security events, and errors.
     /// </summary>
-    private readonly ILoggingService _logger;
-
-    /// <summary>
-    /// Maximum number of items allowed per page in paginated results to prevent performance degradation.
-    /// </summary>
-    private const int MaxPageSize = 100;
-
-    /// <summary>
-    /// Default page size when not specified in pagination requests.
-    /// </summary>
-    private const int DefaultPageSize = 10;
-
-    /// <summary>
-    /// Maximum total number of results that can be returned to prevent resource exhaustion.
-    /// </summary>
-    private const int MaxResultLimit = 1000;
+    private readonly LoggingService<RefundController> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RefundController"/> class.
@@ -153,7 +142,7 @@ public sealed class RefundController : ControllerBase
     )
     {
         if (pageNumber < 1 || pageSize < 1 || pageSize > 100)
-            return BadRequest("Invalid pagination parameters");
+            return BadRequest(ErrorMessages.InvalidPaginationParameters);
 
         var refunds = await _context
             .Refunds.Where(r => !r.IsDeleted)
@@ -209,7 +198,7 @@ public sealed class RefundController : ControllerBase
         );
 
         if (refund == null)
-            return NotFound(new { Message = $"Refund with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.RefundNotFoundById(id.ToString()) });
 
         return Ok(refund);
     }
@@ -306,7 +295,7 @@ public sealed class RefundController : ControllerBase
         if (customerId == Guid.Empty)
         {
             _logger.LogWarning("Invalid customer GUID provided");
-            return BadRequest(new { Message = "Invalid customer ID" });
+            return BadRequest(new { Message = ErrorMessages.InvalidCustomerId });
         }
 
         try
@@ -407,13 +396,13 @@ public sealed class RefundController : ControllerBase
     )
     {
         if (refund == null)
-            return BadRequest("Refund data is required");
+            return BadRequest(ErrorMessages.RefundDataRequired);
 
         // Basic validation of refund reason
         if (string.IsNullOrWhiteSpace(refund.Reason))
         {
             _logger.LogWarning("Refund reason is required");
-            return BadRequest(new { Message = "Refund reason is required" });
+            return BadRequest(new { Message = ErrorMessages.RefundReasonRequired });
         }
 
         _logger.LogInformation(
@@ -500,10 +489,10 @@ public sealed class RefundController : ControllerBase
     )
     {
         if (refund == null)
-            return BadRequest("Refund data is required");
+            return BadRequest(ErrorMessages.RefundDataRequired);
 
         if (id != refund.Id)
-            return BadRequest("ID mismatch");
+            return BadRequest(ErrorMessages.IdMismatch);
 
         var existingRefund = await _context.Refunds.FindAsync(
             new object[] { id },
@@ -663,18 +652,18 @@ public sealed class RefundController : ControllerBase
         if (id == Guid.Empty)
         {
             _logger.LogWarning("Invalid refund GUID provided for rejection");
-            return BadRequest(new { Message = "Invalid refund ID" });
+            return BadRequest(new { Message = ErrorMessages.InvalidId });
         }
 
         // Validate rejection reason
         if (string.IsNullOrWhiteSpace(reason))
         {
-            return BadRequest(new { Message = "Rejection reason is required" });
+            return BadRequest(new { Message = ErrorMessages.RejectionReasonRequired });
         }
 
         if (reason.Length > 500)
         {
-            return BadRequest(new { Message = "Rejection reason must not exceed 500 characters" });
+            return BadRequest(new { Message = ErrorMessages.RejectionReasonTooLong });
         }
 
         try
@@ -687,7 +676,7 @@ public sealed class RefundController : ControllerBase
             if (refund == null)
             {
                 _logger.LogWarning("Refund not found for rejection: {RefundId}", id);
-                return NotFound(new { Message = "Refund not found" });
+                return NotFound(new { Message = ErrorMessages.RefundNotFound });
             }
 
             // Validate state transition
@@ -701,7 +690,7 @@ public sealed class RefundController : ControllerBase
                     id,
                     refund.Status
                 );
-                return BadRequest(new { Message = "Cannot reject a refund in this status" });
+                return BadRequest(new { Message = ErrorMessages.CannotRejectRefundInStatus });
             }
 
             refund.Status = Domain.Enums.RefundStatus.Rejected;
