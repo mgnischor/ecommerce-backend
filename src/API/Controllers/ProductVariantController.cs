@@ -1,7 +1,9 @@
-using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -27,7 +29,7 @@ public sealed class ProductVariantController : ControllerBase
     /// <summary>
     /// Logger instance for controller operations
     /// </summary>
-    private readonly ILoggingService _logger;
+    private readonly LoggingService<ProductVariantController> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProductVariantController"/> class
@@ -65,11 +67,19 @@ public sealed class ProductVariantController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Retrieving variants for product: {ProductId}", productId);
+
         var variants = await _context
             .ProductVariants.Where(v => v.ProductId == productId && !v.IsDeleted)
             .OrderBy(v => v.DisplayOrder)
             .ThenBy(v => v.Name)
             .ToListAsync(cancellationToken);
+
+        _logger.LogInformation(
+            "Found {Count} variants for product: {ProductId}",
+            variants.Count,
+            productId
+        );
 
         return Ok(variants);
     }
@@ -96,14 +106,20 @@ public sealed class ProductVariantController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Retrieving product variant: {VariantId}", id);
+
         var variant = await _context.ProductVariants.FirstOrDefaultAsync(
             v => v.Id == id && !v.IsDeleted,
             cancellationToken
         );
 
         if (variant == null)
+        {
+            _logger.LogWarning("Product variant not found: {VariantId}", id);
             return NotFound(new { Message = $"Product variant with ID '{id}' not found" });
+        }
 
+        _logger.LogInformation("Product variant retrieved successfully: {VariantId}", id);
         return Ok(variant);
     }
 
@@ -137,19 +153,24 @@ public sealed class ProductVariantController : ControllerBase
         // Input validation
         if (string.IsNullOrWhiteSpace(sku))
         {
+            _logger.LogWarning("SKU lookup attempted with null or empty SKU");
             return BadRequest(new { Message = "SKU is required" });
         }
 
         if (sku.Length > 50)
         {
+            _logger.LogWarning("SKU lookup attempted with SKU exceeding 50 characters");
             return BadRequest(new { Message = "SKU must not exceed 50 characters" });
         }
 
         // Validate SKU format (alphanumeric, hyphens, underscores)
         if (!System.Text.RegularExpressions.Regex.IsMatch(sku, @"^[a-zA-Z0-9\-_]+$"))
         {
+            _logger.LogWarning("SKU lookup attempted with invalid format");
             return BadRequest(new { Message = "Invalid SKU format" });
         }
+
+        _logger.LogInformation("Looking up product variant by SKU");
 
         try
         {
@@ -159,14 +180,17 @@ public sealed class ProductVariantController : ControllerBase
 
             if (variant == null)
             {
+                _logger.LogWarning("Product variant not found for SKU lookup");
                 return NotFound(new { Message = "Product variant not found" });
             }
 
+            _logger.LogInformation("Product variant retrieved successfully by SKU");
             return Ok(variant);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             // Don't log the SKU to avoid exposing potential attack vectors in logs
+            _logger.LogError(ex, "Error occurred while retrieving product variant by SKU");
             return StatusCode(
                 500,
                 new { Message = "An error occurred while processing your request" }
@@ -210,7 +234,15 @@ public sealed class ProductVariantController : ControllerBase
     )
     {
         if (variant == null)
+        {
+            _logger.LogWarning("Create variant attempted with null data");
             return BadRequest("Variant data is required");
+        }
+
+        _logger.LogInformation(
+            "Creating new product variant for product: {ProductId}",
+            variant.ProductId
+        );
 
         variant.Id = Guid.NewGuid();
         variant.CreatedAt = DateTime.UtcNow;
@@ -218,6 +250,12 @@ public sealed class ProductVariantController : ControllerBase
 
         _context.ProductVariants.Add(variant);
         await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation(
+            "Product variant created successfully: {VariantId}, Product: {ProductId}",
+            variant.Id,
+            variant.ProductId
+        );
 
         return CreatedAtAction(nameof(GetVariantById), new { id = variant.Id }, variant);
     }
@@ -263,20 +301,37 @@ public sealed class ProductVariantController : ControllerBase
     )
     {
         if (variant == null)
+        {
+            _logger.LogWarning("Update variant attempted with null data for ID: {VariantId}", id);
             return BadRequest("Variant data is required");
+        }
 
         if (id != variant.Id)
+        {
+            _logger.LogWarning(
+                "Update variant ID mismatch. Route: {RouteId}, Body: {BodyId}",
+                id,
+                variant.Id
+            );
             return BadRequest("ID mismatch");
+        }
+
+        _logger.LogInformation("Updating product variant: {VariantId}", id);
 
         var existingVariant = await _context.ProductVariants.FindAsync([id], cancellationToken);
 
         if (existingVariant == null || existingVariant.IsDeleted)
+        {
+            _logger.LogWarning("Product variant not found for update: {VariantId}", id);
             return NotFound(new { Message = $"Product variant with ID '{id}' not found" });
+        }
 
         variant.UpdatedAt = DateTime.UtcNow;
         _context.Entry(existingVariant).CurrentValues.SetValues(variant);
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Product variant updated successfully: {VariantId}", id);
 
         return NoContent();
     }
@@ -309,15 +364,26 @@ public sealed class ProductVariantController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Deleting product variant: {VariantId}", id);
+
         var variant = await _context.ProductVariants.FindAsync([id], cancellationToken);
 
         if (variant == null || variant.IsDeleted)
+        {
+            _logger.LogWarning("Product variant not found for deletion: {VariantId}", id);
             return NotFound(new { Message = $"Product variant with ID '{id}' not found" });
+        }
 
         variant.IsDeleted = true;
         variant.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation(
+            "Product variant deleted successfully: {VariantId}, Product: {ProductId}",
+            id,
+            variant.ProductId
+        );
 
         return NoContent();
     }
