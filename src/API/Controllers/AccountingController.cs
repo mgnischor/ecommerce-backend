@@ -29,17 +29,33 @@ namespace ECommerce.API.Controllers;
 /// <strong>Security:</strong> All endpoints require authenticated users. Administrative operations may require elevated privileges.
 /// </para>
 /// </remarks>
+/// <remarks>
+/// Initializes a new instance of the <see cref="AccountingController"/> class
+/// </remarks>
+/// <param name="accountingQueryService">Service for accounting query operations. Cannot be null.</param>
+/// <param name="logger">Logger instance for recording controller activity. Cannot be null.</param>
+/// <exception cref="ArgumentNullException">
+/// Thrown when any of the required dependencies are null.
+/// </exception>
+/// <remarks>
+/// This constructor uses dependency injection to provide all required services.
+/// All parameters are validated for null values to ensure the controller operates correctly.
+/// </remarks>
 [Tags("Accounting")]
 [ApiController]
 [Route("api/v1/accounting")]
 [Produces("application/json")]
 [Authorize]
-public sealed class AccountingController : ControllerBase
+public sealed class AccountingController(
+    IAccountingQueryService accountingQueryService,
+    ILoggingService logger
+) : ControllerBase
 {
     /// <summary>
     /// Read-only accounting query service used by this controller.
     /// </summary>
-    private readonly IAccountingQueryService _accountingQueryService;
+    private readonly IAccountingQueryService _accountingQueryService =
+        accountingQueryService ?? throw new ArgumentNullException(nameof(accountingQueryService));
 
     /// <summary>
     /// Logger instance for tracking controller operations and errors
@@ -47,30 +63,10 @@ public sealed class AccountingController : ControllerBase
     /// <remarks>
     /// Used to log information, warnings, and errors throughout the accounting controller lifecycle.
     /// </remarks>
-    private readonly LoggingService<AccountingController> _logger;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AccountingController"/> class
-    /// </summary>
-    /// <param name="accountingQueryService">Service for accounting query operations. Cannot be null.</param>
-    /// <param name="logger">Logger instance for recording controller activity. Cannot be null.</param>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown when any of the required dependencies are null.
-    /// </exception>
-    /// <remarks>
-    /// This constructor uses dependency injection to provide all required services.
-    /// All parameters are validated for null values to ensure the controller operates correctly.
-    /// </remarks>
-    public AccountingController(
-        IAccountingQueryService accountingQueryService,
-        ILoggingService logger
-    )
-    {
-        _accountingQueryService =
-            accountingQueryService
-            ?? throw new ArgumentNullException(nameof(accountingQueryService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly LoggingService<AccountingController> _logger =
+        (LoggingService<AccountingController>)(
+            logger ?? throw new ArgumentNullException(nameof(logger))
+        );
 
     /// <summary>
     /// Retrieves the complete chart of accounts
