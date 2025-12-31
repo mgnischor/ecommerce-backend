@@ -1,7 +1,12 @@
+using System.Security.Claims;
+using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -132,18 +137,6 @@ public sealed class NotificationController : ControllerBase
     private bool IsAdmin() => User.IsInRole("Admin");
 
     /// <summary>
-    /// Checks if the current authenticated user has the Manager role
-    /// </summary>
-    /// <returns>
-    /// True if the user has the Manager role; otherwise, false.
-    /// </returns>
-    /// <remarks>
-    /// Managers have the ability to create notifications for users and perform
-    /// certain administrative tasks related to notification management.
-    /// </remarks>
-    private bool IsManager() => User.IsInRole("Manager");
-
-    /// <summary>
     /// Retrieves notifications for a specific user with optional filtering
     /// </summary>
     /// <remarks>
@@ -267,7 +260,7 @@ public sealed class NotificationController : ControllerBase
                 _logger.LogWarning(
                     "Unauthorized access attempt to user notifications: {UserId}, User: {CurrentUserId}",
                     userId,
-                    currentUserId ?? "Unknown"
+                    currentUserId ?? ErrorMessages.Unknown
                 );
                 return Forbid();
             }
