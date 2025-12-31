@@ -15,14 +15,17 @@ public class ProductEntityTests : BaseTestFixture
         var product = new ProductEntity();
 
         // Assert
-        product.Category.Should().Be(ProductCategory.General);
-        product.Status.Should().Be(ProductStatus.Active);
-        product.IsActive.Should().BeTrue();
-        product.IsDeleted.Should().BeFalse();
-        product.IsFeatured.Should().BeFalse();
-        product.IsOnSale.Should().BeFalse();
-        product.Tags.Should().NotBeNull();
-        product.Images.Should().NotBeNull();
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(product.Category, Is.EqualTo(ProductCategory.General));
+            Assert.That(product.Status, Is.EqualTo(ProductStatus.Active));
+            Assert.That(product.IsActive, Is.True);
+            Assert.That(product.IsDeleted, Is.False);
+            Assert.That(product.IsFeatured, Is.False);
+            Assert.That(product.IsOnSale, Is.False);
+            Assert.That(product.Tags, Is.Not.Null);
+            Assert.That(product.Images, Is.Not.Null);
+        }
     }
 
     [Test]
@@ -36,7 +39,7 @@ public class ProductEntityTests : BaseTestFixture
         product.Price = expectedPrice;
 
         // Assert
-        product.Price.Should().Be(expectedPrice);
+        Assert.That(product.Price, Is.EqualTo(expectedPrice));
     }
 
     [Test]
@@ -50,7 +53,7 @@ public class ProductEntityTests : BaseTestFixture
         product.DiscountPrice = discountPrice;
 
         // Assert
-        product.DiscountPrice.Should().Be(discountPrice);
+        Assert.That(product.DiscountPrice, Is.EqualTo(discountPrice));
     }
 
     [Test]
@@ -64,7 +67,7 @@ public class ProductEntityTests : BaseTestFixture
         product.StockQuantity = stockQuantity;
 
         // Assert
-        product.StockQuantity.Should().Be(stockQuantity);
+        Assert.That(product.StockQuantity, Is.EqualTo(stockQuantity));
     }
 
     [Test]
@@ -77,7 +80,7 @@ public class ProductEntityTests : BaseTestFixture
         product.Category = ProductCategory.Electronics;
 
         // Assert
-        product.Category.Should().Be(ProductCategory.Electronics);
+        Assert.That(product.Category, Is.EqualTo(ProductCategory.Electronics));
     }
 
     [Test]
@@ -90,7 +93,7 @@ public class ProductEntityTests : BaseTestFixture
         product.Status = ProductStatus.Discontinued;
 
         // Assert
-        product.Status.Should().Be(ProductStatus.Discontinued);
+        Assert.That(product.Status, Is.EqualTo(ProductStatus.Discontinued));
     }
 
     [Test]
@@ -103,7 +106,7 @@ public class ProductEntityTests : BaseTestFixture
         product.IsFeatured = true;
 
         // Assert
-        product.IsFeatured.Should().BeTrue();
+        Assert.That(product.IsFeatured, Is.True);
     }
 
     [Test]
@@ -116,7 +119,7 @@ public class ProductEntityTests : BaseTestFixture
         product.IsOnSale = true;
 
         // Assert
-        product.IsOnSale.Should().BeTrue();
+        Assert.That(product.IsOnSale, Is.True);
     }
 
     [Test]
@@ -130,8 +133,12 @@ public class ProductEntityTests : BaseTestFixture
         product.Tags.Add("featured");
 
         // Assert
-        product.Tags.Should().HaveCount(2);
-        product.Tags.Should().Contain(new[] { "new", "featured" });
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(product.Tags, Has.Count.EqualTo(2));
+            Assert.That(product.Tags, Does.Contain("new"));
+            Assert.That(product.Tags, Does.Contain("featured"));
+        }
     }
 
     [Test]
@@ -144,7 +151,7 @@ public class ProductEntityTests : BaseTestFixture
         product.IsDeleted = true;
 
         // Assert
-        product.IsDeleted.Should().BeTrue();
+        Assert.That(product.IsDeleted, Is.True);
     }
 
     [Test]
@@ -158,7 +165,16 @@ public class ProductEntityTests : BaseTestFixture
         };
 
         // Assert
-        product.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        product.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(
+                product.CreatedAt,
+                Is.EqualTo(DateTime.UtcNow).Within(TimeSpan.FromSeconds(1))
+            );
+            Assert.That(
+                product.UpdatedAt,
+                Is.EqualTo(DateTime.UtcNow).Within(TimeSpan.FromSeconds(1))
+            );
+        }
     }
 }
