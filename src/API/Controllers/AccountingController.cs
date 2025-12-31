@@ -1,6 +1,9 @@
 using ECommerce.API.DTOs;
 using ECommerce.API.Services;
 using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
 
@@ -44,7 +47,7 @@ public sealed class AccountingController : ControllerBase
     /// <remarks>
     /// Used to log information, warnings, and errors throughout the accounting controller lifecycle.
     /// </remarks>
-    private readonly ILoggingService _logger;
+    private readonly LoggingService<AccountingController> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AccountingController"/> class
