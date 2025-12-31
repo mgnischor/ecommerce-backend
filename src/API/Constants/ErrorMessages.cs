@@ -26,6 +26,16 @@ public static class ErrorMessages
     /// </summary>
     public const string InvalidId = "Invalid ID";
 
+    /// <summary>
+    /// Generic message for processing errors
+    /// </summary>
+    public const string ProcessingRequestError = "An error occurred while processing your request";
+
+    /// <summary>
+    /// Generic message for unknown errors
+    /// </summary>
+    public const string Unknown = "Unknown";
+
     #endregion
 
     #region Pagination
