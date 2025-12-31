@@ -1,6 +1,10 @@
+using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -60,7 +64,7 @@ public sealed class VendorController : ControllerBase
     )
     {
         if (pageNumber < 1 || pageSize < 1 || pageSize > 100)
-            return BadRequest("Invalid pagination parameters");
+            return BadRequest(ErrorMessages.InvalidPaginationParameters);
 
         var vendors = await _context
             .Vendors.Where(v => !v.IsDeleted)
@@ -110,7 +114,7 @@ public sealed class VendorController : ControllerBase
         );
 
         if (vendor == null)
-            return NotFound(new { Message = $"Vendor with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.VendorNotFoundById(id.ToString()) });
 
         return Ok(vendor);
     }
@@ -183,17 +187,17 @@ public sealed class VendorController : ControllerBase
         // Input validation
         if (string.IsNullOrWhiteSpace(searchTerm))
         {
-            return BadRequest(new { Message = "Search term is required" });
+            return BadRequest(new { Message = ErrorMessages.SearchTermRequired });
         }
 
         if (searchTerm.Length < 2)
         {
-            return BadRequest(new { Message = "Search term must be at least 2 characters" });
+            return BadRequest(new { Message = ErrorMessages.SearchTermTooShort });
         }
 
         if (searchTerm.Length > 100)
         {
-            return BadRequest(new { Message = "Search term must not exceed 100 characters" });
+            return BadRequest(new { Message = ErrorMessages.SearchTermTooLong });
         }
 
         try
@@ -277,7 +281,7 @@ public sealed class VendorController : ControllerBase
     )
     {
         if (vendor == null)
-            return BadRequest(new { Message = "Vendor data is required" });
+            return BadRequest(new { Message = ErrorMessages.VendorDataRequired });
 
         // Set system-managed fields
         vendor.Id = Guid.NewGuid();
