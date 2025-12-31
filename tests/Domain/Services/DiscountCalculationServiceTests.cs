@@ -16,7 +16,7 @@ public class DiscountCalculationServiceTests : BaseTestFixture
         var finalPrice = DiscountCalculationService.CalculateProductFinalPrice(product);
 
         // Assert
-        finalPrice.Should().Be(100m);
+        Assert.That(finalPrice, Is.EqualTo(100m));
     }
 
     [Test]
@@ -29,7 +29,7 @@ public class DiscountCalculationServiceTests : BaseTestFixture
         var finalPrice = DiscountCalculationService.CalculateProductFinalPrice(product);
 
         // Assert
-        finalPrice.Should().Be(80m);
+        Assert.That(finalPrice, Is.EqualTo(80m));
     }
 
     [Test]
@@ -43,7 +43,7 @@ public class DiscountCalculationServiceTests : BaseTestFixture
         var savings = DiscountCalculationService.CalculateSavings(originalPrice, finalPrice);
 
         // Assert
-        savings.Should().Be(25m);
+        Assert.That(savings, Is.EqualTo(25m));
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class DiscountCalculationServiceTests : BaseTestFixture
         var savings = DiscountCalculationService.CalculateSavings(originalPrice, finalPrice);
 
         // Assert
-        savings.Should().Be(0m);
+        Assert.That(savings, Is.EqualTo(0m));
     }
 
     [Test]
@@ -74,8 +74,11 @@ public class DiscountCalculationServiceTests : BaseTestFixture
         var (subtotal, discount) = DiscountCalculationService.CalculateCartTotal(cartItems);
 
         // Assert
-        subtotal.Should().Be(310m); // (80 * 2) + (50 * 3) = 160 + 150 = 310
-        discount.Should().Be(40m); // (100 - 80) * 2 = 40
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(subtotal, Is.EqualTo(310m)); // (80 * 2) + (50 * 3) = 160 + 150 = 310
+            Assert.That(discount, Is.EqualTo(40m)); // (100 - 80) * 2 = 40
+        }
     }
 
     [Test]
@@ -88,8 +91,11 @@ public class DiscountCalculationServiceTests : BaseTestFixture
         var (subtotal, discount) = DiscountCalculationService.CalculateCartTotal(cartItems);
 
         // Assert
-        subtotal.Should().Be(0m);
-        discount.Should().Be(0m);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(subtotal, Is.EqualTo(0m));
+            Assert.That(discount, Is.EqualTo(0m));
+        }
     }
 
     [Test]
@@ -103,7 +109,7 @@ public class DiscountCalculationServiceTests : BaseTestFixture
         var discount = DiscountCalculationService.CalculateBulkDiscount(unitPrice, quantity);
 
         // Assert
-        discount.Should().BeGreaterThan(0m);
+        Assert.That(discount, Is.GreaterThan(0m));
     }
 
     [Test]
@@ -117,7 +123,7 @@ public class DiscountCalculationServiceTests : BaseTestFixture
         var discount = DiscountCalculationService.CalculateBulkDiscount(unitPrice, quantity);
 
         // Assert
-        discount.Should().BeGreaterThan(0m);
+        Assert.That(discount, Is.GreaterThan(0m));
     }
 
     [Test]
@@ -131,7 +137,7 @@ public class DiscountCalculationServiceTests : BaseTestFixture
         var discount = DiscountCalculationService.CalculateBulkDiscount(unitPrice, quantity);
 
         // Assert
-        discount.Should().BeGreaterThan(0m);
+        Assert.That(discount, Is.GreaterThan(0m));
     }
 
     [Test]
@@ -145,6 +151,6 @@ public class DiscountCalculationServiceTests : BaseTestFixture
         var discount = DiscountCalculationService.CalculateBulkDiscount(unitPrice, quantity);
 
         // Assert
-        discount.Should().Be(0m);
+        Assert.That(discount, Is.EqualTo(0m));
     }
 }
