@@ -15,7 +15,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isOutOfStock = StockManagementPolicy.IsOutOfStock(0);
 
         // Assert
-        isOutOfStock.Should().BeTrue();
+        Assert.That(isOutOfStock, Is.True);
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isOutOfStock = StockManagementPolicy.IsOutOfStock(-5);
 
         // Assert
-        isOutOfStock.Should().BeTrue();
+        Assert.That(isOutOfStock, Is.True);
     }
 
     [Test]
@@ -35,7 +35,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isOutOfStock = StockManagementPolicy.IsOutOfStock(10);
 
         // Assert
-        isOutOfStock.Should().BeFalse();
+        Assert.That(isOutOfStock, Is.False);
     }
 
     [Test]
@@ -45,7 +45,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isLowStock = StockManagementPolicy.IsLowStock(5, 10);
 
         // Assert
-        isLowStock.Should().BeTrue();
+        Assert.That(isLowStock, Is.True);
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isLowStock = StockManagementPolicy.IsLowStock(10, 10);
 
         // Assert
-        isLowStock.Should().BeTrue();
+        Assert.That(isLowStock, Is.True);
     }
 
     [Test]
@@ -65,7 +65,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isLowStock = StockManagementPolicy.IsLowStock(15, 10);
 
         // Assert
-        isLowStock.Should().BeFalse();
+        Assert.That(isLowStock, Is.False);
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isLowStock = StockManagementPolicy.IsLowStock(0, 10);
 
         // Assert
-        isLowStock.Should().BeFalse();
+        Assert.That(isLowStock, Is.False);
     }
 
     [Test]
@@ -85,7 +85,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isLowStock = StockManagementPolicy.IsLowStock(5, 0);
 
         // Assert
-        isLowStock.Should().BeTrue();
+        Assert.That(isLowStock, Is.True);
     }
 
     [Test]
@@ -95,7 +95,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var canReserve = StockManagementPolicy.CanReserveStock(10, 5);
 
         // Assert
-        canReserve.Should().BeTrue();
+        Assert.That(canReserve, Is.True);
     }
 
     [Test]
@@ -105,7 +105,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var canReserve = StockManagementPolicy.CanReserveStock(10, 10);
 
         // Assert
-        canReserve.Should().BeTrue();
+        Assert.That(canReserve, Is.True);
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var canReserve = StockManagementPolicy.CanReserveStock(5, 10);
 
         // Assert
-        canReserve.Should().BeFalse();
+        Assert.That(canReserve, Is.False);
     }
 
     [Test]
@@ -125,7 +125,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var canReserve = StockManagementPolicy.CanReserveStock(10, 0);
 
         // Assert
-        canReserve.Should().BeFalse();
+        Assert.That(canReserve, Is.False);
     }
 
     [Test]
@@ -135,85 +135,67 @@ public class StockManagementPolicyTests : BaseTestFixture
         var canReserve = StockManagementPolicy.CanReserveStock(10, -5);
 
         // Assert
-        canReserve.Should().BeFalse();
+        Assert.That(canReserve, Is.False);
     }
 
     [Test]
     public void IsQuantityWithinOrderLimits_BelowLimit_ReturnsTrue()
     {
         // Act
-        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(
-            5,
-            10
-        );
+        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(5, 10);
 
         // Assert
-        isWithinLimit.Should().BeTrue();
+        Assert.That(isWithinLimit, Is.True);
     }
 
     [Test]
     public void IsQuantityWithinOrderLimits_AtLimit_ReturnsTrue()
     {
         // Act
-        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(
-            10,
-            10
-        );
+        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(10, 10);
 
         // Assert
-        isWithinLimit.Should().BeTrue();
+        Assert.That(isWithinLimit, Is.True);
     }
 
     [Test]
     public void IsQuantityWithinOrderLimits_ExceedsLimit_ReturnsFalse()
     {
         // Act
-        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(
-            15,
-            10
-        );
+        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(15, 10);
 
         // Assert
-        isWithinLimit.Should().BeFalse();
+        Assert.That(isWithinLimit, Is.False);
     }
 
     [Test]
     public void IsQuantityWithinOrderLimits_WithNoLimit_ReturnsTrue()
     {
         // Act
-        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(
-            100,
-            0
-        );
+        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(100, 0);
 
         // Assert
-        isWithinLimit.Should().BeTrue();
+        Assert.That(isWithinLimit, Is.True);
     }
 
     [Test]
     public void IsQuantityWithinOrderLimits_WithZeroQuantity_ReturnsFalse()
     {
         // Act
-        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(
-            0,
-            10
-        );
+        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(0, 10);
 
         // Assert
-        isWithinLimit.Should().BeFalse();
+        Assert.That(isWithinLimit, Is.False);
     }
 
     [Test]
     public void IsQuantityWithinOrderLimits_WithNegativeQuantity_ReturnsFalse()
     {
         // Act
-        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(
-            -5,
-            10
-        );
+        var isWithinLimit = StockManagementPolicy.IsQuantityWithinOrderLimits(-5, 10);
 
         // Assert
-        isWithinLimit.Should().BeFalse();
+        Assert.That(isWithinLimit, Is.False);
     }
 
     [Test]
@@ -233,7 +215,7 @@ public class StockManagementPolicyTests : BaseTestFixture
 
         // Assert
         // (5 * 30) + 20 - 10 = 150 + 20 - 10 = 160
-        reorderQuantity.Should().Be(160);
+        Assert.That(reorderQuantity, Is.EqualTo(160));
     }
 
     [Test]
@@ -252,7 +234,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         );
 
         // Assert
-        reorderQuantity.Should().Be(50); // Default reorder quantity
+        Assert.That(reorderQuantity, Is.EqualTo(50)); // Default reorder quantity
     }
 
     [Test]
@@ -271,7 +253,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         );
 
         // Assert
-        reorderQuantity.Should().Be(50); // Default reorder quantity
+        Assert.That(reorderQuantity, Is.EqualTo(50)); // Default reorder quantity
     }
 
     [Test]
@@ -290,7 +272,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         );
 
         // Assert
-        reorderQuantity.Should().BeGreaterThanOrEqualTo(50); // At least default quantity
+        Assert.That(reorderQuantity, Is.GreaterThanOrEqualTo(50)); // At least default quantity
     }
 
     [Test]
@@ -300,7 +282,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isValid = StockManagementPolicy.IsValidStockAdjustment(10, 5);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -310,7 +292,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isValid = StockManagementPolicy.IsValidStockAdjustment(10, -5);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -320,7 +302,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isValid = StockManagementPolicy.IsValidStockAdjustment(10, -10);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -330,7 +312,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isValid = StockManagementPolicy.IsValidStockAdjustment(10, -15);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -340,7 +322,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var isValid = StockManagementPolicy.IsValidStockAdjustment(10, 0);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -350,7 +332,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var shouldReorder = StockManagementPolicy.ShouldTriggerReorder(5, 10, 8);
 
         // Assert
-        shouldReorder.Should().BeTrue();
+        Assert.That(shouldReorder, Is.True);
     }
 
     [Test]
@@ -360,7 +342,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var shouldReorder = StockManagementPolicy.ShouldTriggerReorder(8, 10, 8);
 
         // Assert
-        shouldReorder.Should().BeTrue();
+        Assert.That(shouldReorder, Is.True);
     }
 
     [Test]
@@ -370,7 +352,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var shouldReorder = StockManagementPolicy.ShouldTriggerReorder(10, 10, 8);
 
         // Assert
-        shouldReorder.Should().BeFalse();
+        Assert.That(shouldReorder, Is.False);
     }
 
     [Test]
@@ -380,7 +362,7 @@ public class StockManagementPolicyTests : BaseTestFixture
         var shouldReorder = StockManagementPolicy.ShouldTriggerReorder(5, 10, 0);
 
         // Assert
-        shouldReorder.Should().BeTrue();
+        Assert.That(shouldReorder, Is.True);
     }
 
     [Test]
@@ -390,7 +372,6 @@ public class StockManagementPolicyTests : BaseTestFixture
         var shouldReorder = StockManagementPolicy.ShouldTriggerReorder(15, 10, 0);
 
         // Assert
-        shouldReorder.Should().BeFalse();
+        Assert.That(shouldReorder, Is.False);
     }
 }
-
