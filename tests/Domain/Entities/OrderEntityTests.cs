@@ -15,10 +15,13 @@ public class OrderEntityTests : BaseTestFixture
         var order = new OrderEntity();
 
         // Assert
-        order.Status.Should().Be(OrderStatus.Pending);
-        order.PaymentMethod.Should().Be(PaymentMethod.NotSpecified);
-        order.ShippingMethod.Should().Be(ShippingMethod.NotSpecified);
-        order.IsDeleted.Should().BeFalse();
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(order.Status, Is.EqualTo(OrderStatus.Pending));
+            Assert.That(order.PaymentMethod, Is.EqualTo(PaymentMethod.NotSpecified));
+            Assert.That(order.ShippingMethod, Is.EqualTo(ShippingMethod.NotSpecified));
+            Assert.That(order.IsDeleted, Is.False);
+        }
     }
 
     [Test]
@@ -32,7 +35,7 @@ public class OrderEntityTests : BaseTestFixture
         order.CustomerId = customerId;
 
         // Assert
-        order.CustomerId.Should().Be(customerId);
+        Assert.That(order.CustomerId, Is.EqualTo(customerId));
     }
 
     [Test]
@@ -46,7 +49,7 @@ public class OrderEntityTests : BaseTestFixture
         order.OrderNumber = orderNumber;
 
         // Assert
-        order.OrderNumber.Should().Be(orderNumber);
+        Assert.That(order.OrderNumber, Is.EqualTo(orderNumber));
     }
 
     [Test]
@@ -66,7 +69,7 @@ public class OrderEntityTests : BaseTestFixture
             order.SubTotal + order.TaxAmount + order.ShippingCost - order.DiscountAmount;
 
         // Assert
-        order.TotalAmount.Should().Be(100m);
+        Assert.That(order.TotalAmount, Is.EqualTo(100m));
     }
 
     [Test]
@@ -79,7 +82,7 @@ public class OrderEntityTests : BaseTestFixture
         order.Status = OrderStatus.Shipped;
 
         // Assert
-        order.Status.Should().Be(OrderStatus.Shipped);
+        Assert.That(order.Status, Is.EqualTo(OrderStatus.Shipped));
     }
 
     [Test]
@@ -92,7 +95,7 @@ public class OrderEntityTests : BaseTestFixture
         order.PaymentMethod = PaymentMethod.CreditCard;
 
         // Assert
-        order.PaymentMethod.Should().Be(PaymentMethod.CreditCard);
+        Assert.That(order.PaymentMethod, Is.EqualTo(PaymentMethod.CreditCard));
     }
 
     [Test]
@@ -105,7 +108,7 @@ public class OrderEntityTests : BaseTestFixture
         order.ShippingMethod = ShippingMethod.Express;
 
         // Assert
-        order.ShippingMethod.Should().Be(ShippingMethod.Express);
+        Assert.That(order.ShippingMethod, Is.EqualTo(ShippingMethod.Express));
     }
 
     [Test]
@@ -119,7 +122,7 @@ public class OrderEntityTests : BaseTestFixture
         order.CouponCode = couponCode;
 
         // Assert
-        order.CouponCode.Should().Be(couponCode);
+        Assert.That(order.CouponCode, Is.EqualTo(couponCode));
     }
 
     [Test]
@@ -133,7 +136,7 @@ public class OrderEntityTests : BaseTestFixture
         order.TrackingNumber = trackingNumber;
 
         // Assert
-        order.TrackingNumber.Should().Be(trackingNumber);
+        Assert.That(order.TrackingNumber, Is.EqualTo(trackingNumber));
     }
 
     [Test]
@@ -147,7 +150,7 @@ public class OrderEntityTests : BaseTestFixture
         order.ExpectedDeliveryDate = deliveryDate;
 
         // Assert
-        order.ExpectedDeliveryDate.Should().Be(deliveryDate);
+        Assert.That(order.ExpectedDeliveryDate, Is.EqualTo(deliveryDate));
     }
 
     [Test]
@@ -163,9 +166,12 @@ public class OrderEntityTests : BaseTestFixture
         order.CancellationReason = cancellationReason;
 
         // Assert
-        order.Status.Should().Be(OrderStatus.Cancelled);
-        order.CancelledAt.Should().NotBeNull();
-        order.CancellationReason.Should().Be(cancellationReason);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(order.Status, Is.EqualTo(OrderStatus.Cancelled));
+            Assert.That(order.CancelledAt, Is.Not.Null);
+            Assert.That(order.CancellationReason, Is.EqualTo(cancellationReason));
+        }
     }
 
     [Test]
@@ -175,7 +181,16 @@ public class OrderEntityTests : BaseTestFixture
         var order = new OrderEntity();
 
         // Assert
-        order.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        order.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(
+                order.CreatedAt,
+                Is.EqualTo(DateTime.UtcNow).Within(TimeSpan.FromSeconds(1))
+            );
+            Assert.That(
+                order.UpdatedAt,
+                Is.EqualTo(DateTime.UtcNow).Within(TimeSpan.FromSeconds(1))
+            );
+        }
     }
 }
