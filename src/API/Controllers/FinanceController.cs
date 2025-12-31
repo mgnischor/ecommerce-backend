@@ -1,7 +1,11 @@
+using System.Security.Claims;
+using ECommerce.API.Constants;
 using ECommerce.API.DTOs;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
 
@@ -59,6 +63,11 @@ namespace ECommerce.API.Controllers;
 [Authorize]
 public sealed class FinanceController : ControllerBase
 {
+    private const string V = "Current_0_30";
+    private const string V1 = "Aging_31_60";
+    private const string V2 = "Aging_61_90";
+    private const string V3 = "Aging_Over90";
+    private const string V4 = "Count";
     private readonly IFinancialService _financialService;
     private readonly IFinancialTransactionRepository _financialTransactionRepository;
     private readonly ILoggingService _logger;
@@ -162,7 +171,7 @@ public sealed class FinanceController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving financial transactions");
-            return StatusCode(500, new { Message = "An error occurred processing your request" });
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -294,7 +303,7 @@ public sealed class FinanceController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving period transactions");
-            return StatusCode(500, new { Message = "An error occurred processing your request" });
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -354,7 +363,7 @@ public sealed class FinanceController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving unreconciled transactions");
-            return StatusCode(500, new { Message = "An error occurred processing your request" });
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -422,7 +431,7 @@ public sealed class FinanceController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving order transactions: {OrderId}", orderId);
-            return StatusCode(500, new { Message = "An error occurred processing your request" });
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -513,7 +522,7 @@ public sealed class FinanceController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating cash flow report");
-            return StatusCode(500, new { Message = "An error occurred processing your request" });
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -564,11 +573,11 @@ public sealed class FinanceController : ControllerBase
             var arDto = new AccountsReceivableDto
             {
                 TotalReceivable = summary["TotalReceivable"],
-                Current_0_30 = summary["Current_0_30"],
-                Aging_31_60 = summary["Aging_31_60"],
-                Aging_61_90 = summary["Aging_61_90"],
-                Aging_Over90 = summary["Aging_Over90"],
-                Count = (int)summary["Count"],
+                Current_0_30 = summary[V],
+                Aging_31_60 = summary[V1],
+                Aging_61_90 = summary[V2],
+                Aging_Over90 = summary[V3],
+                Count = (int)summary[V4],
             };
 
             _logger.LogInformation(
@@ -582,7 +591,7 @@ public sealed class FinanceController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving accounts receivable summary");
-            return StatusCode(500, new { Message = "An error occurred processing your request" });
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
