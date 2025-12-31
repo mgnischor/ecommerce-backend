@@ -1,7 +1,10 @@
+using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
 
@@ -78,13 +81,13 @@ public sealed class UserController : ControllerBase
         if (pageNumber < 1)
         {
             _logger.LogWarning("Invalid page number: {PageNumber}", pageNumber);
-            return BadRequest("Page number must be greater than 0");
+            return BadRequest(ErrorMessages.InvalidPageNumber);
         }
 
         if (pageSize < 1 || pageSize > 100)
         {
             _logger.LogWarning("Invalid page size: {PageSize}", pageSize);
-            return BadRequest("Page size must be between 1 and 100");
+            return BadRequest(string.Format(ErrorMessages.InvalidPageSize, 100));
         }
 
         var users = await _userRepository.GetPagedAsync(pageNumber, pageSize, cancellationToken);
@@ -140,7 +143,7 @@ public sealed class UserController : ControllerBase
         if (user == null)
         {
             _logger.LogWarning("User not found with ID: {UserId}", id);
-            return NotFound(new { Message = $"User with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.UserNotFoundById(id.ToString()) });
         }
 
         _logger.LogInformation("Successfully retrieved user: {UserId}", id);
@@ -196,7 +199,7 @@ public sealed class UserController : ControllerBase
         if (newUser == null)
         {
             _logger.LogWarning("Attempt to create user with null data");
-            return BadRequest("User data is required");
+            return BadRequest(ErrorMessages.UserDataRequired);
         }
 
         if (await _userRepository.ExistsByEmailAsync(newUser.Email, cancellationToken))
@@ -205,7 +208,7 @@ public sealed class UserController : ControllerBase
                 "Attempt to create user with duplicate email: {Email}",
                 newUser.Email
             );
-            return Conflict(new { Message = $"User with email '{newUser.Email}' already exists" });
+            return Conflict(new { Message = ErrorMessages.UserEmailAlreadyExists(newUser.Email) });
         }
 
         if (await _userRepository.ExistsByUsernameAsync(newUser.Username, cancellationToken))
@@ -215,7 +218,7 @@ public sealed class UserController : ControllerBase
                 newUser.Username
             );
             return Conflict(
-                new { Message = $"User with username '{newUser.Username}' already exists" }
+                new { Message = ErrorMessages.AlreadyExists("User", "username", newUser.Username) }
             );
         }
 
@@ -284,7 +287,7 @@ public sealed class UserController : ControllerBase
         if (updatedUser == null)
         {
             _logger.LogWarning("Attempt to update user with null data for ID: {UserId}", id);
-            return BadRequest("User data is required");
+            return BadRequest(ErrorMessages.UserDataRequired);
         }
 
         if (id != updatedUser.Id)
@@ -294,14 +297,14 @@ public sealed class UserController : ControllerBase
                 id,
                 updatedUser.Id
             );
-            return BadRequest("ID mismatch");
+            return BadRequest(ErrorMessages.IdMismatch);
         }
 
         var existingUser = await _userRepository.GetByIdAsync(id, cancellationToken);
         if (existingUser == null)
         {
             _logger.LogWarning("Attempt to update non-existent user: {UserId}", id);
-            return NotFound(new { Message = $"User with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.UserNotFoundById(id.ToString()) });
         }
 
         var emailExists = await _userRepository.ExistsByEmailAsync(
@@ -316,7 +319,7 @@ public sealed class UserController : ControllerBase
                 updatedUser.Email
             );
             return Conflict(
-                new { Message = $"User with email '{updatedUser.Email}' already exists" }
+                new { Message = ErrorMessages.UserEmailAlreadyExists(updatedUser.Email) }
             );
         }
 
@@ -366,7 +369,7 @@ public sealed class UserController : ControllerBase
         if (!deleted)
         {
             _logger.LogWarning("Attempt to delete non-existent user: {UserId}", id);
-            return NotFound(new { Message = $"User with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.UserNotFoundById(id.ToString()) });
         }
 
         await _context.SaveChangesAsync(cancellationToken);
