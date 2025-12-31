@@ -1,7 +1,11 @@
+using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -88,7 +92,7 @@ public sealed class StoreController : ControllerBase
         );
 
         if (store == null)
-            return NotFound(new { Message = $"Store with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.StoreNotFoundById(id.ToString()) });
 
         return Ok(store);
     }
@@ -124,7 +128,7 @@ public sealed class StoreController : ControllerBase
         );
 
         if (store == null)
-            return NotFound(new { Message = $"Store with code '{code}' not found" });
+            return NotFound(new { Message = ErrorMessages.StoreNotFoundByCode(code) });
 
         return Ok(store);
     }
@@ -159,12 +163,12 @@ public sealed class StoreController : ControllerBase
         // Input validation
         if (string.IsNullOrWhiteSpace(city))
         {
-            return BadRequest(new { Message = "City name is required" });
+            return BadRequest(new { Message = ErrorMessages.CityNameRequired });
         }
 
         if (city.Length > 100)
         {
-            return BadRequest(new { Message = "City name must not exceed 100 characters" });
+            return BadRequest(new { Message = ErrorMessages.CityNameTooLong });
         }
 
         try
@@ -237,7 +241,7 @@ public sealed class StoreController : ControllerBase
     )
     {
         if (store == null)
-            return BadRequest("Store data is required");
+            return BadRequest(ErrorMessages.StoreDataRequired);
 
         store.Id = Guid.NewGuid();
         store.CreatedAt = DateTime.UtcNow;
@@ -295,15 +299,15 @@ public sealed class StoreController : ControllerBase
     )
     {
         if (store == null)
-            return BadRequest("Store data is required");
+            return BadRequest(ErrorMessages.StoreDataRequired);
 
         if (id != store.Id)
-            return BadRequest("ID mismatch");
+            return BadRequest(ErrorMessages.IdMismatch);
 
         var existingStore = await _context.Stores.FindAsync(new object[] { id }, cancellationToken);
 
         if (existingStore == null || existingStore.IsDeleted)
-            return NotFound(new { Message = $"Store with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.StoreNotFoundById(id.ToString()) });
 
         store.UpdatedAt = DateTime.UtcNow;
         _context.Entry(existingStore).CurrentValues.SetValues(store);
@@ -346,7 +350,7 @@ public sealed class StoreController : ControllerBase
         var store = await _context.Stores.FindAsync(new object[] { id }, cancellationToken);
 
         if (store == null || store.IsDeleted)
-            return NotFound(new { Message = $"Store with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.StoreNotFoundById(id.ToString()) });
 
         store.IsDeleted = true;
         store.UpdatedAt = DateTime.UtcNow;
