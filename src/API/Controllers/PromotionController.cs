@@ -1,7 +1,13 @@
+using System.Security.Claims;
+using System.Text.RegularExpressions;
+using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -19,43 +25,39 @@ namespace ECommerce.API.Controllers;
 /// </list>
 /// All responses are in JSON format and follow RESTful conventions.
 /// </remarks>
+/// <remarks>
+/// Initializes a new instance of the <see cref="PromotionController"/> class.
+/// </remarks>
+/// <param name="context">The database context for data access operations.</param>
+/// <param name="logger">The logger for recording operational events and errors.</param>
+/// <exception cref="ArgumentNullException">
+/// Thrown when <paramref name="context"/> or <paramref name="logger"/> is null.
+/// </exception>
 [Tags("Promotions")]
 [ApiController]
 [Route("api/v1/promotions")]
 [Produces("application/json")]
-public sealed class PromotionController : ControllerBase
+public sealed class PromotionController(
+    PostgresqlContext context,
+    LoggingService<PromotionController> logger
+) : ControllerBase
 {
     /// <summary>
     /// The database context for accessing promotion data.
     /// </summary>
-    private readonly PostgresqlContext _context;
+    private readonly PostgresqlContext _context =
+        context ?? throw new ArgumentNullException(nameof(context));
 
     /// <summary>
     /// Logger instance for recording controller operations and errors.
     /// </summary>
-    private readonly ILoggingService _logger;
+    private readonly ILoggingService _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
     /// <summary>
     /// Maximum number of promotions to return in a single query to prevent performance issues.
     /// </summary>
     private const int MaxPromotions = 500;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PromotionController"/> class.
-    /// </summary>
-    /// <param name="context">The database context for data access operations.</param>
-    /// <param name="logger">The logger for recording operational events and errors.</param>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="context"/> or <paramref name="logger"/> is null.
-    /// </exception>
-    public PromotionController(
-        PostgresqlContext context,
-        LoggingService<PromotionController> logger
-    )
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
 
     /// <summary>
     /// Retrieves the unique identifier of the currently authenticated user.
@@ -68,28 +70,6 @@ public sealed class PromotionController : ControllerBase
     /// Used for audit trail tracking (CreatedBy, UpdatedBy fields).
     /// </remarks>
     private string? GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-    /// <summary>
-    /// Determines whether the current user has administrator privileges.
-    /// </summary>
-    /// <returns>
-    /// <c>true</c> if the user is in the Admin role; otherwise, <c>false</c>.
-    /// </returns>
-    /// <remarks>
-    /// Administrators have full access to all promotion management operations including deletion.
-    /// </remarks>
-    private bool IsAdmin() => User.IsInRole("Admin");
-
-    /// <summary>
-    /// Determines whether the current user has manager privileges.
-    /// </summary>
-    /// <returns>
-    /// <c>true</c> if the user is in the Manager role; otherwise, <c>false</c>.
-    /// </returns>
-    /// <remarks>
-    /// Managers can create and update promotions but cannot delete them.
-    /// </remarks>
-    private bool IsManager() => User.IsInRole("Manager");
 
     /// <summary>
     /// Retrieves all currently active promotions available for use.
@@ -140,10 +120,7 @@ public sealed class PromotionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving active promotions");
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -200,10 +177,7 @@ public sealed class PromotionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving featured promotions");
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -240,7 +214,7 @@ public sealed class PromotionController : ControllerBase
         if (id == Guid.Empty)
         {
             _logger.LogWarning("Invalid promotion GUID provided");
-            return BadRequest(new { Message = "Invalid promotion ID" });
+            return BadRequest(new { Message = ErrorMessages.InvalidId });
         }
 
         try
@@ -252,7 +226,7 @@ public sealed class PromotionController : ControllerBase
             if (promotion == null)
             {
                 _logger.LogInformation("Promotion not found: {PromotionId}", id);
-                return NotFound(new { Message = "Promotion not found" });
+                return NotFound(new { Message = ErrorMessages.PromotionNotFound });
             }
 
             return Ok(promotion);
@@ -260,10 +234,7 @@ public sealed class PromotionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving promotion: {PromotionId}", id);
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -317,20 +288,20 @@ public sealed class PromotionController : ControllerBase
         if (string.IsNullOrWhiteSpace(code))
         {
             _logger.LogWarning("Empty promotion code provided");
-            return BadRequest(new { Message = "Promotion code is required" });
+            return BadRequest(new { Message = ErrorMessages.PromotionCodeRequired });
         }
 
         if (code.Length > 50)
         {
             _logger.LogWarning("Promotion code too long: {Length}", code.Length);
-            return BadRequest(new { Message = "Promotion code must not exceed 50 characters" });
+            return BadRequest(new { Message = ErrorMessages.PromotionCodeTooLong });
         }
 
         // Validate code format (alphanumeric, hyphens, underscores)
         if (!Regex.IsMatch(code, @"^[a-zA-Z0-9\-_]+$"))
         {
             _logger.LogWarning("Invalid promotion code format: {Code}", code);
-            return BadRequest(new { Message = "Invalid promotion code format" });
+            return BadRequest(new { Message = ErrorMessages.InvalidPromotionCodeFormat });
         }
 
         try
@@ -342,7 +313,7 @@ public sealed class PromotionController : ControllerBase
             if (promotion == null)
             {
                 _logger.LogInformation("Promotion code not found: {Code}", code);
-                return NotFound(new { Message = "Promotion not found" });
+                return NotFound(new { Message = ErrorMessages.PromotionNotFound });
             }
 
             // Check if promotion is currently valid
@@ -350,7 +321,7 @@ public sealed class PromotionController : ControllerBase
             if (!promotion.IsActive || promotion.StartDate > now || promotion.EndDate < now)
             {
                 _logger.LogInformation("Promotion code inactive or expired: {Code}", code);
-                return NotFound(new { Message = "Promotion not found" });
+                return NotFound(new { Message = ErrorMessages.PromotionNotFound });
             }
 
             _logger.LogInformation("Promotion code validated: {Code}", code);
@@ -359,10 +330,7 @@ public sealed class PromotionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving promotion by code");
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -425,7 +393,7 @@ public sealed class PromotionController : ControllerBase
         if (promotion == null)
         {
             _logger.LogWarning("Null promotion data received");
-            return BadRequest(new { Message = "Promotion data is required" });
+            return BadRequest(new { Message = ErrorMessages.PromotionDataRequired });
         }
 
         // Input validation
