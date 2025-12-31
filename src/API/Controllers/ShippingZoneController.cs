@@ -1,7 +1,12 @@
+using System.Security.Claims;
+using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -149,10 +154,7 @@ public sealed class ShippingZoneController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving shipping zones");
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -202,7 +204,7 @@ public sealed class ShippingZoneController : ControllerBase
         if (id == Guid.Empty)
         {
             _logger.LogWarning("Invalid shipping zone GUID provided");
-            return BadRequest(new { Message = "Invalid shipping zone ID" });
+            return BadRequest(new { Message = ErrorMessages.InvalidShippingZoneId });
         }
 
         try
@@ -214,7 +216,7 @@ public sealed class ShippingZoneController : ControllerBase
             if (zone == null)
             {
                 _logger.LogInformation("Shipping zone not found: {ZoneId}", id);
-                return NotFound(new { Message = "Shipping zone not found" });
+                return NotFound(new { Message = ErrorMessages.ShippingZoneNotFound });
             }
 
             return Ok(zone);
@@ -222,10 +224,7 @@ public sealed class ShippingZoneController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving shipping zone: {ZoneId}", id);
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -315,28 +314,30 @@ public sealed class ShippingZoneController : ControllerBase
         if (zone == null)
         {
             _logger.LogWarning("Null shipping zone data received");
-            return BadRequest(new { Message = "Shipping zone data is required" });
+            return BadRequest(new { Message = ErrorMessages.ShippingZoneDataRequired });
         }
 
         // Input validation
         if (string.IsNullOrWhiteSpace(zone.Name) || zone.Name.Length > 200)
         {
-            return BadRequest(new { Message = "Valid zone name is required (max 200 characters)" });
+            return BadRequest(new { Message = ErrorMessages.ZoneNameRequired });
         }
 
         if (zone.BaseRate < 0 || zone.RatePerKg < 0 || zone.RatePerItem < 0)
         {
-            return BadRequest(new { Message = "Rates cannot be negative" });
+            return BadRequest(new { Message = ErrorMessages.RatesCannotBeNegative });
         }
 
         if (zone.FreeShippingThreshold.HasValue && zone.FreeShippingThreshold < 0)
         {
-            return BadRequest(new { Message = "Free shipping threshold cannot be negative" });
+            return BadRequest(
+                new { Message = ErrorMessages.FreeShippingThresholdCannotBeNegative }
+            );
         }
 
         if (zone.Priority < 0)
         {
-            return BadRequest(new { Message = "Priority must be a positive number" });
+            return BadRequest(new { Message = ErrorMessages.PriorityMustBePositive });
         }
 
         try
@@ -350,7 +351,7 @@ public sealed class ShippingZoneController : ControllerBase
             if (duplicateName)
             {
                 _logger.LogWarning("Duplicate shipping zone name attempt: {Name}", zone.Name);
-                return Conflict(new { Message = "Shipping zone name already exists" });
+                return Conflict(new { Message = ErrorMessages.ShippingZoneNameAlreadyExists });
             }
 
             // Secure assignment
@@ -396,6 +397,48 @@ public sealed class ShippingZoneController : ControllerBase
                 new { Message = "An error occurred while processing your request" }
             );
         }
+    }
+
+    /// <summary>
+    /// Validates shipping zone basic input requirements.
+    /// </summary>
+    private IActionResult? ValidateShippingZoneInput(Guid id, ShippingZoneEntity? zone)
+    {
+        if (zone == null)
+        {
+            _logger.LogWarning("Null shipping zone data received for update");
+            return BadRequest(new { Message = ErrorMessages.ShippingZoneDataRequired });
+        }
+
+        if (id == Guid.Empty || id != zone.Id)
+        {
+            _logger.LogWarning(
+                "ID mismatch in shipping zone update. Route: {RouteId}, Body: {BodyId}",
+                id,
+                zone.Id
+            );
+            return BadRequest(new { Message = ErrorMessages.IdMismatch });
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Validates shipping zone business rules.
+    /// </summary>
+    private IActionResult? ValidateShippingZoneRules(ShippingZoneEntity zone)
+    {
+        if (string.IsNullOrWhiteSpace(zone.Name) || zone.Name.Length > 200)
+        {
+            return BadRequest(new { Message = ErrorMessages.ZoneNameRequired });
+        }
+
+        if (zone.BaseRate < 0 || zone.RatePerKg < 0 || zone.RatePerItem < 0)
+        {
+            return BadRequest(new { Message = ErrorMessages.RatesCannotBeNegative });
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -480,32 +523,13 @@ public sealed class ShippingZoneController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        if (zone == null)
-        {
-            _logger.LogWarning("Null shipping zone data received for update");
-            return BadRequest(new { Message = "Shipping zone data is required" });
-        }
+        var inputValidation = ValidateShippingZoneInput(id, zone);
+        if (inputValidation != null)
+            return inputValidation;
 
-        if (id == Guid.Empty || id != zone.Id)
-        {
-            _logger.LogWarning(
-                "ID mismatch in shipping zone update. Route: {RouteId}, Body: {BodyId}",
-                id,
-                zone.Id
-            );
-            return BadRequest(new { Message = "ID mismatch" });
-        }
-
-        // Input validation
-        if (string.IsNullOrWhiteSpace(zone.Name) || zone.Name.Length > 200)
-        {
-            return BadRequest(new { Message = "Valid zone name is required (max 200 characters)" });
-        }
-
-        if (zone.BaseRate < 0 || zone.RatePerKg < 0 || zone.RatePerItem < 0)
-        {
-            return BadRequest(new { Message = "Rates cannot be negative" });
-        }
+        var rulesValidation = ValidateShippingZoneRules(zone!);
+        if (rulesValidation != null)
+            return rulesValidation;
 
         try
         {
@@ -517,7 +541,7 @@ public sealed class ShippingZoneController : ControllerBase
             if (existingZone == null)
             {
                 _logger.LogWarning("Shipping zone not found for update: {ZoneId}", id);
-                return NotFound(new { Message = "Shipping zone not found" });
+                return NotFound(new { Message = ErrorMessages.ShippingZoneNotFound });
             }
 
             // Check for name conflict if name changed
@@ -664,7 +688,7 @@ public sealed class ShippingZoneController : ControllerBase
         if (id == Guid.Empty)
         {
             _logger.LogWarning("Invalid shipping zone GUID provided for deletion");
-            return BadRequest(new { Message = "Invalid shipping zone ID" });
+            return BadRequest(new { Message = ErrorMessages.InvalidShippingZoneId });
         }
 
         try
@@ -677,7 +701,7 @@ public sealed class ShippingZoneController : ControllerBase
             if (zone == null)
             {
                 _logger.LogWarning("Shipping zone not found for deletion: {ZoneId}", id);
-                return NotFound(new { Message = "Shipping zone not found" });
+                return NotFound(new { Message = ErrorMessages.ShippingZoneNotFound });
             }
 
             zone.IsDeleted = true;
