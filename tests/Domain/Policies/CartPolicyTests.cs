@@ -18,7 +18,7 @@ public class CartPolicyTests : BaseTestFixture
         var canAdd = CartPolicy.CanAddItemToCart(currentItemCount);
 
         // Assert
-        canAdd.Should().BeTrue();
+        Assert.That(canAdd, Is.True);
     }
 
     [Test]
@@ -31,7 +31,7 @@ public class CartPolicyTests : BaseTestFixture
         var canAdd = CartPolicy.CanAddItemToCart(currentItemCount);
 
         // Assert
-        canAdd.Should().BeFalse();
+        Assert.That(canAdd, Is.False);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class CartPolicyTests : BaseTestFixture
         var canAdd = CartPolicy.CanAddItemToCart(currentItemCount);
 
         // Assert
-        canAdd.Should().BeFalse();
+        Assert.That(canAdd, Is.False);
     }
 
     [Test]
@@ -54,7 +54,7 @@ public class CartPolicyTests : BaseTestFixture
         var isValid = CartPolicy.IsValidQuantity(5);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class CartPolicyTests : BaseTestFixture
         var isValid = CartPolicy.IsValidQuantity(0);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -74,7 +74,7 @@ public class CartPolicyTests : BaseTestFixture
         var isValid = CartPolicy.IsValidQuantity(-5);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class CartPolicyTests : BaseTestFixture
         var isValid = CartPolicy.IsValidQuantity(100);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -94,7 +94,7 @@ public class CartPolicyTests : BaseTestFixture
         var isValid = CartPolicy.IsValidQuantity(99);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class CartPolicyTests : BaseTestFixture
         var canUpdate = CartPolicy.CanUpdateQuantity(5, 10);
 
         // Assert
-        canUpdate.Should().BeTrue();
+        Assert.That(canUpdate, Is.True);
     }
 
     [Test]
@@ -114,7 +114,7 @@ public class CartPolicyTests : BaseTestFixture
         var canUpdate = CartPolicy.CanUpdateQuantity(10, 5);
 
         // Assert
-        canUpdate.Should().BeFalse();
+        Assert.That(canUpdate, Is.False);
     }
 
     [Test]
@@ -124,7 +124,7 @@ public class CartPolicyTests : BaseTestFixture
         var canUpdate = CartPolicy.CanUpdateQuantity(-1, 10);
 
         // Assert
-        canUpdate.Should().BeFalse();
+        Assert.That(canUpdate, Is.False);
     }
 
     [Test]
@@ -137,7 +137,7 @@ public class CartPolicyTests : BaseTestFixture
         var isExpired = CartPolicy.IsCartExpired(lastUpdatedAt, true);
 
         // Assert
-        isExpired.Should().BeFalse();
+        Assert.That(isExpired, Is.False);
     }
 
     [Test]
@@ -150,7 +150,7 @@ public class CartPolicyTests : BaseTestFixture
         var isExpired = CartPolicy.IsCartExpired(lastUpdatedAt, true);
 
         // Assert
-        isExpired.Should().BeTrue();
+        Assert.That(isExpired, Is.True);
     }
 
     [Test]
@@ -163,7 +163,7 @@ public class CartPolicyTests : BaseTestFixture
         var isExpired = CartPolicy.IsCartExpired(lastUpdatedAt, false);
 
         // Assert
-        isExpired.Should().BeFalse();
+        Assert.That(isExpired, Is.False);
     }
 
     [Test]
@@ -176,7 +176,7 @@ public class CartPolicyTests : BaseTestFixture
         var isExpired = CartPolicy.IsCartExpired(lastUpdatedAt, false);
 
         // Assert
-        isExpired.Should().BeTrue();
+        Assert.That(isExpired, Is.True);
     }
 
     [Test]
@@ -186,7 +186,7 @@ public class CartPolicyTests : BaseTestFixture
         var isValid = CartPolicy.IsValidCartValue(100m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -196,7 +196,7 @@ public class CartPolicyTests : BaseTestFixture
         var isValid = CartPolicy.IsValidCartValue(0m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -206,7 +206,7 @@ public class CartPolicyTests : BaseTestFixture
         var isValid = CartPolicy.IsValidCartValue(1000000m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -216,7 +216,7 @@ public class CartPolicyTests : BaseTestFixture
         var canMerge = CartPolicy.CanMergeCarts(20, 25);
 
         // Assert
-        canMerge.Should().BeTrue();
+        Assert.That(canMerge, Is.True);
     }
 
     [Test]
@@ -226,7 +226,7 @@ public class CartPolicyTests : BaseTestFixture
         var canMerge = CartPolicy.CanMergeCarts(30, 25);
 
         // Assert
-        canMerge.Should().BeFalse();
+        Assert.That(canMerge, Is.False);
     }
 
     [Test]
@@ -245,7 +245,7 @@ public class CartPolicyTests : BaseTestFixture
         );
 
         // Assert
-        shouldMerge.Should().BeTrue();
+        Assert.That(shouldMerge, Is.True);
     }
 
     [Test]
@@ -256,15 +256,10 @@ public class CartPolicyTests : BaseTestFixture
         var productId2 = Guid.NewGuid();
 
         // Act
-        var shouldMerge = CartPolicy.ShouldMergeDuplicateItems(
-            productId1,
-            productId2,
-            null,
-            null
-        );
+        var shouldMerge = CartPolicy.ShouldMergeDuplicateItems(productId1, productId2, null, null);
 
         // Assert
-        shouldMerge.Should().BeFalse();
+        Assert.That(shouldMerge, Is.False);
     }
 
     [Test]
@@ -284,7 +279,7 @@ public class CartPolicyTests : BaseTestFixture
         );
 
         // Assert
-        shouldMerge.Should().BeFalse();
+        Assert.That(shouldMerge, Is.False);
     }
 
     [Test]
@@ -294,7 +289,7 @@ public class CartPolicyTests : BaseTestFixture
         var merged = CartPolicy.CalculateMergedQuantity(5, 10);
 
         // Assert
-        merged.Should().Be(15);
+        Assert.That(merged, Is.EqualTo(15));
     }
 
     [Test]
@@ -304,7 +299,7 @@ public class CartPolicyTests : BaseTestFixture
         var merged = CartPolicy.CalculateMergedQuantity(60, 50);
 
         // Assert
-        merged.Should().Be(99);
+        Assert.That(merged, Is.EqualTo(99));
     }
 
     [Test]
@@ -314,7 +309,7 @@ public class CartPolicyTests : BaseTestFixture
         var isEmpty = CartPolicy.IsCartEmpty(0);
 
         // Assert
-        isEmpty.Should().BeTrue();
+        Assert.That(isEmpty, Is.True);
     }
 
     [Test]
@@ -324,7 +319,7 @@ public class CartPolicyTests : BaseTestFixture
         var isEmpty = CartPolicy.IsCartEmpty(5);
 
         // Assert
-        isEmpty.Should().BeFalse();
+        Assert.That(isEmpty, Is.False);
     }
 
     [Test]
@@ -334,7 +329,7 @@ public class CartPolicyTests : BaseTestFixture
         var canConvert = CartPolicy.CanConvertToOrder(5, 100m, false);
 
         // Assert
-        canConvert.Should().BeTrue();
+        Assert.That(canConvert, Is.True);
     }
 
     [Test]
@@ -344,7 +339,7 @@ public class CartPolicyTests : BaseTestFixture
         var canConvert = CartPolicy.CanConvertToOrder(0, 100m, false);
 
         // Assert
-        canConvert.Should().BeFalse();
+        Assert.That(canConvert, Is.False);
     }
 
     [Test]
@@ -354,7 +349,7 @@ public class CartPolicyTests : BaseTestFixture
         var canConvert = CartPolicy.CanConvertToOrder(5, 100m, true);
 
         // Assert
-        canConvert.Should().BeFalse();
+        Assert.That(canConvert, Is.False);
     }
 
     [Test]
@@ -364,7 +359,7 @@ public class CartPolicyTests : BaseTestFixture
         var canConvert = CartPolicy.CanConvertToOrder(5, 0m, false);
 
         // Assert
-        canConvert.Should().BeFalse();
+        Assert.That(canConvert, Is.False);
     }
 
     [Test]
@@ -374,12 +369,10 @@ public class CartPolicyTests : BaseTestFixture
         var lastValidatedAt = DateTime.UtcNow.AddMinutes(-10);
 
         // Act
-        var requiresRevalidation = CartPolicy.RequiresStockRevalidation(
-            lastValidatedAt
-        );
+        var requiresRevalidation = CartPolicy.RequiresStockRevalidation(lastValidatedAt);
 
         // Assert
-        requiresRevalidation.Should().BeFalse();
+        Assert.That(requiresRevalidation, Is.False);
     }
 
     [Test]
@@ -389,12 +382,10 @@ public class CartPolicyTests : BaseTestFixture
         var lastValidatedAt = DateTime.UtcNow.AddMinutes(-20);
 
         // Act
-        var requiresRevalidation = CartPolicy.RequiresStockRevalidation(
-            lastValidatedAt
-        );
+        var requiresRevalidation = CartPolicy.RequiresStockRevalidation(lastValidatedAt);
 
         // Assert
-        requiresRevalidation.Should().BeTrue();
+        Assert.That(requiresRevalidation, Is.True);
     }
 
     [Test]
@@ -404,7 +395,7 @@ public class CartPolicyTests : BaseTestFixture
         var canSave = CartPolicy.CanSaveCartForLater(true);
 
         // Assert
-        canSave.Should().BeTrue();
+        Assert.That(canSave, Is.True);
     }
 
     [Test]
@@ -414,7 +405,7 @@ public class CartPolicyTests : BaseTestFixture
         var canSave = CartPolicy.CanSaveCartForLater(false);
 
         // Assert
-        canSave.Should().BeFalse();
+        Assert.That(canSave, Is.False);
     }
 
     [Test]
@@ -424,7 +415,7 @@ public class CartPolicyTests : BaseTestFixture
         var shouldRemove = CartPolicy.ShouldAutoRemoveItem(false, false, 10);
 
         // Assert
-        shouldRemove.Should().BeTrue();
+        Assert.That(shouldRemove, Is.True);
     }
 
     [Test]
@@ -434,7 +425,7 @@ public class CartPolicyTests : BaseTestFixture
         var shouldRemove = CartPolicy.ShouldAutoRemoveItem(true, true, 10);
 
         // Assert
-        shouldRemove.Should().BeTrue();
+        Assert.That(shouldRemove, Is.True);
     }
 
     [Test]
@@ -444,7 +435,7 @@ public class CartPolicyTests : BaseTestFixture
         var shouldRemove = CartPolicy.ShouldAutoRemoveItem(true, false, 0);
 
         // Assert
-        shouldRemove.Should().BeTrue();
+        Assert.That(shouldRemove, Is.True);
     }
 
     [Test]
@@ -454,7 +445,7 @@ public class CartPolicyTests : BaseTestFixture
         var shouldRemove = CartPolicy.ShouldAutoRemoveItem(true, false, 10);
 
         // Assert
-        shouldRemove.Should().BeFalse();
+        Assert.That(shouldRemove, Is.False);
     }
 
     [Test]
@@ -467,7 +458,7 @@ public class CartPolicyTests : BaseTestFixture
         var subtotal = CartPolicy.CalculateSubtotal(items);
 
         // Assert
-        subtotal.Should().Be(145m); // (10*2) + (25*3) + (50*1) = 20 + 75 + 50
+        Assert.That(subtotal, Is.EqualTo(145m)); // (10*2) + (25*3) + (50*1) = 20 + 75 + 50
     }
 
     [Test]
@@ -480,7 +471,7 @@ public class CartPolicyTests : BaseTestFixture
         var subtotal = CartPolicy.CalculateSubtotal(items);
 
         // Assert
-        subtotal.Should().Be(0m);
+        Assert.That(subtotal, Is.EqualTo(0m));
     }
 
     [Test]
@@ -490,7 +481,7 @@ public class CartPolicyTests : BaseTestFixture
         var allows = CartPolicy.AllowsMultipleVariants(true);
 
         // Assert
-        allows.Should().BeTrue();
+        Assert.That(allows, Is.True);
     }
 
     [Test]
@@ -500,7 +491,7 @@ public class CartPolicyTests : BaseTestFixture
         var allows = CartPolicy.AllowsMultipleVariants(false);
 
         // Assert
-        allows.Should().BeFalse();
+        Assert.That(allows, Is.False);
     }
 
     [Test]
@@ -510,7 +501,7 @@ public class CartPolicyTests : BaseTestFixture
         var meets = CartPolicy.MeetsMinimumOrderValue(100m, 50m);
 
         // Assert
-        meets.Should().BeTrue();
+        Assert.That(meets, Is.True);
     }
 
     [Test]
@@ -520,7 +511,7 @@ public class CartPolicyTests : BaseTestFixture
         var meets = CartPolicy.MeetsMinimumOrderValue(30m, 50m);
 
         // Assert
-        meets.Should().BeFalse();
+        Assert.That(meets, Is.False);
     }
 
     [Test]
@@ -530,7 +521,6 @@ public class CartPolicyTests : BaseTestFixture
         var meets = CartPolicy.MeetsMinimumOrderValue(10m, 0m);
 
         // Assert
-        meets.Should().BeTrue();
+        Assert.That(meets, Is.True);
     }
 }
-
