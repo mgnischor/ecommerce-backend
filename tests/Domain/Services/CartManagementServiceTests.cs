@@ -21,8 +21,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateAddToCart(product, 1);
 
         // Assert
-        isValid.Should().BeFalse();
-        errorMessage.Should().Be("Product is not available");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(errorMessage, Is.EqualTo("Product is not available"));
+        }
     }
 
     [Test]
@@ -40,8 +43,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateAddToCart(product, 1);
 
         // Assert
-        isValid.Should().BeFalse();
-        errorMessage.Should().Be("Product not found");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(errorMessage, Is.EqualTo("Product not found"));
+        }
     }
 
     [Test]
@@ -59,8 +65,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateAddToCart(product, 0);
 
         // Assert
-        isValid.Should().BeFalse();
-        errorMessage.Should().Be("Quantity must be greater than zero");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(errorMessage, Is.EqualTo("Quantity must be greater than zero"));
+        }
     }
 
     [Test]
@@ -78,8 +87,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateAddToCart(product, -5);
 
         // Assert
-        isValid.Should().BeFalse();
-        errorMessage.Should().Be("Quantity must be greater than zero");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(errorMessage, Is.EqualTo("Quantity must be greater than zero"));
+        }
     }
 
     [Test]
@@ -97,8 +109,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateAddToCart(product, 1000);
 
         // Assert
-        isValid.Should().BeFalse();
-        errorMessage.Should().Contain("Maximum quantity");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(errorMessage, Does.Contain("Maximum quantity"));
+        }
     }
 
     [Test]
@@ -118,8 +133,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateAddToCart(product, 10);
 
         // Assert
-        isValid.Should().BeFalse();
-        errorMessage.Should().Be("Insufficient stock available");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(errorMessage, Is.EqualTo("Insufficient stock available"));
+        }
     }
 
     [Test]
@@ -139,8 +157,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateAddToCart(product, 15);
 
         // Assert
-        isValid.Should().BeFalse();
-        errorMessage.Should().Contain("Maximum order quantity");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(errorMessage, Does.Contain("Maximum order quantity"));
+        }
     }
 
     [Test]
@@ -160,8 +181,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateAddToCart(product, 5);
 
         // Assert
-        isValid.Should().BeTrue();
-        errorMessage.Should().BeNull();
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.True);
+            Assert.That(errorMessage, Is.Null);
+        }
     }
 
     [Test]
@@ -174,8 +198,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateCartForCheckout(cartItems);
 
         // Assert
-        isValid.Should().BeFalse();
-        errorMessage.Should().Be("Cart is empty");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(errorMessage, Is.EqualTo("Cart is empty"));
+        }
     }
 
     [Test]
@@ -185,8 +212,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateCartForCheckout(null!);
 
         // Assert
-        isValid.Should().BeFalse();
-        errorMessage.Should().Be("Cart is empty");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(errorMessage, Is.EqualTo("Cart is empty"));
+        }
     }
 
     [Test]
@@ -211,8 +241,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateCartForCheckout(cartItems);
 
         // Assert
-        isValid.Should().BeFalse();
-        errorMessage.Should().Contain("Product A");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.False);
+            Assert.That(errorMessage, Does.Contain("Product A"));
+        }
     }
 
     [Test]
@@ -239,8 +272,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var (isValid, errorMessage) = CartManagementService.ValidateCartForCheckout(cartItems);
 
         // Assert
-        isValid.Should().BeTrue();
-        errorMessage.Should().BeNull();
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(isValid, Is.True);
+            Assert.That(errorMessage, Is.Null);
+        }
     }
 
     [Test]
@@ -250,7 +286,10 @@ public class CartManagementServiceTests : BaseTestFixture
         var expirationDate = CartManagementService.CalculateCartExpiration();
 
         // Assert
-        expirationDate.Should().BeCloseTo(DateTime.UtcNow.AddDays(30), TimeSpan.FromSeconds(5));
+        Assert.That(
+            expirationDate,
+            Is.EqualTo(DateTime.UtcNow.AddDays(30)).Within(TimeSpan.FromSeconds(5))
+        );
     }
 
     [Test]
@@ -260,7 +299,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var isExpired = CartManagementService.IsCartExpired(null);
 
         // Assert
-        isExpired.Should().BeFalse();
+        Assert.That(isExpired, Is.False);
     }
 
     [Test]
@@ -273,7 +312,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var isExpired = CartManagementService.IsCartExpired(futureDate);
 
         // Assert
-        isExpired.Should().BeFalse();
+        Assert.That(isExpired, Is.False);
     }
 
     [Test]
@@ -286,7 +325,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var isExpired = CartManagementService.IsCartExpired(pastDate);
 
         // Assert
-        isExpired.Should().BeTrue();
+        Assert.That(isExpired, Is.True);
     }
 
     [Test]
@@ -300,7 +339,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var merged = CartManagementService.MergeCarts(anonymousCart, userCart);
 
         // Assert
-        merged.Should().BeEmpty();
+        Assert.That(merged, Is.Empty);
     }
 
     [Test]
@@ -316,9 +355,12 @@ public class CartManagementServiceTests : BaseTestFixture
         var merged = CartManagementService.MergeCarts(anonymousCart, userCart);
 
         // Assert
-        merged.Should().HaveCount(2);
-        merged.Should().Contain((product1, 2));
-        merged.Should().Contain((product2, 3));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(merged, Has.Count.EqualTo(2));
+            Assert.That(merged, Does.Contain((product1, 2)));
+            Assert.That(merged, Does.Contain((product2, 3)));
+        }
     }
 
     [Test]
@@ -333,8 +375,11 @@ public class CartManagementServiceTests : BaseTestFixture
         var merged = CartManagementService.MergeCarts(anonymousCart, userCart);
 
         // Assert
-        merged.Should().HaveCount(1);
-        merged.Should().Contain((product1, 5));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(merged, Has.Count.EqualTo(1));
+            Assert.That(merged, Does.Contain((product1, 5)));
+        }
     }
 
     [Test]
@@ -347,7 +392,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var totalWeight = CartManagementService.CalculateTotalWeight(cartItems);
 
         // Assert
-        totalWeight.Should().Be(0);
+        Assert.That(totalWeight, Is.EqualTo(0));
     }
 
     [Test]
@@ -364,7 +409,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var totalWeight = CartManagementService.CalculateTotalWeight(cartItems);
 
         // Assert
-        totalWeight.Should().Be(4.5m); // (1.5 * 2) + (0.5 * 3) = 3 + 1.5 = 4.5
+        Assert.That(totalWeight, Is.EqualTo(4.5m)); // (1.5 * 2) + (0.5 * 3) = 3 + 1.5 = 4.5
     }
 
     [Test]
@@ -377,7 +422,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var qualifies = CartManagementService.QualifiesForFreeShipping(cartSubtotal, 100m);
 
         // Assert
-        qualifies.Should().BeFalse();
+        Assert.That(qualifies, Is.False);
     }
 
     [Test]
@@ -390,7 +435,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var qualifies = CartManagementService.QualifiesForFreeShipping(cartSubtotal, 100m);
 
         // Assert
-        qualifies.Should().BeTrue();
+        Assert.That(qualifies, Is.True);
     }
 
     [Test]
@@ -403,7 +448,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var qualifies = CartManagementService.QualifiesForFreeShipping(cartSubtotal, 100m);
 
         // Assert
-        qualifies.Should().BeTrue();
+        Assert.That(qualifies, Is.True);
     }
 
     [Test]
@@ -416,7 +461,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var amountNeeded = CartManagementService.AmountNeededForFreeShipping(cartSubtotal, 100m);
 
         // Assert
-        amountNeeded.Should().Be(25m);
+        Assert.That(amountNeeded, Is.EqualTo(25m));
     }
 
     [Test]
@@ -429,7 +474,7 @@ public class CartManagementServiceTests : BaseTestFixture
         var amountNeeded = CartManagementService.AmountNeededForFreeShipping(cartSubtotal, 100m);
 
         // Assert
-        amountNeeded.Should().Be(0);
+        Assert.That(amountNeeded, Is.EqualTo(0));
     }
 
     [Test]
@@ -446,7 +491,7 @@ public class CartManagementServiceTests : BaseTestFixture
         );
 
         // Assert
-        suggestions.Should().BeEmpty();
+        Assert.That(suggestions, Is.Empty);
     }
 
     [Test]
@@ -480,7 +525,7 @@ public class CartManagementServiceTests : BaseTestFixture
         );
 
         // Assert
-        suggestions.Should().BeEmpty();
+        Assert.That(suggestions, Is.Empty);
     }
 
     [Test]
@@ -515,7 +560,10 @@ public class CartManagementServiceTests : BaseTestFixture
         );
 
         // Assert
-        suggestions.Should().NotBeEmpty();
-        suggestions.Should().Contain(p => p.Price == 25m);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(suggestions, Is.Not.Empty);
+            Assert.That(suggestions.Any(p => p.Price == 25m), Is.True);
+        }
     }
 }
