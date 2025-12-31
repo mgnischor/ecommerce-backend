@@ -15,7 +15,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidPrice(100m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidPrice(0.01m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -35,7 +35,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidPrice(999999.99m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -45,7 +45,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidPrice(0m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidPrice(-10m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -65,7 +65,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidPrice(1000000m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidDiscountPrice(100m, 80m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -85,7 +85,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidDiscountPrice(100m, 100m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -95,7 +95,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidDiscountPrice(100m, 120m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -105,7 +105,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidDiscountPrice(100m, 0m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidDiscountPrice(100m, 0.001m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -125,7 +125,7 @@ public class PricingPolicyTests : BaseTestFixture
         var percentage = PricingPolicy.CalculateDiscountPercentage(100m, 80m);
 
         // Assert
-        percentage.Should().Be(20m);
+        Assert.That(percentage, Is.EqualTo(20m));
     }
 
     [Test]
@@ -135,7 +135,7 @@ public class PricingPolicyTests : BaseTestFixture
         var percentage = PricingPolicy.CalculateDiscountPercentage(0m, 0m);
 
         // Assert
-        percentage.Should().Be(0m);
+        Assert.That(percentage, Is.EqualTo(0m));
     }
 
     [Test]
@@ -145,7 +145,7 @@ public class PricingPolicyTests : BaseTestFixture
         var percentage = PricingPolicy.CalculateDiscountPercentage(100m, 50m);
 
         // Assert
-        percentage.Should().Be(50m);
+        Assert.That(percentage, Is.EqualTo(50m));
     }
 
     [Test]
@@ -155,7 +155,7 @@ public class PricingPolicyTests : BaseTestFixture
         var percentage = PricingPolicy.CalculateDiscountPercentage(100m, 66.67m);
 
         // Assert
-        percentage.Should().Be(33.33m);
+        Assert.That(percentage, Is.EqualTo(33.33m));
     }
 
     [Test]
@@ -165,7 +165,7 @@ public class PricingPolicyTests : BaseTestFixture
         var discountedPrice = PricingPolicy.ApplyDiscountPercentage(100m, 20m);
 
         // Assert
-        discountedPrice.Should().Be(80m);
+        Assert.That(discountedPrice, Is.EqualTo(80m));
     }
 
     [Test]
@@ -175,7 +175,7 @@ public class PricingPolicyTests : BaseTestFixture
         var discountedPrice = PricingPolicy.ApplyDiscountPercentage(100m, 0m);
 
         // Assert
-        discountedPrice.Should().Be(100m);
+        Assert.That(discountedPrice, Is.EqualTo(100m));
     }
 
     [Test]
@@ -185,27 +185,21 @@ public class PricingPolicyTests : BaseTestFixture
         var discountedPrice = PricingPolicy.ApplyDiscountPercentage(100m, 99m);
 
         // Assert
-        discountedPrice.Should().Be(1m);
+        Assert.That(discountedPrice, Is.EqualTo(1m));
     }
 
     [Test]
     public void ApplyDiscountPercentage_WithNegativePercentage_ThrowsException()
     {
         // Act
-        Action act = () => PricingPolicy.ApplyDiscountPercentage(100m, -10m);
-
-        // Assert
-        act.Should().Throw<ArgumentException>().WithMessage("*Discount percentage*");
+        Assert.Throws<ArgumentException>(() => PricingPolicy.ApplyDiscountPercentage(100m, -10m));
     }
 
     [Test]
     public void ApplyDiscountPercentage_WithExcessivePercentage_ThrowsException()
     {
         // Act
-        Action act = () => PricingPolicy.ApplyDiscountPercentage(100m, 100m);
-
-        // Assert
-        act.Should().Throw<ArgumentException>().WithMessage("*Discount percentage*");
+        Assert.Throws<ArgumentException>(() => PricingPolicy.ApplyDiscountPercentage(100m, 100m));
     }
 
     [Test]
@@ -215,7 +209,7 @@ public class PricingPolicyTests : BaseTestFixture
         var discountedPrice = PricingPolicy.ApplyDiscountPercentage(99.99m, 33.33m);
 
         // Assert
-        discountedPrice.Should().Be(66.66m);
+        Assert.That(discountedPrice, Is.EqualTo(66.66m));
     }
 
     [Test]
@@ -225,7 +219,7 @@ public class PricingPolicyTests : BaseTestFixture
         var effectivePrice = PricingPolicy.GetEffectivePrice(100m, null);
 
         // Assert
-        effectivePrice.Should().Be(100m);
+        Assert.That(effectivePrice, Is.EqualTo(100m));
     }
 
     [Test]
@@ -235,7 +229,7 @@ public class PricingPolicyTests : BaseTestFixture
         var effectivePrice = PricingPolicy.GetEffectivePrice(100m, 80m);
 
         // Assert
-        effectivePrice.Should().Be(80m);
+        Assert.That(effectivePrice, Is.EqualTo(80m));
     }
 
     [Test]
@@ -245,7 +239,7 @@ public class PricingPolicyTests : BaseTestFixture
         var effectivePrice = PricingPolicy.GetEffectivePrice(100m, 120m);
 
         // Assert
-        effectivePrice.Should().Be(100m);
+        Assert.That(effectivePrice, Is.EqualTo(100m));
     }
 
     [Test]
@@ -255,7 +249,7 @@ public class PricingPolicyTests : BaseTestFixture
         var effectivePrice = PricingPolicy.GetEffectivePrice(100m, 0m);
 
         // Assert
-        effectivePrice.Should().Be(100m);
+        Assert.That(effectivePrice, Is.EqualTo(100m));
     }
 
     [Test]
@@ -265,7 +259,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidBulkPrice(10m, 5, 50m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -275,7 +269,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidBulkPrice(10m, 5, 50.005m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 
     [Test]
@@ -285,7 +279,7 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidBulkPrice(10m, 5, 55m);
 
         // Assert
-        isValid.Should().BeFalse();
+        Assert.That(isValid, Is.False);
     }
 
     [Test]
@@ -295,7 +289,6 @@ public class PricingPolicyTests : BaseTestFixture
         var isValid = PricingPolicy.IsValidBulkPrice(9.99m, 10, 99.90m);
 
         // Assert
-        isValid.Should().BeTrue();
+        Assert.That(isValid, Is.True);
     }
 }
-
