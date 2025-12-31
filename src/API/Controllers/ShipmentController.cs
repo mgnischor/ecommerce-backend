@@ -1,7 +1,13 @@
+using System.Security.Claims;
+using System.Text.RegularExpressions;
+using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -162,13 +168,15 @@ public sealed class ShipmentController : ControllerBase
         if (pageNumber < 1)
         {
             _logger.LogWarning("Invalid page number requested: {PageNumber}", pageNumber);
-            return BadRequest(new { Message = "Page number must be greater than 0" });
+            return BadRequest(new { Message = ErrorMessages.InvalidPageNumber });
         }
 
         if (pageSize < 1 || pageSize > MaxPageSize)
         {
             _logger.LogWarning("Invalid page size requested: {PageSize}", pageSize);
-            return BadRequest(new { Message = $"Page size must be between 1 and {MaxPageSize}" });
+            return BadRequest(
+                new { Message = string.Format(ErrorMessages.InvalidPageSize, MaxPageSize) }
+            );
         }
 
         try
@@ -182,7 +190,7 @@ public sealed class ShipmentController : ControllerBase
             {
                 _logger.LogWarning(
                     "Attempt to retrieve data beyond limit. User: {UserId}",
-                    GetCurrentUserId() ?? "Unknown"
+                    GetCurrentUserId() ?? ErrorMessages.Unknown
                 );
                 return BadRequest(
                     new { Message = "Result set too large. Please refine your query" }
@@ -208,7 +216,7 @@ public sealed class ShipmentController : ControllerBase
                 "Retrieved {Count} shipments. Page: {Page}, User: {UserId}",
                 shipments.Count,
                 pageNumber,
-                GetCurrentUserId() ?? "Unknown"
+                GetCurrentUserId() ?? ErrorMessages.Unknown
             );
 
             return Ok(shipments);
@@ -218,12 +226,9 @@ public sealed class ShipmentController : ControllerBase
             _logger.LogError(
                 ex,
                 "Error retrieving shipments. User: {UserId}",
-                GetCurrentUserId() ?? "Unknown"
+                GetCurrentUserId() ?? ErrorMessages.Unknown
             );
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -276,7 +281,7 @@ public sealed class ShipmentController : ControllerBase
         if (id == Guid.Empty)
         {
             _logger.LogWarning("Invalid GUID provided for shipment lookup");
-            return BadRequest(new { Message = "Invalid shipment ID" });
+            return BadRequest(new { Message = ErrorMessages.InvalidId });
         }
 
         try
@@ -290,9 +295,9 @@ public sealed class ShipmentController : ControllerBase
                 _logger.LogWarning(
                     "Shipment not found: {ShipmentId}, User: {UserId}",
                     id,
-                    GetCurrentUserId() ?? "Unknown"
+                    GetCurrentUserId() ?? ErrorMessages.Unknown
                 );
-                return NotFound(new { Message = "Shipment not found" });
+                return NotFound(new { Message = ErrorMessages.ShipmentNotFound });
             }
 
             // Authorization check - users can only view their own shipments unless admin/manager
@@ -308,7 +313,7 @@ public sealed class ShipmentController : ControllerBase
                     _logger.LogWarning(
                         "Unauthorized access attempt to shipment: {ShipmentId}, User: {UserId}",
                         id,
-                        currentUserId ?? "Unknown"
+                        currentUserId ?? ErrorMessages.Unknown
                     );
                     return Forbid();
                 }
@@ -317,17 +322,14 @@ public sealed class ShipmentController : ControllerBase
             _logger.LogInformation(
                 "Shipment retrieved: {ShipmentId}, User: {UserId}",
                 id,
-                GetCurrentUserId() ?? "Unknown"
+                GetCurrentUserId() ?? ErrorMessages.Unknown
             );
             return Ok(shipment);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving shipment: {ShipmentId}", id);
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -385,7 +387,7 @@ public sealed class ShipmentController : ControllerBase
         if (orderId == Guid.Empty)
         {
             _logger.LogWarning("Invalid order GUID provided");
-            return BadRequest(new { Message = "Invalid order ID" });
+            return BadRequest(new { Message = ErrorMessages.InvalidId });
         }
 
         try
@@ -400,9 +402,11 @@ public sealed class ShipmentController : ControllerBase
                 _logger.LogWarning(
                     "Order not found: {OrderId}, User: {UserId}",
                     orderId,
-                    GetCurrentUserId() ?? "Unknown"
+                    GetCurrentUserId() ?? ErrorMessages.Unknown
                 );
-                return NotFound(new { Message = "Order not found" });
+                return NotFound(
+                    new { Message = ErrorMessages.OrderNotFoundById(orderId.ToString()) }
+                );
             }
 
             // Authorization check
@@ -412,7 +416,7 @@ public sealed class ShipmentController : ControllerBase
                 _logger.LogWarning(
                     "Unauthorized access attempt to order shipments: {OrderId}, User: {UserId}",
                     orderId,
-                    currentUserId ?? "Unknown"
+                    currentUserId ?? ErrorMessages.Unknown
                 );
                 return Forbid();
             }
@@ -428,7 +432,7 @@ public sealed class ShipmentController : ControllerBase
                 "Retrieved {Count} shipments for order: {OrderId}, User: {UserId}",
                 shipments.Count,
                 orderId,
-                currentUserId ?? "Unknown"
+                currentUserId ?? ErrorMessages.Unknown
             );
 
             return Ok(shipments);
@@ -436,10 +440,7 @@ public sealed class ShipmentController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving shipments for order: {OrderId}", orderId);
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -511,14 +512,14 @@ public sealed class ShipmentController : ControllerBase
         if (string.IsNullOrWhiteSpace(trackingNumber))
         {
             _logger.LogWarning("Empty tracking number provided");
-            return BadRequest(new { Message = "Tracking number is required" });
+            return BadRequest(new { Message = ErrorMessages.TrackingNumberRequired });
         }
 
         // Validate tracking number format (alphanumeric, hyphens, max 50 chars)
         if (trackingNumber.Length > 50 || !Regex.IsMatch(trackingNumber, @"^[a-zA-Z0-9\-]+$"))
         {
             _logger.LogWarning("Invalid tracking number format: {TrackingNumber}", trackingNumber);
-            return BadRequest(new { Message = "Invalid tracking number format" });
+            return BadRequest(new { Message = ErrorMessages.InvalidTrackingNumberFormat });
         }
 
         try
@@ -537,7 +538,7 @@ public sealed class ShipmentController : ControllerBase
                     "Tracking number not found: {TrackingNumber}",
                     trackingNumber
                 );
-                return NotFound(new { Message = "Shipment not found" });
+                return NotFound(new { Message = ErrorMessages.ShipmentNotFound });
             }
 
             _logger.LogInformation(
@@ -549,10 +550,7 @@ public sealed class ShipmentController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error tracking shipment: {TrackingNumber}", trackingNumber);
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -628,13 +626,13 @@ public sealed class ShipmentController : ControllerBase
         if (shipment == null)
         {
             _logger.LogWarning("Null shipment data received");
-            return BadRequest(new { Message = "Shipment data is required" });
+            return BadRequest(new { Message = ErrorMessages.ShipmentDataRequired });
         }
 
         // Input validation
         if (shipment.OrderId == Guid.Empty)
         {
-            return BadRequest(new { Message = "Valid Order ID is required" });
+            return BadRequest(new { Message = ErrorMessages.ShipmentOrderIdRequired });
         }
 
         if (
@@ -642,16 +640,12 @@ public sealed class ShipmentController : ControllerBase
             || shipment.TrackingNumber.Length > 50
         )
         {
-            return BadRequest(
-                new { Message = "Valid tracking number is required (max 50 characters)" }
-            );
+            return BadRequest(new { Message = ErrorMessages.TrackingNumberRequired });
         }
 
         if (string.IsNullOrWhiteSpace(shipment.Carrier) || shipment.Carrier.Length > 100)
         {
-            return BadRequest(
-                new { Message = "Valid carrier name is required (max 100 characters)" }
-            );
+            return BadRequest(new { Message = ErrorMessages.CarrierNameRequired });
         }
 
         try
@@ -668,7 +662,9 @@ public sealed class ShipmentController : ControllerBase
                     "Attempt to create shipment for non-existent order: {OrderId}",
                     shipment.OrderId
                 );
-                return BadRequest(new { Message = "Order not found" });
+                return BadRequest(
+                    new { Message = ErrorMessages.OrderNotFoundById(shipment.OrderId.ToString()) }
+                );
             }
 
             // Check for duplicate tracking number
@@ -683,7 +679,7 @@ public sealed class ShipmentController : ControllerBase
                     "Duplicate tracking number attempt: {TrackingNumber}",
                     shipment.TrackingNumber
                 );
-                return Conflict(new { Message = "Tracking number already exists" });
+                return Conflict(new { Message = ErrorMessages.TrackingNumberAlreadyExists });
             }
 
             // Secure assignment - prevent mass assignment vulnerabilities
@@ -811,7 +807,7 @@ public sealed class ShipmentController : ControllerBase
         if (shipment == null)
         {
             _logger.LogWarning("Null shipment data received for update");
-            return BadRequest(new { Message = "Shipment data is required" });
+            return BadRequest(new { Message = ErrorMessages.ShipmentDataRequired });
         }
 
         if (id == Guid.Empty || id != shipment.Id)
@@ -821,7 +817,7 @@ public sealed class ShipmentController : ControllerBase
                 id,
                 shipment.Id
             );
-            return BadRequest(new { Message = "ID mismatch" });
+            return BadRequest(new { Message = ErrorMessages.IdMismatch });
         }
 
         // Input validation
@@ -830,9 +826,7 @@ public sealed class ShipmentController : ControllerBase
             || shipment.TrackingNumber.Length > 50
         )
         {
-            return BadRequest(
-                new { Message = "Valid tracking number is required (max 50 characters)" }
-            );
+            return BadRequest(new { Message = ErrorMessages.TrackingNumberRequired });
         }
 
         try
@@ -845,7 +839,7 @@ public sealed class ShipmentController : ControllerBase
             if (existingShipment == null)
             {
                 _logger.LogWarning("Shipment not found for update: {ShipmentId}", id);
-                return NotFound(new { Message = "Shipment not found" });
+                return NotFound(new { Message = ErrorMessages.ShipmentNotFound });
             }
 
             // Check for tracking number conflict
@@ -862,7 +856,7 @@ public sealed class ShipmentController : ControllerBase
                         "Duplicate tracking number in update: {TrackingNumber}",
                         shipment.TrackingNumber
                     );
-                    return Conflict(new { Message = "Tracking number already exists" });
+                    return Conflict(new { Message = ErrorMessages.TrackingNumberAlreadyExists });
                 }
             }
 
