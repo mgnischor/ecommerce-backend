@@ -136,6 +136,11 @@ public static class ErrorMessages
     public const string ProductDataRequired = "Product data is required";
 
     /// <summary>
+    /// Message when product attribute not found
+    /// </summary>
+    public const string ProductAttributeNotFound = "Product attribute not found";
+
+    /// <summary>
     /// Message when product not found by ID
     /// </summary>
     public static string ProductNotFoundById(string id) => NotFound("Product", id);
