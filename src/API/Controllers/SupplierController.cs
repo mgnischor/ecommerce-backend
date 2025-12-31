@@ -1,7 +1,11 @@
+using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -94,7 +98,7 @@ public sealed class SupplierController : ControllerBase
         );
 
         if (supplier == null)
-            return NotFound(new { Message = $"Supplier with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.SupplierNotFoundById(id.ToString()) });
 
         return Ok(supplier);
     }
@@ -132,7 +136,7 @@ public sealed class SupplierController : ControllerBase
         );
 
         if (supplier == null)
-            return NotFound(new { Message = $"Supplier with code '{code}' not found" });
+            return NotFound(new { Message = ErrorMessages.SupplierNotFoundByCode(code) });
 
         return Ok(supplier);
     }
@@ -174,17 +178,17 @@ public sealed class SupplierController : ControllerBase
         // Input validation
         if (string.IsNullOrWhiteSpace(searchTerm))
         {
-            return BadRequest(new { Message = "Search term is required" });
+            return BadRequest(new { Message = ErrorMessages.SearchTermRequired });
         }
 
         if (searchTerm.Length < 2)
         {
-            return BadRequest(new { Message = "Search term must be at least 2 characters" });
+            return BadRequest(new { Message = ErrorMessages.SearchTermTooShort });
         }
 
         if (searchTerm.Length > 100)
         {
-            return BadRequest(new { Message = "Search term must not exceed 100 characters" });
+            return BadRequest(new { Message = ErrorMessages.SearchTermTooLong });
         }
 
         try
@@ -263,7 +267,7 @@ public sealed class SupplierController : ControllerBase
     )
     {
         if (supplier == null)
-            return BadRequest("Supplier data is required");
+            return BadRequest(ErrorMessages.SupplierDataRequired);
 
         supplier.Id = Guid.NewGuid();
         supplier.CreatedAt = DateTime.UtcNow;
@@ -324,10 +328,10 @@ public sealed class SupplierController : ControllerBase
     )
     {
         if (supplier == null)
-            return BadRequest("Supplier data is required");
+            return BadRequest(ErrorMessages.SupplierDataRequired);
 
         if (id != supplier.Id)
-            return BadRequest("ID mismatch");
+            return BadRequest(ErrorMessages.IdMismatch);
 
         var existingSupplier = await _context.Suppliers.FindAsync(
             new object[] { id },
@@ -335,7 +339,7 @@ public sealed class SupplierController : ControllerBase
         );
 
         if (existingSupplier == null || existingSupplier.IsDeleted)
-            return NotFound(new { Message = $"Supplier with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.SupplierNotFoundById(id.ToString()) });
 
         supplier.UpdatedAt = DateTime.UtcNow;
         _context.Entry(existingSupplier).CurrentValues.SetValues(supplier);
@@ -378,7 +382,7 @@ public sealed class SupplierController : ControllerBase
         var supplier = await _context.Suppliers.FindAsync(new object[] { id }, cancellationToken);
 
         if (supplier == null || supplier.IsDeleted)
-            return NotFound(new { Message = $"Supplier with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.SupplierNotFoundById(id.ToString()) });
 
         supplier.IsDeleted = true;
         supplier.UpdatedAt = DateTime.UtcNow;
