@@ -1,7 +1,12 @@
-using ECommerce.Application.Interfaces;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
+using ECommerce.API.Constants;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -85,7 +90,7 @@ public sealed class ProductAttributeController : ControllerBase
     /// Used to log attribute access, modifications, validation errors, security events,
     /// and exceptions for monitoring, debugging, and audit trail purposes.
     /// </remarks>
-    private readonly ILoggingService _logger;
+    private readonly LoggingService<ProductAttributeController> _logger;
 
     /// <summary>
     /// Maximum number of product attributes that can be retrieved in a single request
@@ -232,10 +237,7 @@ public sealed class ProductAttributeController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving product attributes");
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -327,7 +329,7 @@ public sealed class ProductAttributeController : ControllerBase
             if (attribute == null)
             {
                 _logger.LogInformation("Product attribute not found: {AttributeId}", id);
-                return NotFound(new { Message = "Product attribute not found" });
+                return NotFound(ErrorMessages.ProductAttributeNotFound);
             }
 
             return Ok(attribute);
@@ -335,10 +337,7 @@ public sealed class ProductAttributeController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving product attribute: {AttributeId}", id);
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -465,10 +464,7 @@ public sealed class ProductAttributeController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving product attribute by code");
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
@@ -576,10 +572,7 @@ public sealed class ProductAttributeController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving variant attributes");
-            return StatusCode(
-                500,
-                new { Message = "An error occurred while processing your request" }
-            );
+            return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
 
