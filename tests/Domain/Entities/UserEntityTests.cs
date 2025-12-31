@@ -15,14 +15,17 @@ public class UserEntityTests : BaseTestFixture
         var user = new UserEntity();
 
         // Assert
-        user.AccessLevel.Should().Be(UserAccessLevel.Customer);
-        user.IsActive.Should().BeTrue();
-        user.IsBanned.Should().BeFalse();
-        user.IsDebugEnabled.Should().BeFalse();
-        user.IsDeleted.Should().BeFalse();
-        user.IsEmailVerified.Should().BeFalse();
-        user.Groups.Should().NotBeNull();
-        user.FavoriteProducts.Should().NotBeNull();
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(user.AccessLevel, Is.EqualTo(UserAccessLevel.Customer));
+            Assert.That(user.IsActive, Is.True);
+            Assert.That(user.IsBanned, Is.False);
+            Assert.That(user.IsDebugEnabled, Is.False);
+            Assert.That(user.IsDeleted, Is.False);
+            Assert.That(user.IsEmailVerified, Is.False);
+            Assert.That(user.Groups, Is.Not.Null);
+            Assert.That(user.FavoriteProducts, Is.Not.Null);
+        }
     }
 
     [Test]
@@ -36,7 +39,7 @@ public class UserEntityTests : BaseTestFixture
         user.Email = email;
 
         // Assert
-        user.Email.Should().Be(email);
+        Assert.That(user.Email, Is.EqualTo(email));
     }
 
     [Test]
@@ -50,7 +53,7 @@ public class UserEntityTests : BaseTestFixture
         user.Username = username;
 
         // Assert
-        user.Username.Should().Be(username);
+        Assert.That(user.Username, Is.EqualTo(username));
     }
 
     [Test]
@@ -64,7 +67,7 @@ public class UserEntityTests : BaseTestFixture
         user.PasswordHash = passwordHash;
 
         // Assert
-        user.PasswordHash.Should().Be(passwordHash);
+        Assert.That(user.PasswordHash, Is.EqualTo(passwordHash));
     }
 
     [Test]
@@ -77,7 +80,7 @@ public class UserEntityTests : BaseTestFixture
         user.AccessLevel = UserAccessLevel.Admin;
 
         // Assert
-        user.AccessLevel.Should().Be(UserAccessLevel.Admin);
+        Assert.That(user.AccessLevel, Is.EqualTo(UserAccessLevel.Admin));
     }
 
     [Test]
@@ -90,7 +93,7 @@ public class UserEntityTests : BaseTestFixture
         user.IsActive = false;
 
         // Assert
-        user.IsActive.Should().BeFalse();
+        Assert.That(user.IsActive, Is.False);
     }
 
     [Test]
@@ -103,7 +106,7 @@ public class UserEntityTests : BaseTestFixture
         user.IsBanned = true;
 
         // Assert
-        user.IsBanned.Should().BeTrue();
+        Assert.That(user.IsBanned, Is.True);
     }
 
     [Test]
@@ -116,7 +119,7 @@ public class UserEntityTests : BaseTestFixture
         user.IsEmailVerified = true;
 
         // Assert
-        user.IsEmailVerified.Should().BeTrue();
+        Assert.That(user.IsEmailVerified, Is.True);
     }
 
     [Test]
@@ -130,7 +133,7 @@ public class UserEntityTests : BaseTestFixture
         user.Groups.Add(groupId);
 
         // Assert
-        user.Groups.Should().Contain(groupId);
+        Assert.That(user.Groups, Does.Contain(groupId));
     }
 
     [Test]
@@ -144,7 +147,7 @@ public class UserEntityTests : BaseTestFixture
         user.FavoriteProducts.Add(productId);
 
         // Assert
-        user.FavoriteProducts.Should().Contain(productId);
+        Assert.That(user.FavoriteProducts, Does.Contain(productId));
     }
 
     [Test]
@@ -162,9 +165,12 @@ public class UserEntityTests : BaseTestFixture
         user.Country = country;
 
         // Assert
-        user.Address.Should().Be(address);
-        user.City.Should().Be(city);
-        user.Country.Should().Be(country);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(user.Address, Is.EqualTo(address));
+            Assert.That(user.City, Is.EqualTo(city));
+            Assert.That(user.Country, Is.EqualTo(country));
+        }
     }
 
     [Test]
@@ -174,8 +180,17 @@ public class UserEntityTests : BaseTestFixture
         var user = new UserEntity { CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
 
         // Assert
-        user.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        user.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(
+                user.CreatedAt,
+                Is.EqualTo(DateTime.UtcNow).Within(TimeSpan.FromSeconds(1))
+            );
+            Assert.That(
+                user.UpdatedAt,
+                Is.EqualTo(DateTime.UtcNow).Within(TimeSpan.FromSeconds(1))
+            );
+        }
     }
 
     [Test]
@@ -188,6 +203,6 @@ public class UserEntityTests : BaseTestFixture
         user.IsDeleted = true;
 
         // Assert
-        user.IsDeleted.Should().BeTrue();
+        Assert.That(user.IsDeleted, Is.True);
     }
 }
