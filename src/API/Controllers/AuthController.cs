@@ -1,7 +1,10 @@
+using System.Security.Cryptography;
+using System.Text;
 using ECommerce.API.DTOs;
 using ECommerce.API.Filters;
 using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
 
@@ -224,6 +227,7 @@ public sealed class AuthController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<LoginResponseDto>> Login(
         [FromBody] LoginRequestDto loginRequest,
+        [FromHeader(Name = "User-Agent")] string? userAgent = null,
         CancellationToken cancellationToken = default
     )
     {
@@ -234,7 +238,7 @@ public sealed class AuthController : ControllerBase
         Response.Headers.Append("X-XSS-Protection", "1; mode=block");
 
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-        var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+        userAgent ??= "Unknown";
 
         if (loginRequest == null)
         {
@@ -259,6 +263,15 @@ public sealed class AuthController : ControllerBase
                 ipAddress
             );
             return BadRequest(ModelState);
+        }
+
+        if (string.IsNullOrWhiteSpace(loginRequest.Email))
+        {
+            _logger.LogWarning(
+                "Login attempt with null or empty email from IP: {IpAddress}",
+                ipAddress
+            );
+            return BadRequest(new { Message = "Email is required" });
         }
 
         // Find user by email
