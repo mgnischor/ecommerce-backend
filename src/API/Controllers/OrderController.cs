@@ -1,9 +1,14 @@
+using System.Security.Claims;
+using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.Domain.Policies;
 using ECommerce.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -59,11 +64,11 @@ public sealed class OrderController : ControllerBase
     )
     {
         if (order == null)
-            return BadRequest("Order data is required");
+            return BadRequest(ErrorMessages.OrderDataRequired);
 
         var userId = GetCurrentUserId();
         if (userId == Guid.Empty)
-            return Unauthorized(new { Message = "User ID not found in authentication token" });
+            return Unauthorized(new { Message = ErrorMessages.UserIdNotFoundInToken });
 
         // Load order items from database to validate business rules
         var orderItems = await _context
@@ -83,7 +88,7 @@ public sealed class OrderController : ControllerBase
         {
             _logger.LogWarning(
                 "Order creation validation failed: {Error}, CustomerId={CustomerId}, Amount={Amount}",
-                errorMessage ?? "Unknown error",
+                errorMessage ?? ErrorMessages.Unknown,
                 order.CustomerId,
                 order.TotalAmount
             );
@@ -101,10 +106,7 @@ public sealed class OrderController : ControllerBase
                     item.Quantity
                 );
                 return BadRequest(
-                    new
-                    {
-                        Message = $"Item quantity must be positive for product {item.ProductName}",
-                    }
+                    new { Message = ErrorMessages.InvalidOrderItemQuantity(item.ProductName) }
                 );
             }
         }
@@ -210,7 +212,7 @@ public sealed class OrderController : ControllerBase
         var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
 
         if (order == null)
-            return NotFound(new { Message = $"Order with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.OrderNotFoundById(id.ToString()) });
 
         return Ok(order);
     }
@@ -243,7 +245,7 @@ public sealed class OrderController : ControllerBase
         var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
 
         if (order == null)
-            return NotFound(new { Message = $"Order with ID '{id}' not found" });
+            return NotFound(new { Message = ErrorMessages.OrderNotFoundById(id.ToString()) });
 
         var userId = GetCurrentUserId();
 
