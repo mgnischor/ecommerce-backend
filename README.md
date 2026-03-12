@@ -18,23 +18,23 @@ A production-ready, enterprise-grade e-commerce backend API built with ASP.NET C
 
 ## 📋 Table of Contents
 
--   [Overview](#-overview)
--   [Features](#-features)
--   [Architecture](#-architecture)
--   [Tech Stack](#-tech-stack)
--   [Quick Start](#-quick-start)
-    -   [Prerequisites](#prerequisites)
-    -   [Local Development](#local-development)
-    -   [Docker Compose](#docker-compose)
--   [Configuration](#-configuration)
--   [Database Management](#-database-management)
--   [API Reference](#-api-reference)
--   [Observability](#-observability)
--   [Testing](#-testing)
--   [Documentation](#-documentation)
--   [Security](#-security)
--   [Contributing](#-contributing)
--   [License](#-license)
+- [Overview](#-overview)
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Tech Stack](#-tech-stack)
+- [Quick Start](#-quick-start)
+    - [Prerequisites](#prerequisites)
+    - [Local Development](#local-development)
+    - [Docker Compose](#docker-compose)
+- [Configuration](#-configuration)
+- [Database Management](#-database-management)
+- [API Reference](#-api-reference)
+- [Observability](#-observability)
+- [Testing](#-testing)
+- [Documentation](#-documentation)
+- [Security](#-security)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
@@ -58,45 +58,83 @@ The **E-Commerce Backend API** is a robust, scalable solution designed for moder
 
 ### Core Functionality
 
--   **Authentication & Authorization**
+- **Authentication & Authorization**
+    - JWT-based authentication with configurable expiration
+    - Role-based access control (Admin, Manager, Customer)
+    - Password hashing using BCrypt
+    - Token refresh and validation
 
-    -   JWT-based authentication with configurable expiration
-    -   Role-based access control (Admin, Manager, Customer)
-    -   Password hashing using BCrypt
-    -   Token refresh and validation
+- **Product Management**
+    - Full CRUD operations with pagination
+    - Advanced search and filtering (category, price, rating)
+    - Featured products and sales management
+    - SKU-based inventory tracking
+    - Product specifications with value objects
 
--   **Product Management**
+- **Inventory & Accounting**
+    - Real-time inventory tracking across multiple locations
+    - Automatic double-entry accounting for all inventory movements
+    - Transaction types: Purchase, Sale, Return, Adjustment, Loss, Transfer
+    - Full audit trail with traceability
+    - Chart of accounts seeded with 40+ predefined accounts
+    - Financial reports support (COGS, Trial Balance, Income Statement)
 
-    -   Full CRUD operations with pagination
-    -   Advanced search and filtering (category, price, rating)
-    -   Featured products and sales management
-    -   SKU-based inventory tracking
-    -   Product specifications with value objects
+- **Business Rules Engine**
+    - Pricing policies with discount validation
+    - Stock management with low-stock alerts
+    - Order validation and lifecycle management
+    - Coupon validation with usage limits
+    - Review moderation policies
+    - Fraud detection scoring
 
--   **Inventory & Accounting**
+- **Domain-Driven Design**
+    - Value Objects: Money, Discount, EmailAddress, SKU
+    - Policies: Pricing, Stock Management, Order Validation, Coupon Validation
+    - Specifications: Product and Order filtering criteria
+    - Domain Services: Discount Calculation, Order Lifecycle, Product Pricing, Fraud Detection
+    - Domain Events: Order Placed, Stock Alert, Product Price Changed, etc.
 
-    -   Real-time inventory tracking across multiple locations
-    -   Automatic double-entry accounting for all inventory movements
-    -   Transaction types: Purchase, Sale, Return, Adjustment, Loss, Transfer
-    -   Full audit trail with traceability
-    -   Chart of accounts seeded with 40+ predefined accounts
-    -   Financial reports support (COGS, Trial Balance, Income Statement)
+- **Order Management**
+    - Full order lifecycle: Pending → Processing → Shipped → Delivered → Cancelled/Returned
+    - Business rule validation (min/max amounts, item limits, cancellation window)
+    - Inventory deduction on order creation via inventory transaction service
+    - Multi-address support (shipping and billing)
 
--   **Business Rules Engine**
+- **Financial Transactions**
+    - Centralized ledger of all monetary movements (sales, purchases, refunds, expenses)
+    - Cash flow analysis and accounts receivable/payable aging reports
+    - Payment reconciliation with bank statements
+    - Multi-currency support
 
-    -   Pricing policies with discount validation
-    -   Stock management with low-stock alerts
-    -   Order validation and lifecycle management
-    -   Coupon validation with usage limits
-    -   Review moderation policies
-    -   Fraud detection scoring
+- **Notification System**
+    - Multi-channel notifications: in-app, email, push
+    - Priority-based ordering with expiry management
+    - IDOR-protected per-user read/unread management
+    - Role-restricted creation (Admin/Manager)
 
--   **Domain-Driven Design**
-    -   Value Objects: Money, Discount, EmailAddress, SKU
-    -   Policies: Pricing, Stock Management, Order Validation, Coupon Validation
-    -   Specifications: Product and Order filtering criteria
-    -   Domain Services: Discount Calculation, Order Lifecycle, Product Pricing, Fraud Detection
-    -   Domain Events: Order Placed, Stock Alert, Product Price Changed, etc.
+- **Promotions & Discounts**
+    - Flexible promotions: percentage or fixed-amount, combinable or exclusive
+    - Eligibility rules by product, category, or user
+    - Featured promotions with banners and terms & conditions
+
+- **Refund Management**
+    - Full refund lifecycle with approval/rejection workflows
+    - Return tracking integration, optional restocking fees
+    - Admin notes and customer notes
+
+- **Shipments & Logistics**
+    - Shipment tracking (carrier, service type, tracking number, URL)
+    - Dimensional weight and insurance support
+    - Shipping zones with geographic scoping, rate models, and tax rates
+
+- **Supplier & Vendor Management**
+    - Supplier profiles with financial terms, lead times, and preferred status
+    - Multi-vendor marketplace with commission rates, ratings, and verification
+    - Store management with location, opening hours, and geolocation
+
+- **Product Catalog Extensions**
+    - Product attributes system (filterable, searchable, variant-specific)
+    - Product variants with independent SKU, pricing, and stock per attribute combination
 
 ---
 
@@ -108,7 +146,10 @@ The solution follows **Clean Architecture** principles with four distinct layers
 ┌─────────────────────────────────────────────────────────────┐
 │                       Presentation Layer                     │
 │                         (src/API)                            │
-│  • Controllers (Auth, Products, Users, Accounting)          │
+│  • Controllers (Auth, Products, Users, Accounting,          │
+│    Orders, Finance, Notifications, Suppliers, Vendors,      │
+│    Stores, Shipments, ShippingZones, Promotions, Refunds,   │
+│    ProductAttributes, ProductVariants)                      │
 │  • Middlewares (Exception Handling)                         │
 │  • OpenAPI/Scalar Documentation                             │
 │  • OpenTelemetry Configuration                              │
@@ -148,18 +189,18 @@ The solution follows **Clean Architecture** principles with four distinct layers
 
 ### Dependency Flow
 
--   **API** → Application → Domain ← Infrastructure
--   Dependencies flow inward; Domain has no external dependencies
--   Infrastructure implements interfaces defined in Domain/Application
+- **API** → Application → Domain ← Infrastructure
+- Dependencies flow inward; Domain has no external dependencies
+- Infrastructure implements interfaces defined in Domain/Application
 
 ### Key Design Patterns
 
--   **Repository Pattern** - Data access abstraction
--   **Unit of Work** - EF Core DbContext
--   **Specification Pattern** - Reusable query criteria
--   **Domain Events** - Decoupled business logic
--   **Value Objects** - Immutable, self-validating domain concepts
--   **Aggregate Root** - Consistency boundaries
+- **Repository Pattern** - Data access abstraction
+- **Unit of Work** - EF Core DbContext
+- **Specification Pattern** - Reusable query criteria
+- **Domain Events** - Decoupled business logic
+- **Value Objects** - Immutable, self-validating domain concepts
+- **Aggregate Root** - Consistency boundaries
 
 ---
 
@@ -167,46 +208,46 @@ The solution follows **Clean Architecture** principles with four distinct layers
 
 ### Backend Framework
 
--   **ASP.NET Core 10.0** - High-performance web framework
--   **C# 13** - Latest language features
+- **ASP.NET Core 10.0** - High-performance web framework
+- **C# 13** - Latest language features
 
 ### Data & Persistence
 
--   **PostgreSQL 16** - Robust relational database
--   **Entity Framework Core 10.0** - ORM with code-first migrations
--   **Npgsql 10.0** - PostgreSQL provider for EF Core
+- **PostgreSQL 16** - Robust relational database
+- **Entity Framework Core 10.0** - ORM with code-first migrations
+- **Npgsql 10.0.1** - PostgreSQL provider for EF Core
 
 ### Authentication & Security
 
--   **JWT Bearer Authentication** - Stateless authentication
--   **BCrypt** - Password hashing
--   **Role-Based Authorization** - Fine-grained access control
+- **JWT Bearer Authentication** - Stateless authentication
+- **BCrypt** - Password hashing
+- **Role-Based Authorization** - Fine-grained access control
 
 ### API Documentation
 
--   **Microsoft.AspNetCore.OpenApi** - OpenAPI 3.0 specification
--   **Scalar.AspNetCore 2.10** - Modern, interactive API documentation UI
+- **Microsoft.AspNetCore.OpenApi** - OpenAPI 3.0 specification
+- **Scalar.AspNetCore 2.12** - Modern, interactive API documentation UI
 
 ### Observability & Monitoring
 
--   **OpenTelemetry 1.14** - Distributed tracing and metrics
--   **OpenTelemetry.Instrumentation.AspNetCore** - HTTP request tracing
--   **OpenTelemetry.Instrumentation.EntityFrameworkCore** - Database query tracing
--   **OpenTelemetry.Instrumentation.Http** - HTTP client tracing
--   **OpenTelemetry.Instrumentation.Runtime** - .NET runtime metrics
--   **OpenTelemetry.Exporter.OpenTelemetryProtocol** - OTLP/gRPC exporter
--   **Jaeger** - Distributed tracing UI (Docker image)
+- **OpenTelemetry 1.15** - Distributed tracing and metrics
+- **OpenTelemetry.Instrumentation.AspNetCore** - HTTP request tracing
+- **OpenTelemetry.Instrumentation.EntityFrameworkCore** - Database query tracing
+- **OpenTelemetry.Instrumentation.Http** - HTTP client tracing
+- **OpenTelemetry.Instrumentation.Runtime** - .NET runtime metrics
+- **OpenTelemetry.Exporter.OpenTelemetryProtocol** - OTLP/gRPC exporter
+- **Jaeger** - Distributed tracing UI (Docker image)
 
 ### Containerization & Orchestration
 
--   **Docker** - Application containerization
--   **Docker Compose** - Multi-container orchestration
--   **Alpine Linux** - Minimal base images for security and size
+- **Docker** - Application containerization
+- **Docker Compose** - Multi-container orchestration
+- **Alpine Linux** - Minimal base images for security and size
 
 ### Development Tools
 
--   **.NET CLI** - Command-line interface for .NET
--   **EF Core CLI** - Database migrations and scaffolding
+- **.NET CLI** - Command-line interface for .NET
+- **EF Core CLI** - Database migrations and scaffolding
 
 ---
 
@@ -216,10 +257,10 @@ The solution follows **Clean Architecture** principles with four distinct layers
 
 Ensure you have the following installed:
 
--   [.NET SDK 10.0+](https://dotnet.microsoft.com/download)
--   [Docker Desktop](https://www.docker.com/products/docker-desktop) (for Docker-based development)
--   [PostgreSQL 16+](https://www.postgresql.org/download/) (for local development without Docker)
--   [Git](https://git-scm.com/downloads)
+- [.NET SDK 10.0+](https://dotnet.microsoft.com/download)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) (for Docker-based development)
+- [PostgreSQL 16+](https://www.postgresql.org/download/) (for local development without Docker)
+- [Git](https://git-scm.com/downloads)
 
 ### Build and Run Options
 
@@ -245,8 +286,8 @@ cd scripts
 
 **Requirements:**
 
--   PostgreSQL running locally on port 5432
--   Database credentials configured in `appsettings.json`
+- PostgreSQL running locally on port 5432
+- Database credentials configured in `appsettings.json`
 
 **What it does:**
 
@@ -277,8 +318,8 @@ cd scripts
 
 **Requirements:**
 
--   Docker Desktop installed and running
--   No local PostgreSQL needed
+- Docker Desktop installed and running
+- No local PostgreSQL needed
 
 **What it does:**
 
@@ -290,9 +331,9 @@ cd scripts
 
 **Containers created:**
 
--   `ecommerce-postgres` - PostgreSQL 16 Alpine
--   `ecommerce-backend-dev` - Development mode
--   `ecommerce-backend-prod` - Production mode
+- `ecommerce-postgres` - PostgreSQL 16 Alpine
+- `ecommerce-backend-dev` - Development mode
+- `ecommerce-backend-prod` - Production mode
 
 **Cleanup Docker containers:**
 
@@ -333,23 +374,23 @@ cd scripts
 
 **Local Build:**
 
--   **API**: `https://localhost:5049`
--   **API Docs**: `https://localhost:5049/docs`
+- **API**: `https://localhost:5049`
+- **API Docs**: `https://localhost:5049/docs`
 
 **Docker Build:**
 
--   **Development API**: `http://localhost:5049`
--   **Production API**: `http://localhost:8080`
--   **PostgreSQL**: `localhost:5432`
--   **API Docs (Dev)**: `http://localhost:5049/docs`
--   **API Docs (Prod)**: `http://localhost:8080/docs`
+- **Development API**: `http://localhost:5049`
+- **Production API**: `http://localhost:8080`
+- **PostgreSQL**: `localhost:5432`
+- **API Docs (Dev)**: `http://localhost:5049/docs`
+- **API Docs (Prod)**: `http://localhost:8080/docs`
 
 #### 4. Default Credentials
 
 On first run, an admin user is automatically seeded:
 
--   **Email**: `admin@ecommerce.com.br`
--   **Password**: `admin`
+- **Email**: `admin@ecommerce.com.br`
+- **Password**: `admin`
 
 > ⚠️ **Important**: Change these credentials immediately in production!
 
@@ -365,10 +406,10 @@ docker-compose -f docker-compose.dev.yml up -d
 
 **Services:**
 
--   API: `http://localhost:5049`
--   API Docs: `http://localhost:5049/docs`
--   PostgreSQL: `localhost:5432`
--   Jaeger UI: `http://localhost:16686`
+- API: `http://localhost:5049`
+- API Docs: `http://localhost:5049/docs`
+- PostgreSQL: `localhost:5432`
+- Jaeger UI: `http://localhost:16686`
 
 #### Production Mode
 
@@ -378,9 +419,9 @@ docker-compose up -d
 
 **Services:**
 
--   API: `http://localhost`
--   PostgreSQL: `localhost:5432`
--   Jaeger UI: `http://localhost:16686`
+- API: `http://localhost`
+- PostgreSQL: `localhost:5432`
+- Jaeger UI: `http://localhost:16686`
 
 #### Stop Services
 
@@ -455,7 +496,7 @@ $env:Jwt__ExpirationMinutes = "60"
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.1.20",
+        "ServiceVersion": "0.1.21",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": ""
     }
@@ -466,7 +507,7 @@ $env:Jwt__ExpirationMinutes = "60"
 
 ```powershell
 $env:OpenTelemetry__ServiceName = "ECommerce.Backend"
-$env:OpenTelemetry__ServiceVersion = "0.1.20"
+$env:OpenTelemetry__ServiceVersion = "0.1.21"
 $env:OpenTelemetry__EnableConsoleExporter = "true"
 $env:OpenTelemetry__OtlpEndpoint = "http://localhost:4317"
 ```
@@ -522,7 +563,6 @@ dotnet ef migrations remove
 The application automatically seeds the database on first run:
 
 1. **Admin User**
-
     - Email: `admin@ecommerce.com.br`
     - Password: `admin`
     - Role: Admin
@@ -540,9 +580,9 @@ Seeding logic: `src/Infrastructure/Persistence/DatabaseSeeder.cs`
 
 PowerShell scripts are available in the `scripts/` directory:
 
--   **`build-local.ps1`** - Complete build pipeline (version bump, migration, build, publish, SQL export)
--   **`migration-script.ps1`** - Export migration SQL scripts
--   **`update-version.ps1`** - Bump project version
+- **`build-local.ps1`** - Complete build pipeline (version bump, migration, build, publish, SQL export)
+- **`migration-script.ps1`** - Export migration SQL scripts
+- **`update-version.ps1`** - Bump project version
 
 ---
 
@@ -550,9 +590,9 @@ PowerShell scripts are available in the `scripts/` directory:
 
 ### Base URL
 
--   **Development**: `https://localhost:5049/api/v1`
--   **Docker (Dev)**: `http://localhost:5049/api/v1`
--   **Docker (Prod)**: `http://localhost/api/v1`
+- **Development**: `https://localhost:5049/api/v1`
+- **Docker (Dev)**: `http://localhost:5049/api/v1`
+- **Docker (Prod)**: `http://localhost/api/v1`
 
 ### Authentication Endpoints
 
@@ -626,6 +666,137 @@ Content-Type: application/json
 | GET    | `/accounting/journal-entries/{id}`         | Get journal entry by ID          | Yes  |
 | GET    | `/accounting/journal-entries/product/{id}` | Get entries by product           | Yes  |
 
+### Order Endpoints
+
+| Method | Endpoint              | Description                 | Auth  |
+| ------ | --------------------- | --------------------------- | ----- |
+| GET    | `/orders`             | List all orders (paginated) | Yes   |
+| GET    | `/orders/{id}`        | Get order by ID             | Yes   |
+| POST   | `/orders`             | Create new order            | Yes   |
+| PUT    | `/orders/{id}`        | Update order                | Yes   |
+| PATCH  | `/orders/{id}/cancel` | Cancel order                | Yes   |
+| DELETE | `/orders/{id}`        | Delete order                | Admin |
+
+### Finance Endpoints
+
+| Method | Endpoint                                               | Description                             | Auth |
+| ------ | ------------------------------------------------------ | --------------------------------------- | ---- |
+| GET    | `/finance/transactions`                                | List financial transactions (paginated) | Yes  |
+| GET    | `/finance/transactions/{id}`                           | Get transaction by ID                   | Yes  |
+| GET    | `/finance/transactions/period?startDate={}&endDate={}` | Get transactions by period              | Yes  |
+| GET    | `/finance/cash-flow`                                   | Cash flow report                        | Yes  |
+| GET    | `/finance/accounts-receivable`                         | Accounts receivable aging               | Yes  |
+| GET    | `/finance/accounts-payable`                            | Accounts payable aging                  | Yes  |
+| GET    | `/finance/dashboard`                                   | Financial dashboard KPIs                | Yes  |
+| POST   | `/finance/reconcile/{id}`                              | Reconcile a transaction                 | Yes  |
+
+### Notification Endpoints
+
+| Method | Endpoint                                    | Description                    | Auth          |
+| ------ | ------------------------------------------- | ------------------------------ | ------------- |
+| GET    | `/notifications/user/{userId}`              | Get notifications for a user   | Yes           |
+| GET    | `/notifications/user/{userId}/unread-count` | Get unread count for a user    | Yes           |
+| PATCH  | `/notifications/{id}/read`                  | Mark notification as read      | Yes           |
+| PATCH  | `/notifications/user/{userId}/read-all`     | Mark all notifications as read | Yes           |
+| POST   | `/notifications`                            | Create notification            | Admin/Manager |
+| DELETE | `/notifications/{id}`                       | Delete notification            | Yes           |
+
+### Supplier Endpoints
+
+| Method | Endpoint                        | Description               | Auth          |
+| ------ | ------------------------------- | ------------------------- | ------------- |
+| GET    | `/suppliers`                    | List all active suppliers | Admin/Manager |
+| GET    | `/suppliers/{id}`               | Get supplier by ID        | Admin/Manager |
+| GET    | `/suppliers/code/{code}`        | Get supplier by code      | Admin/Manager |
+| GET    | `/suppliers/search?term={term}` | Search suppliers          | Admin/Manager |
+| POST   | `/suppliers`                    | Create supplier           | Admin/Manager |
+| PUT    | `/suppliers/{id}`               | Update supplier           | Admin/Manager |
+| DELETE | `/suppliers/{id}`               | Soft delete supplier      | Admin         |
+
+### Vendor Endpoints
+
+| Method | Endpoint                      | Description                  | Auth |
+| ------ | ----------------------------- | ---------------------------- | ---- |
+| GET    | `/vendors`                    | List all vendors (paginated) | No   |
+| GET    | `/vendors/{id}`               | Get vendor by ID             | No   |
+| GET    | `/vendors/featured`           | Get featured vendors         | No   |
+| GET    | `/vendors/search?term={term}` | Search vendors               | No   |
+| POST   | `/vendors`                    | Register as vendor           | Yes  |
+| PUT    | `/vendors/{id}`               | Update vendor                | Yes  |
+
+### Store Endpoints
+
+| Method | Endpoint       | Description            | Auth          |
+| ------ | -------------- | ---------------------- | ------------- |
+| GET    | `/stores`      | List all active stores | No            |
+| GET    | `/stores/{id}` | Get store by ID        | No            |
+| POST   | `/stores`      | Create store           | Admin/Manager |
+| PUT    | `/stores/{id}` | Update store           | Admin/Manager |
+| DELETE | `/stores/{id}` | Delete store           | Admin         |
+
+### Shipment Endpoints
+
+| Method | Endpoint                     | Description                    | Auth          |
+| ------ | ---------------------------- | ------------------------------ | ------------- |
+| GET    | `/shipments`                 | List all shipments (paginated) | Yes           |
+| GET    | `/shipments/{id}`            | Get shipment by ID             | Yes           |
+| GET    | `/shipments/order/{orderId}` | Get shipments for an order     | Yes           |
+| POST   | `/shipments`                 | Create shipment                | Admin/Manager |
+| PUT    | `/shipments/{id}`            | Update shipment                | Admin/Manager |
+| PATCH  | `/shipments/{id}/deliver`    | Mark as delivered              | Admin/Manager |
+
+### Shipping Zone Endpoints
+
+| Method | Endpoint               | Description           | Auth          |
+| ------ | ---------------------- | --------------------- | ------------- |
+| GET    | `/shipping-zones`      | List all active zones | No            |
+| GET    | `/shipping-zones/{id}` | Get zone by ID        | No            |
+| POST   | `/shipping-zones`      | Create shipping zone  | Admin/Manager |
+| PUT    | `/shipping-zones/{id}` | Update shipping zone  | Admin/Manager |
+| DELETE | `/shipping-zones/{id}` | Delete shipping zone  | Admin         |
+
+### Promotion Endpoints
+
+| Method | Endpoint               | Description             | Auth          |
+| ------ | ---------------------- | ----------------------- | ------------- |
+| GET    | `/promotions`          | List active promotions  | No            |
+| GET    | `/promotions/{id}`     | Get promotion by ID     | No            |
+| GET    | `/promotions/featured` | Get featured promotions | No            |
+| POST   | `/promotions`          | Create promotion        | Admin/Manager |
+| PUT    | `/promotions/{id}`     | Update promotion        | Admin/Manager |
+| DELETE | `/promotions/{id}`     | Delete promotion        | Admin         |
+
+### Refund Endpoints
+
+| Method | Endpoint                   | Description                  | Auth          |
+| ------ | -------------------------- | ---------------------------- | ------------- |
+| GET    | `/refunds`                 | List all refunds (paginated) | Admin/Manager |
+| GET    | `/refunds/{id}`            | Get refund by ID             | Yes           |
+| GET    | `/refunds/order/{orderId}` | Get refunds for an order     | Yes           |
+| POST   | `/refunds`                 | Request a refund             | Yes           |
+| PATCH  | `/refunds/{id}/approve`    | Approve refund               | Admin/Manager |
+| PATCH  | `/refunds/{id}/reject`     | Reject refund                | Admin/Manager |
+
+### Product Attribute Endpoints
+
+| Method | Endpoint                   | Description         | Auth          |
+| ------ | -------------------------- | ------------------- | ------------- |
+| GET    | `/product-attributes`      | List all attributes | No            |
+| GET    | `/product-attributes/{id}` | Get attribute by ID | No            |
+| POST   | `/product-attributes`      | Create attribute    | Admin/Manager |
+| PUT    | `/product-attributes/{id}` | Update attribute    | Admin/Manager |
+| DELETE | `/product-attributes/{id}` | Delete attribute    | Admin         |
+
+### Product Variant Endpoints
+
+| Method | Endpoint                                | Description                 | Auth          |
+| ------ | --------------------------------------- | --------------------------- | ------------- |
+| GET    | `/product-variants/product/{productId}` | List variants for a product | No            |
+| GET    | `/product-variants/{id}`                | Get variant by ID           | No            |
+| POST   | `/product-variants`                     | Create product variant      | Admin/Manager |
+| PUT    | `/product-variants/{id}`                | Update product variant      | Admin/Manager |
+| DELETE | `/product-variants/{id}`                | Delete product variant      | Admin         |
+
 ### Authentication
 
 Protected endpoints require a JWT token in the `Authorization` header:
@@ -638,10 +809,10 @@ Authorization: Bearer <your-jwt-token>
 
 Access the **Scalar UI** at `/docs` for interactive API exploration:
 
--   Try out endpoints directly from the browser
--   View request/response schemas
--   Download OpenAPI specification (JSON/YAML)
--   Explore all available operations
+- Try out endpoints directly from the browser
+- View request/response schemas
+- Download OpenAPI specification (JSON/YAML)
+- Explore all available operations
 
 ---
 
@@ -657,10 +828,10 @@ The application is fully instrumented with **OpenTelemetry** for distributed tra
 
 Automatic instrumentation is enabled for:
 
--   **ASP.NET Core** - HTTP request/response tracking with status codes, durations, and exceptions
--   **Entity Framework Core** - Database queries with SQL statements and execution times
--   **HTTP Client** - Outgoing HTTP requests with URIs and response codes
--   **.NET Runtime** - Garbage collection, thread pool, and exception metrics
+- **ASP.NET Core** - HTTP request/response tracking with status codes, durations, and exceptions
+- **Entity Framework Core** - Database queries with SQL statements and execution times
+- **HTTP Client** - Outgoing HTTP requests with URIs and response codes
+- **.NET Runtime** - Garbage collection, thread pool, and exception metrics
 
 ### Distributed Tracing
 
@@ -672,11 +843,11 @@ When running with Docker Compose, Jaeger is available at:
 
 **Features:**
 
--   View end-to-end request traces
--   Analyze service dependencies
--   Identify performance bottlenecks
--   Troubleshoot errors with full stack traces
--   Monitor request latency percentiles (p50, p75, p95, p99)
+- View end-to-end request traces
+- Analyze service dependencies
+- Identify performance bottlenecks
+- Troubleshoot errors with full stack traces
+- Monitor request latency percentiles (p50, p75, p95, p99)
 
 #### Custom Tracing
 
@@ -712,20 +883,18 @@ public async Task<Order> ProcessOrderAsync(Guid orderId)
 
 Available metrics include:
 
--   **HTTP Metrics**
+- **HTTP Metrics**
+    - `http.server.request.duration` - Request duration histogram
+    - `http.server.active_requests` - Active requests gauge
 
-    -   `http.server.request.duration` - Request duration histogram
-    -   `http.server.active_requests` - Active requests gauge
+- **Database Metrics**
+    - Query execution times
+    - Connection pool statistics
 
--   **Database Metrics**
-
-    -   Query execution times
-    -   Connection pool statistics
-
--   **Runtime Metrics**
-    -   `process.runtime.dotnet.gc.collections.count` - GC collections
-    -   `process.runtime.dotnet.thread_pool.threads.count` - Thread pool size
-    -   `process.runtime.dotnet.exceptions.count` - Exception count
+- **Runtime Metrics**
+    - `process.runtime.dotnet.gc.collections.count` - GC collections
+    - `process.runtime.dotnet.thread_pool.threads.count` - Thread pool size
+    - `process.runtime.dotnet.exceptions.count` - Exception count
 
 ### Exporters
 
@@ -792,12 +961,12 @@ _logger.LogInformation(
 
 **Log Levels:**
 
--   `Trace` - Very detailed diagnostic information
--   `Debug` - Debugging information
--   `Information` - General informational messages
--   `Warning` - Warnings that don't prevent execution
--   `Error` - Errors that stop the current operation
--   `Critical` - Critical errors that require immediate attention
+- `Trace` - Very detailed diagnostic information
+- `Debug` - Debugging information
+- `Information` - General informational messages
+- `Warning` - Warnings that don't prevent execution
+- `Error` - Errors that stop the current operation
+- `Critical` - Critical errors that require immediate attention
 
 ---
 
@@ -809,10 +978,10 @@ The project includes a comprehensive unit test suite located in the `tests/` dir
 
 **Tech Stack:**
 
--   **NUnit** - Testing framework
--   **FluentAssertions** - Fluent assertion library
--   **Moq** - Mocking library
--   **EF Core InMemory** - For database testing
+- **NUnit** - Testing framework
+- **FluentAssertions** - Fluent assertion library
+- **Moq** - Mocking library
+- **EF Core InMemory** - For database testing
 
 **Structure:**
 
@@ -860,20 +1029,20 @@ Comprehensive documentation is available in the `docs/` directory:
 
 ### Business & Architecture
 
--   **[BUSINESS_RULES.md](docs/BUSINESS_RULES.md)** - Domain policies, specifications, value objects, and business logic
--   **[ACCOUNTING_SYSTEM.md](docs/ACCOUNTING_SYSTEM.md)** - Double-entry accounting implementation following NBC TG
--   **[ACCOUNTING_INTEGRATION_GUIDE.md](docs/ACCOUNTING_INTEGRATION_GUIDE.md)** - How to integrate accounting in your code
+- **[BUSINESS_RULES.md](docs/BUSINESS_RULES.md)** - Domain policies, specifications, value objects, and business logic
+- **[ACCOUNTING_SYSTEM.md](docs/ACCOUNTING_SYSTEM.md)** - Double-entry accounting implementation following NBC TG
+- **[ACCOUNTING_INTEGRATION_GUIDE.md](docs/ACCOUNTING_INTEGRATION_GUIDE.md)** - How to integrate accounting in your code
 
 ### Observability
 
--   **[OPENTELEMETRY_GUIDE.md](docs/OPENTELEMETRY_GUIDE.md)** - Complete OpenTelemetry setup and custom instrumentation
--   **[RUNNING_WITH_JAEGER.md](docs/RUNNING_WITH_JAEGER.md)** - Running and troubleshooting with Jaeger
+- **[OPENTELEMETRY_GUIDE.md](docs/OPENTELEMETRY_GUIDE.md)** - Complete OpenTelemetry setup and custom instrumentation
+- **[RUNNING_WITH_JAEGER.md](docs/RUNNING_WITH_JAEGER.md)** - Running and troubleshooting with Jaeger
 
 ### Project Management
 
--   **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
--   **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
--   **[SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md)** - Security considerations and best practices
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+- **[SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md)** - Security considerations and best practices
 
 ---
 
@@ -881,9 +1050,9 @@ Comprehensive documentation is available in the `docs/` directory:
 
 ### Authentication
 
--   **JWT Bearer Tokens** with configurable expiration
--   **BCrypt password hashing** with salt
--   **Role-based authorization** (Admin, Manager, Customer)
+- **JWT Bearer Tokens** with configurable expiration
+- **BCrypt password hashing** with salt
+- **Role-based authorization** (Admin, Manager, Customer)
 
 ### Best Practices
 
@@ -900,16 +1069,16 @@ Comprehensive documentation is available in the `docs/` directory:
 
 Before deploying to production:
 
--   [ ] Change default admin credentials
--   [ ] Use strong, randomly generated JWT secret key
--   [ ] Enable HTTPS with valid SSL certificates
--   [ ] Configure CORS for specific origins
--   [ ] Set up database backups and disaster recovery
--   [ ] Enable application insights and monitoring
--   [ ] Review and implement security headers
--   [ ] Configure rate limiting and throttling
--   [ ] Set up Web Application Firewall (WAF)
--   [ ] Perform security audit and penetration testing
+- [ ] Change default admin credentials
+- [ ] Use strong, randomly generated JWT secret key
+- [ ] Enable HTTPS with valid SSL certificates
+- [ ] Configure CORS for specific origins
+- [ ] Set up database backups and disaster recovery
+- [ ] Enable application insights and monitoring
+- [ ] Review and implement security headers
+- [ ] Configure rate limiting and throttling
+- [ ] Set up Web Application Firewall (WAF)
+- [ ] Perform security audit and penetration testing
 
 See **[SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md)** for detailed security guidelines.
 
@@ -927,12 +1096,12 @@ Contributions are welcome! Please follow these guidelines:
 
 ### Code Standards
 
--   Follow **Clean Architecture** principles
--   Write **meaningful commit messages**
--   Add **XML documentation** to public APIs
--   Follow **.NET coding conventions**
--   Ensure **no breaking changes** without discussion
--   Update documentation for new features
+- Follow **Clean Architecture** principles
+- Write **meaningful commit messages**
+- Add **XML documentation** to public APIs
+- Follow **.NET coding conventions**
+- Ensure **no breaking changes** without discussion
+- Update documentation for new features
 
 Read **[CONTRIBUTING.md](CONTRIBUTING.md)** for detailed contribution guidelines.
 
@@ -946,11 +1115,11 @@ See the [LICENSE.md](LICENSE.md) file for full license text.
 
 ### Key Points
 
--   ✅ You can use, modify, and distribute this software
--   ✅ You must disclose source code when distributing
--   ✅ You must use the same GPL-3.0 license for derivative works
--   ✅ You must state changes made to the code
--   ❌ No warranty or liability is provided
+- ✅ You can use, modify, and distribute this software
+- ✅ You must disclose source code when distributing
+- ✅ You must use the same GPL-3.0 license for derivative works
+- ✅ You must state changes made to the code
+- ❌ No warranty or liability is provided
 
 ---
 
@@ -958,18 +1127,18 @@ See the [LICENSE.md](LICENSE.md) file for full license text.
 
 **Miguel Nischor**
 
--   GitHub: [@mgnischor](https://github.com/mgnischor)
--   Repository: [ecommerce-backend](https://github.com/mgnischor/ecommerce-backend)
+- GitHub: [@mgnischor](https://github.com/mgnischor)
+- Repository: [ecommerce-backend](https://github.com/mgnischor/ecommerce-backend)
 
 ---
 
 ## 🙏 Acknowledgments
 
--   **ASP.NET Core Team** - For the excellent framework
--   **EF Core Team** - For the powerful ORM
--   **OpenTelemetry Community** - For observability standards
--   **PostgreSQL Team** - For the robust database
--   **Scalar Team** - For the beautiful API documentation UI
+- **ASP.NET Core Team** - For the excellent framework
+- **EF Core Team** - For the powerful ORM
+- **OpenTelemetry Community** - For observability standards
+- **PostgreSQL Team** - For the robust database
+- **Scalar Team** - For the beautiful API documentation UI
 
 ---
 
