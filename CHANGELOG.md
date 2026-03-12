@@ -13,81 +13,86 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.1.21] - 2026-02-22
+
+### Changed
+
+- Empty migration (no database changes)
+- Build version increment only
+
 ## [0.1.20] - 2025-12-16
 
 ### Changed
 
--   Empty migration (no database changes)
--   Build version increment only
+- Empty migration (no database changes)
+- Build version increment only
 
 ## [0.1.19] - 2025-12-16
 
 ### Changed
 
--   Empty migration (no database changes)
--   Build version increment only
+- Empty migration (no database changes)
+- Build version increment only
 
 ## [0.1.18] - 2025-12-16
 
 ### Added
 
--   **Accounting Rules System**: Database-driven accounting rules for automated journal entries
+- **Accounting Rules System**: Database-driven accounting rules for automated journal entries
+    - **AccountingRules Table**: Configurable accounting rules for transaction types
+        - Maps inventory transaction types to chart of accounts
+        - Defines debit and credit account codes for double-entry bookkeeping
+        - Support for conditional rules (e.g., "Quantity > 0" for adjustments)
+        - Rule activation/deactivation without code changes
+        - Unique rule codes for easy identification (PURCHASE, SALE, SALE_RETURN, etc.)
+    - **Pre-configured Rules**: 7 standard accounting rules inserted during migration:
+        - `PURCHASE` - Debit: Inventory (1.1.03.001), Credit: Suppliers (2.1.01.001)
+        - `SALE` - Debit: COGS (3.1.01.001), Credit: Inventory (1.1.03.001)
+        - `SALE_RETURN` - Debit: Inventory (1.1.03.001), Credit: COGS (3.1.01.001)
+        - `PURCHASE_RETURN` - Debit: Suppliers (2.1.01.001), Credit: Inventory (1.1.03.001)
+        - `ADJUSTMENT_POSITIVE` - Debit: Inventory (1.1.03.001), Credit: Other Income (4.2.01.001)
+        - `ADJUSTMENT_NEGATIVE` - Debit: Operating Expenses (3.2.01.002), Credit: Inventory (1.1.03.001)
+        - `LOSS` - Debit: Inventory Loss (3.2.01.001), Credit: Inventory (1.1.03.001)
+    - **Chart of Accounts Seed Data**: 7 essential accounts added during migration:
+        - Asset accounts: Cash (1.1.01.001), Inventory (1.1.03.001)
+        - Liability account: Accounts Payable - Suppliers (2.1.01.001)
+        - Expense accounts: COGS (3.1.01.001), Inventory Loss (3.2.01.001), Operating Expenses (3.2.01.002)
+        - Revenue account: Other Operating Income (4.2.01.001)
+    - **Database Indexes**:
+        - Unique index on `RuleCode` for rule identification
+        - Index on `TransactionType` for fast lookups
+        - Index on `IsActive` for filtering active rules
+        - Composite index on `TransactionType` and `IsActive` for optimized queries
 
-    -   **AccountingRules Table**: Configurable accounting rules for transaction types
-        -   Maps inventory transaction types to chart of accounts
-        -   Defines debit and credit account codes for double-entry bookkeeping
-        -   Support for conditional rules (e.g., "Quantity > 0" for adjustments)
-        -   Rule activation/deactivation without code changes
-        -   Unique rule codes for easy identification (PURCHASE, SALE, SALE_RETURN, etc.)
-    -   **Pre-configured Rules**: 7 standard accounting rules inserted during migration:
-        -   `PURCHASE` - Debit: Inventory (1.1.03.001), Credit: Suppliers (2.1.01.001)
-        -   `SALE` - Debit: COGS (3.1.01.001), Credit: Inventory (1.1.03.001)
-        -   `SALE_RETURN` - Debit: Inventory (1.1.03.001), Credit: COGS (3.1.01.001)
-        -   `PURCHASE_RETURN` - Debit: Suppliers (2.1.01.001), Credit: Inventory (1.1.03.001)
-        -   `ADJUSTMENT_POSITIVE` - Debit: Inventory (1.1.03.001), Credit: Other Income (4.2.01.001)
-        -   `ADJUSTMENT_NEGATIVE` - Debit: Operating Expenses (3.2.01.002), Credit: Inventory (1.1.03.001)
-        -   `LOSS` - Debit: Inventory Loss (3.2.01.001), Credit: Inventory (1.1.03.001)
-    -   **Chart of Accounts Seed Data**: 7 essential accounts added during migration:
-        -   Asset accounts: Cash (1.1.01.001), Inventory (1.1.03.001)
-        -   Liability account: Accounts Payable - Suppliers (2.1.01.001)
-        -   Expense accounts: COGS (3.1.01.001), Inventory Loss (3.2.01.001), Operating Expenses (3.2.01.002)
-        -   Revenue account: Other Operating Income (4.2.01.001)
-    -   **Database Indexes**:
-        -   Unique index on `RuleCode` for rule identification
-        -   Index on `TransactionType` for fast lookups
-        -   Index on `IsActive` for filtering active rules
-        -   Composite index on `TransactionType` and `IsActive` for optimized queries
+- **Enhanced User Security**: Account lockout and login tracking features
+    - `FailedLoginAttempts` - Counter for failed login attempts
+    - `LastFailedLoginAt` - Timestamp of last failed login
+    - `LastSuccessfulLoginAt` - Timestamp of last successful login
+    - `LastLoginIpAddress` - IP address of last login attempt
+    - `LockedUntil` - Account lockout timestamp for temporary bans
+    - Enables implementation of account lockout policies and security monitoring
 
--   **Enhanced User Security**: Account lockout and login tracking features
-
-    -   `FailedLoginAttempts` - Counter for failed login attempts
-    -   `LastFailedLoginAt` - Timestamp of last failed login
-    -   `LastSuccessfulLoginAt` - Timestamp of last successful login
-    -   `LastLoginIpAddress` - IP address of last login attempt
-    -   `LockedUntil` - Account lockout timestamp for temporary bans
-    -   Enables implementation of account lockout policies and security monitoring
-
--   **Upgraded to .NET 10**: Complete migration from .NET 9 to .NET 10
-    -   Updated `TargetFramework` to `net10.0` in all projects
-    -   Updated all Microsoft packages to version 10.0.0:
-        -   `Microsoft.AspNetCore.Authentication.JwtBearer`
-        -   `Microsoft.AspNetCore.OpenApi`
-        -   `Microsoft.EntityFrameworkCore` (all packages)
-    -   Updated Npgsql packages to version 10.0.0:
-        -   `Npgsql`
-        -   `Npgsql.EntityFrameworkCore.PostgreSQL`
-    -   Updated test project packages:
-        -   `Microsoft.EntityFrameworkCore.InMemory` to 10.0.0
-    -   Updated documentation to reflect .NET 10:
-        -   README.md badge and descriptions
-        -   Tech Stack section (ASP.NET Core 10.0, C# 13, EF Core 10.0)
-        -   Prerequisites section (.NET SDK 10.0+)
-    -   Maintained OpenTelemetry packages at version 1.14.0 (latest stable)
-    -   Build verification successful after upgrade
+- **Upgraded to .NET 10**: Complete migration from .NET 9 to .NET 10
+    - Updated `TargetFramework` to `net10.0` in all projects
+    - Updated all Microsoft packages to version 10.0.0:
+        - `Microsoft.AspNetCore.Authentication.JwtBearer`
+        - `Microsoft.AspNetCore.OpenApi`
+        - `Microsoft.EntityFrameworkCore` (all packages)
+    - Updated Npgsql packages to version 10.0.0:
+        - `Npgsql`
+        - `Npgsql.EntityFrameworkCore.PostgreSQL`
+    - Updated test project packages:
+        - `Microsoft.EntityFrameworkCore.InMemory` to 10.0.0
+    - Updated documentation to reflect .NET 10:
+        - README.md badge and descriptions
+        - Tech Stack section (ASP.NET Core 10.0, C# 13, EF Core 10.0)
+        - Prerequisites section (.NET SDK 10.0+)
+    - Maintained OpenTelemetry packages at version 1.14.0 (latest stable)
+    - Build verification successful after upgrade
 
 ### Database Schema
 
--   **AccountingRules Table**:
+- **AccountingRules Table**:
 
     ```sql
     CREATE TABLE AccountingRules (
@@ -104,7 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     );
     ```
 
--   **Users Table Enhancements**:
+- **Users Table Enhancements**:
     ```sql
     ALTER TABLE Users
       ADD COLUMN FailedLoginAttempts integer DEFAULT 0,
@@ -116,15 +121,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
--   **Flexible Accounting Configuration**: Rules can be modified in the database without code deployment
--   **Conditional Rules**: Support for business logic in accounting rules (e.g., different treatments for positive/negative adjustments)
--   **Audit Trail**: Complete tracking of rule changes with created/updated timestamps
--   **Security Enhancement**: Foundation for implementing:
-    -   Account lockout after N failed login attempts
-    -   Time-based account unlocking
-    -   Login history and security monitoring
-    -   IP-based access tracking
-    -   Suspicious activity detection
+- **Flexible Accounting Configuration**: Rules can be modified in the database without code deployment
+- **Conditional Rules**: Support for business logic in accounting rules (e.g., different treatments for positive/negative adjustments)
+- **Audit Trail**: Complete tracking of rule changes with created/updated timestamps
+- **Security Enhancement**: Foundation for implementing:
+    - Account lockout after N failed login attempts
+    - Time-based account unlocking
+    - Login history and security monitoring
+    - IP-based access tracking
+    - Suspicious activity detection
 
 ### Changed
 
@@ -134,166 +139,349 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
--   **Unit Testing Project**: Complete test suite implementation
-    -   Added `tests/` project using NUnit, Moq, and FluentAssertions
-    -   Implemented tests for Domain, Application, Infrastructure, and API layers
-    -   Added test scripts in `tests/scripts/` for running tests and generating coverage reports
--   **Documentation Updates**:
-    -   Updated README.md with testing instructions and current version
-    -   Updated OpenTelemetry configuration version
+- **Unit Testing Project**: Complete test suite implementation
+    - Added `tests/` project using NUnit, Moq, and FluentAssertions
+    - Implemented tests for Domain, Application, Infrastructure, and API layers
+    - Added test scripts in `tests/scripts/` for running tests and generating coverage reports
+- **Documentation Updates**:
+    - Updated README.md with testing instructions and current version
+    - Updated OpenTelemetry configuration version
 
 ### Changed
 
--   Updated project version to 0.1.17
--   Refined build and deployment scripts
+- Updated project version to 0.1.17
+- Refined build and deployment scripts
+
+## [0.1.16] - 2025-11-08
+
+### Changed
+
+- Empty migration (no database changes)
+- Build version increment only
+
+## [0.1.15] - 2025-11-08
+
+### Added
+
+- **Financial Transactions Module**: Complete financial transaction tracking system
+    - **FinancialTransactions Table**: Centralized record of all monetary movements
+        - Unique transaction numbers for traceability
+        - Typed transaction categories: `CustomerPayment`, `SupplierPayment`, `SalesRevenue`, `PurchaseExpense`, `Refund`, `OperatingExpense`, and more
+        - Multi-currency support with ISO currency codes
+        - Tax, fee, and net amount breakdown
+        - Reconciliation tracking with timestamp and responsible user
+        - Links to related entities: orders, payments, inventory transactions, journal entries
+        - Payment method and provider fields for cross-provider reporting
+        - Statuses: `Pending`, `Completed`, `Failed`, `Cancelled`
+    - **Database Indexes**:
+        - Unique index on `TransactionNumber`
+        - Composite index on `TransactionDate` + `TransactionType` for period reports
+        - Indexes on `OrderId`, `PaymentId`, `InventoryTransactionId`, `JournalEntryId`, `IsReconciled`, `Counterparty`
+    - **Foreign Keys**: Nullable FK references to `InventoryTransactions`, `JournalEntries`, and `Payments` tables with `SET NULL` on delete
+    - **FinanceController** (`/api/v1/finance`): New RESTful controller providing:
+        - Paginated transaction listing with filtering
+        - Period-based transaction queries
+        - Cash flow analysis and trend reports
+        - Accounts receivable/payable aging
+        - Payment reconciliation endpoints
+        - Financial dashboard with key performance indicators
+
+### Database Schema
+
+- **FinancialTransactions Table**:
+
+    ```sql
+    CREATE TABLE financial_transactions (
+      id uuid PRIMARY KEY,
+      transaction_number varchar(50) UNIQUE NOT NULL,
+      transaction_type varchar(50) NOT NULL,
+      amount numeric(18,2) NOT NULL,
+      currency varchar(3) DEFAULT 'USD',
+      transaction_date timestamp with time zone NOT NULL,
+      description varchar(500) NOT NULL,
+      order_id uuid,
+      payment_id uuid,
+      inventory_transaction_id uuid,
+      journal_entry_id uuid,
+      product_id uuid,
+      counterparty varchar(200),
+      reference_number varchar(100),
+      is_reconciled boolean DEFAULT false,
+      reconciled_at timestamp with time zone,
+      reconciled_by uuid,
+      payment_method varchar(50),
+      payment_provider varchar(100),
+      status varchar(50) DEFAULT 'Pending',
+      notes varchar(1000),
+      tax_amount numeric(18,2) DEFAULT 0,
+      fee_amount numeric(18,2) DEFAULT 0,
+      net_amount numeric(18,2) NOT NULL,
+      created_by uuid NOT NULL,
+      created_at timestamp with time zone NOT NULL,
+      updated_at timestamp with time zone NOT NULL
+    );
+    ```
+
+### Changed
+
+### Fixed
+
+## [0.1.14] - 2025-11-03
+
+### Added
+
+- **Extended Domain Entities**: 10 new tables covering marketplace, logistics, and communication features
+    - **Notifications System**:
+        - `NotificationEntity` with multi-channel delivery support (in-app, email, push)
+        - Notification types, priority levels, and expiry management
+        - Read/unread status tracking with timestamps
+        - JSONB metadata field for flexible payloads
+        - Linked to `RelatedEntityId` and `RelatedEntityType` for contextual references
+        - **NotificationController** (`/api/v1/notifications`): IDOR-protected endpoints for per-user notification management
+
+    - **Product Attributes System**:
+        - `ProductAttributeEntity` for defining filterable/searchable product properties
+        - Support for data types (Text, Number, Boolean, Date, etc.)
+        - Variant attribute flag for size/color/style selectors
+        - Category applicability via UUID arrays
+        - Validation patterns and allowed value lists
+        - **ProductAttributeController** (`/api/v1/product-attributes`): CRUD endpoints with Admin/Manager authorization
+
+    - **Product Variants System**:
+        - `ProductVariantEntity` linked to parent products
+        - Independent SKU, barcode, price, and stock per variant
+        - Attribute map stored as JSONB for flexible variant definitions
+        - Default variant flag and display ordering
+        - **ProductVariantController** (`/api/v1/product-variants`): Variant management endpoints
+
+    - **Promotions System**:
+        - `PromotionEntity` supporting percentage and fixed-amount discounts
+        - Promotion types with configurable eligibility (products, categories, users)
+        - Usage limits (global and per-user), date windows, and combinability flag
+        - Featured promotions with banner URLs and terms & conditions
+        - **PromotionController** (`/api/v1/promotions`): Public listing with authenticated write operations
+
+    - **Refunds System**:
+        - `RefundEntity` with full lifecycle: `Requested → Approved → Processed → Completed`
+        - Unique refund numbers, customer and admin notes, rejection tracking
+        - Return flow management with tracking numbers
+        - Optional restocking fee support
+        - **RefundController** (`/api/v1/refunds`): User-accessible request endpoints with Admin/Manager approval flows
+
+    - **Shipments System**:
+        - `ShipmentEntity` with carrier, service type, and dimensional weights
+        - Shipment statuses and delivery tracking (tracking number, URL, timestamps)
+        - Insurance and signature-required flags
+        - **ShipmentController** (`/api/v1/shipments`): Full CRUD with order linkage
+
+    - **Shipping Zones System**:
+        - `ShippingZoneEntity` with geographic scoping (countries, states, postal codes)
+        - Rate model: base rate + per-kg + per-item with free-shipping threshold
+        - Delivery time ranges and available shipping method lists
+        - Tax rates per zone
+        - **ShippingZoneController** (`/api/v1/shipping-zones`): Location-based rate configuration
+
+    - **Stores System**:
+        - `StoreEntity` representing physical or virtual store locations
+        - Unique store codes, full address, geolocation (lat/lng), and timezone
+        - Opening hours stored as JSONB, currency per store
+        - Pickup and delivery capability flags
+        - **StoreController** (`/api/v1/stores`): Store directory management
+
+    - **Suppliers System**:
+        - `SupplierEntity` with company, contact, financial, and logistics information
+        - Banking details, credit limits, ratings, and lead times
+        - Preferred supplier flag for procurement prioritization
+        - **SupplierController** (`/api/v1/suppliers`): Admin/Manager-restricted CRUD
+
+    - **Vendors System**:
+        - `VendorEntity` for marketplace third-party sellers linked to user accounts
+        - Commission rate, rating, sales totals, and order counts
+        - Verification workflow with `VerifiedAt` timestamp
+        - Payment information (bank account, PayPal)
+        - **VendorController** (`/api/v1/vendors`): Public vendor directory with authenticated registration
+
+- **Database Indexes**: Comprehensive indexes across all 10 new tables for optimized queries (unique, composite, single-column)
+
+### Database Schema
+
+- 10 new tables created: `notifications`, `product_attributes`, `product_variants`, `promotions`, `refunds`, `shipments`, `shipping_zones`, `stores`, `suppliers`, `vendors`
+- JSONB columns for flexible unstructured data: `notifications.metadata`, `product_variants.attributes`, `stores.opening_hours`
+- Array columns (`text[]`, `uuid[]`) for multi-value fields
+- Unique indexes: `product_attributes.code`, `product_variants.sku`, `refunds.refund_number`, `stores.store_code`, `suppliers.supplier_code`, `vendors.user_id`
+
+### Changed
+
+### Fixed
+
+## [0.0.13] - 2025-10-28
+
+### Changed
+
+- Empty migration (no database changes)
+- Build version increment only
+
+## [0.0.12] - 2025-10-27
+
+### Changed
+
+- Empty migration (no database changes)
+- Build version increment only
+
+## [0.0.11] - 2025-10-27
+
+### Changed
+
+- Empty migration (no database changes)
+- Build version increment only
 
 ## [0.0.10] - 2025-10-27
 
 ### Added
 
--   **Complete E-Commerce Domain Entities**: Comprehensive database schema for e-commerce operations
-    -   **Orders Management**:
-        -   `OrderEntity` with order tracking, status management, and multi-address support
-        -   `OrderItemEntity` for line items with pricing, discounts, and tax calculations
-        -   Order statuses: Pending, Processing, Shipped, Delivered, Cancelled, Returned, Refunded
-        -   Payment methods: CreditCard, DebitCard, PayPal, BankTransfer, Cash, Pix
-        -   Shipping methods: Standard, Express, Overnight, Pickup
-    -   **Cart System**:
-        -   `CartEntity` with session support and coupon integration
-        -   `CartItemEntity` for cart line items
-        -   Cart expiration and discount tracking
-    -   **Category Management**:
-        -   `CategoryEntity` with hierarchical structure support
-        -   SEO optimization (slug, meta tags)
-        -   Display order and soft delete capabilities
-    -   **Inventory Tracking**:
-        -   `InventoryEntity` with multi-location support
-        -   Stock tracking: in stock, reserved, available
-        -   Reorder level and quantity management
-        -   Last stock received and inventory count timestamps
-    -   **Payment Processing**:
-        -   `PaymentEntity` with transaction tracking
-        -   Payment statuses: Pending, Authorized, Captured, Failed, Refunded, Cancelled
-        -   Support for multiple payment providers
-        -   Refund management with reasons
-    -   **Product Reviews**:
-        -   `ReviewEntity` with rating system (1-5 stars)
-        -   Verified purchase badges
-        -   Approval and flagging system
-        -   Helpful/not helpful voting
-        -   Admin response capability
-    -   **Wishlist System**:
-        -   `WishlistEntity` with public/private lists
-        -   `WishlistItemEntity` with priority and notes
-        -   Multiple wishlists per customer
-    -   **Address Management**:
-        -   `AddressEntity` for shipping and billing addresses
-        -   Full address details with phone number
-        -   Default address designation
-    -   **Coupon System**:
-        -   `CouponEntity` with percentage and fixed amount discounts
-        -   Usage limits (total and per customer)
-        -   Product and category applicability
-        -   Validity period management
-        -   Minimum order amount and maximum discount constraints
+- **Complete E-Commerce Domain Entities**: Comprehensive database schema for e-commerce operations
+    - **Orders Management**:
+        - `OrderEntity` with order tracking, status management, and multi-address support
+        - `OrderItemEntity` for line items with pricing, discounts, and tax calculations
+        - Order statuses: Pending, Processing, Shipped, Delivered, Cancelled, Returned, Refunded
+        - Payment methods: CreditCard, DebitCard, PayPal, BankTransfer, Cash, Pix
+        - Shipping methods: Standard, Express, Overnight, Pickup
+    - **Cart System**:
+        - `CartEntity` with session support and coupon integration
+        - `CartItemEntity` for cart line items
+        - Cart expiration and discount tracking
+    - **Category Management**:
+        - `CategoryEntity` with hierarchical structure support
+        - SEO optimization (slug, meta tags)
+        - Display order and soft delete capabilities
+    - **Inventory Tracking**:
+        - `InventoryEntity` with multi-location support
+        - Stock tracking: in stock, reserved, available
+        - Reorder level and quantity management
+        - Last stock received and inventory count timestamps
+    - **Payment Processing**:
+        - `PaymentEntity` with transaction tracking
+        - Payment statuses: Pending, Authorized, Captured, Failed, Refunded, Cancelled
+        - Support for multiple payment providers
+        - Refund management with reasons
+    - **Product Reviews**:
+        - `ReviewEntity` with rating system (1-5 stars)
+        - Verified purchase badges
+        - Approval and flagging system
+        - Helpful/not helpful voting
+        - Admin response capability
+    - **Wishlist System**:
+        - `WishlistEntity` with public/private lists
+        - `WishlistItemEntity` with priority and notes
+        - Multiple wishlists per customer
+    - **Address Management**:
+        - `AddressEntity` for shipping and billing addresses
+        - Full address details with phone number
+        - Default address designation
+    - **Coupon System**:
+        - `CouponEntity` with percentage and fixed amount discounts
+        - Usage limits (total and per customer)
+        - Product and category applicability
+        - Validity period management
+        - Minimum order amount and maximum discount constraints
 
 ### Database Schema
 
--   10 new tables created: `Orders`, `OrderItems`, `Carts`, `CartItems`, `Categories`, `Inventories`, `Payments`, `Reviews`, `Wishlists`, `WishlistItems`, `Addresses`, `Coupons`
--   Comprehensive entity relationships and foreign keys
--   Soft delete support across all entities
--   Audit trail with created/updated timestamps
+- 10 new tables created: `Orders`, `OrderItems`, `Carts`, `CartItems`, `Categories`, `Inventories`, `Payments`, `Reviews`, `Wishlists`, `WishlistItems`, `Addresses`, `Coupons`
+- Comprehensive entity relationships and foreign keys
+- Soft delete support across all entities
+- Audit trail with created/updated timestamps
 
 ## [0.0.9] - 2025-10-27
 
 ### Added
 
--   **📊 Integrated Accounting System**: Complete accounting system following Brazilian standards (NBC TG)
-    -   **Chart of Accounts** (Plano de Contas):
-        -   `ChartOfAccountsEntity` with hierarchical account structure
-        -   Support for 5 account types: Asset, Liability, Equity, Revenue, Expense
-        -   Analytic and synthetic accounts
-        -   Real-time balance tracking
-        -   SQL initialization script with standard accounts for e-commerce
-    -   **Journal Entries** (Lançamentos Contábeis):
-        -   `JournalEntryEntity` for double-entry bookkeeping
-        -   `AccountingEntryEntity` for individual debits and credits
-        -   Automatic journal entry generation for all inventory transactions
-        -   Post/unpost functionality for accounting period control
-        -   Support for cost centers
-    -   **Inventory Transactions** (Movimentações de Estoque):
-        -   `InventoryTransactionEntity` with full traceability
-        -   10 transaction types: Purchase, Sale, SaleReturn, PurchaseReturn, Adjustment, Transfer, Loss, Reservation, ReservationRelease, Fulfillment
-        -   Automatic cost calculation (unit cost × quantity)
-        -   Document number tracking for fiscal compliance
-        -   Links to products, orders, and journal entries
-    -   **Accounting Service** (`IAccountingService`):
-        -   `RecordPurchaseAsync()` - Debit: Inventory, Credit: Suppliers
-        -   `RecordSaleAsync()` - Debit: CMV, Credit: Inventory
-        -   `RecordSaleReturnAsync()` - Debit: Inventory, Credit: CMV
-        -   `RecordPurchaseReturnAsync()` - Debit: Suppliers, Credit: Inventory
-        -   `RecordAdjustmentAsync()` - Handles positive/negative adjustments
-        -   `RecordLossAsync()` - Debit: Loss Expense, Credit: Inventory
-        -   Automatic account creation with standard chart of accounts
-        -   Real-time balance updates
-    -   **Inventory Transaction Service** (`IInventoryTransactionService`):
-        -   `RecordTransactionAsync()` - Records transaction and generates accounting entry
-        -   `GetProductTransactionsAsync()` - Historical transactions per product
-        -   `GetTransactionsByPeriodAsync()` - Period-based reports
-        -   Sequential transaction numbering with prefixes
-        -   Automatic cost center assignment
-    -   **Entity Framework Configurations**:
-        -   `ChartOfAccountsConfiguration` with indexes and constraints
-        -   `JournalEntryConfiguration` with proper relationships
-        -   `AccountingEntryConfiguration` with cascade/restrict delete behaviors
-        -   `InventoryTransactionConfiguration` with full referential integrity
-        -   Updated `PostgresqlContext` with new DbSets
-    -   **Enumerations**:
-        -   `AccountType` - Asset, Liability, Equity, Revenue, Expense
-        -   `EntryType` - Debit, Credit
-        -   `InventoryTransactionType` - All transaction types
-    -   **Documentation**:
-        -   `ACCOUNTING_SYSTEM.md` - Complete system overview, principles, and examples
-        -   `ACCOUNTING_INTEGRATION_GUIDE.md` - Integration guide with code examples
-        -   SQL initialization script with standard Brazilian chart of accounts
-        -   Updated README.md with accounting features
+- **📊 Integrated Accounting System**: Complete accounting system following Brazilian standards (NBC TG)
+    - **Chart of Accounts** (Plano de Contas):
+        - `ChartOfAccountsEntity` with hierarchical account structure
+        - Support for 5 account types: Asset, Liability, Equity, Revenue, Expense
+        - Analytic and synthetic accounts
+        - Real-time balance tracking
+        - SQL initialization script with standard accounts for e-commerce
+    - **Journal Entries** (Lançamentos Contábeis):
+        - `JournalEntryEntity` for double-entry bookkeeping
+        - `AccountingEntryEntity` for individual debits and credits
+        - Automatic journal entry generation for all inventory transactions
+        - Post/unpost functionality for accounting period control
+        - Support for cost centers
+    - **Inventory Transactions** (Movimentações de Estoque):
+        - `InventoryTransactionEntity` with full traceability
+        - 10 transaction types: Purchase, Sale, SaleReturn, PurchaseReturn, Adjustment, Transfer, Loss, Reservation, ReservationRelease, Fulfillment
+        - Automatic cost calculation (unit cost × quantity)
+        - Document number tracking for fiscal compliance
+        - Links to products, orders, and journal entries
+    - **Accounting Service** (`IAccountingService`):
+        - `RecordPurchaseAsync()` - Debit: Inventory, Credit: Suppliers
+        - `RecordSaleAsync()` - Debit: CMV, Credit: Inventory
+        - `RecordSaleReturnAsync()` - Debit: Inventory, Credit: CMV
+        - `RecordPurchaseReturnAsync()` - Debit: Suppliers, Credit: Inventory
+        - `RecordAdjustmentAsync()` - Handles positive/negative adjustments
+        - `RecordLossAsync()` - Debit: Loss Expense, Credit: Inventory
+        - Automatic account creation with standard chart of accounts
+        - Real-time balance updates
+    - **Inventory Transaction Service** (`IInventoryTransactionService`):
+        - `RecordTransactionAsync()` - Records transaction and generates accounting entry
+        - `GetProductTransactionsAsync()` - Historical transactions per product
+        - `GetTransactionsByPeriodAsync()` - Period-based reports
+        - Sequential transaction numbering with prefixes
+        - Automatic cost center assignment
+    - **Entity Framework Configurations**:
+        - `ChartOfAccountsConfiguration` with indexes and constraints
+        - `JournalEntryConfiguration` with proper relationships
+        - `AccountingEntryConfiguration` with cascade/restrict delete behaviors
+        - `InventoryTransactionConfiguration` with full referential integrity
+        - Updated `PostgresqlContext` with new DbSets
+    - **Enumerations**:
+        - `AccountType` - Asset, Liability, Equity, Revenue, Expense
+        - `EntryType` - Debit, Credit
+        - `InventoryTransactionType` - All transaction types
+    - **Documentation**:
+        - `ACCOUNTING_SYSTEM.md` - Complete system overview, principles, and examples
+        - `ACCOUNTING_INTEGRATION_GUIDE.md` - Integration guide with code examples
+        - SQL initialization script with standard Brazilian chart of accounts
+        - Updated README.md with accounting features
 
 ### Features
 
--   **Double-Entry Bookkeeping**: Every transaction creates balanced debits and credits
--   **Compliance**: Follows NBC TG 16 (Inventory), NBC TG 26 (Financial Statements), Lei 6.404/76
--   **Audit Trail**: Complete traceability with user, timestamp, and document references
--   **Automatic Journal Entries**: No manual accounting entries needed
--   **Flexible Chart of Accounts**: Hierarchical structure with custom accounts support
--   **Cost Tracking**: Unit cost and total cost calculation for all transactions
--   **Multi-Location**: Support for multiple warehouse locations
--   **Document References**: Links to invoices, orders, and fiscal documents
--   **Reconciliation Ready**: Easy reconciliation between physical and accounting inventory
+- **Double-Entry Bookkeeping**: Every transaction creates balanced debits and credits
+- **Compliance**: Follows NBC TG 16 (Inventory), NBC TG 26 (Financial Statements), Lei 6.404/76
+- **Audit Trail**: Complete traceability with user, timestamp, and document references
+- **Automatic Journal Entries**: No manual accounting entries needed
+- **Flexible Chart of Accounts**: Hierarchical structure with custom accounts support
+- **Cost Tracking**: Unit cost and total cost calculation for all transactions
+- **Multi-Location**: Support for multiple warehouse locations
+- **Document References**: Links to invoices, orders, and fiscal documents
+- **Reconciliation Ready**: Easy reconciliation between physical and accounting inventory
 
 ### Database Schema
 
--   4 new tables created: `ChartOfAccounts`, `JournalEntries`, `AccountingEntries`, `InventoryTransactions`
--   **ChartOfAccounts Table**:
-    -   Hierarchical account structure with parent-child relationships
-    -   Unique account codes with indexing
-    -   Balance tracking with 18,2 decimal precision
-    -   Support for analytic and synthetic accounts
--   **JournalEntries Table**:
-    -   Unique entry numbers for audit trail
-    -   Document type and number tracking
-    -   Post/unpost functionality with timestamps
-    -   Links to orders, products, and inventory transactions
--   **AccountingEntries Table**:
-    -   Individual debit/credit entries
-    -   Cost center support for management accounting
-    -   Foreign keys with cascade and restrict behaviors
--   **InventoryTransactions Table**:
-    -   10 transaction types with unique transaction numbers
-    -   Multi-location support (from/to locations)
-    -   Automatic cost calculation (unit cost × quantity)
-    -   Links to products, orders, and journal entries
--   Comprehensive indexes for performance optimization
--   Full referential integrity with proper foreign key constraints
+- 4 new tables created: `ChartOfAccounts`, `JournalEntries`, `AccountingEntries`, `InventoryTransactions`
+- **ChartOfAccounts Table**:
+    - Hierarchical account structure with parent-child relationships
+    - Unique account codes with indexing
+    - Balance tracking with 18,2 decimal precision
+    - Support for analytic and synthetic accounts
+- **JournalEntries Table**:
+    - Unique entry numbers for audit trail
+    - Document type and number tracking
+    - Post/unpost functionality with timestamps
+    - Links to orders, products, and inventory transactions
+- **AccountingEntries Table**:
+    - Individual debit/credit entries
+    - Cost center support for management accounting
+    - Foreign keys with cascade and restrict behaviors
+- **InventoryTransactions Table**:
+    - 10 transaction types with unique transaction numbers
+    - Multi-location support (from/to locations)
+    - Automatic cost calculation (unit cost × quantity)
+    - Links to products, orders, and journal entries
+- Comprehensive indexes for performance optimization
+- Full referential integrity with proper foreign key constraints
 
 ### Changed
 
@@ -303,90 +491,90 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
--   **Comprehensive Logging System**: Complete logging infrastructure across the entire application
-    -   `ILoggingService` interface in `Application/Interfaces` for centralized logging operations
-    -   `LoggingService<T>` implementation in `Application/Services` using Microsoft.Extensions.Logging
-    -   Support for all log levels: Debug, Information, Warning, Error, Critical
--   **Global Exception Handling Middleware**:
-    -   `ExceptionHandlingMiddleware` in `API/Middlewares` for catching all unhandled exceptions
-    -   Automatic logging of exceptions with contextual information (HTTP path, method, status code)
-    -   Standardized error responses using ProblemDetails (RFC 7807)
-    -   Intelligent exception-to-HTTP status code mapping:
-        -   ArgumentNullException / ArgumentException / InvalidOperationException → 400 Bad Request
-        -   UnauthorizedAccessException → 401 Unauthorized
-        -   KeyNotFoundException → 404 Not Found
-        -   Other exceptions → 500 Internal Server Error
--   **Logging in Controllers**:
-    -   `AuthController`: Login attempts, authentication successes and failures, invalid credentials warnings
-    -   `UserController`: All CRUD operations, validation errors, duplicate resource warnings, resource not found warnings
-    -   `ProductController`: All CRUD operations, soft deletes, validation errors, SKU conflicts, resource not found warnings
--   **Logging in Application Services**:
-    -   `JwtService`: Token generation operations, configuration initialization, critical configuration errors
-    -   `PasswordService`: Password hashing operations, password verification, validation warnings
--   **Logging in Repositories**:
-    -   `UserRepository`: Database CRUD operations, query operations, error logging for persistence failures
-    -   `ProductRepository`: Database CRUD operations, soft delete operations, error logging for persistence failures
--   **Logging Configuration**:
-    -   Console and Debug logging providers configured in `Program.cs`
-    -   Environment-specific log levels (Debug for Development, Information for Production)
-    -   Structured logging configuration in `appsettings.json` and `appsettings.Development.json`
-    -   Timestamp formatting: "yyyy-MM-dd HH:mm:ss"
-    -   Scope inclusion enabled for better traceability
-    -   Namespace-specific log level configuration:
-        -   Production: ECommerce._ → Information, Microsoft._ → Warning
-        -   Development: ECommerce._ → Debug, Microsoft._ → Information
+- **Comprehensive Logging System**: Complete logging infrastructure across the entire application
+    - `ILoggingService` interface in `Application/Interfaces` for centralized logging operations
+    - `LoggingService<T>` implementation in `Application/Services` using Microsoft.Extensions.Logging
+    - Support for all log levels: Debug, Information, Warning, Error, Critical
+- **Global Exception Handling Middleware**:
+    - `ExceptionHandlingMiddleware` in `API/Middlewares` for catching all unhandled exceptions
+    - Automatic logging of exceptions with contextual information (HTTP path, method, status code)
+    - Standardized error responses using ProblemDetails (RFC 7807)
+    - Intelligent exception-to-HTTP status code mapping:
+        - ArgumentNullException / ArgumentException / InvalidOperationException → 400 Bad Request
+        - UnauthorizedAccessException → 401 Unauthorized
+        - KeyNotFoundException → 404 Not Found
+        - Other exceptions → 500 Internal Server Error
+- **Logging in Controllers**:
+    - `AuthController`: Login attempts, authentication successes and failures, invalid credentials warnings
+    - `UserController`: All CRUD operations, validation errors, duplicate resource warnings, resource not found warnings
+    - `ProductController`: All CRUD operations, soft deletes, validation errors, SKU conflicts, resource not found warnings
+- **Logging in Application Services**:
+    - `JwtService`: Token generation operations, configuration initialization, critical configuration errors
+    - `PasswordService`: Password hashing operations, password verification, validation warnings
+- **Logging in Repositories**:
+    - `UserRepository`: Database CRUD operations, query operations, error logging for persistence failures
+    - `ProductRepository`: Database CRUD operations, soft delete operations, error logging for persistence failures
+- **Logging Configuration**:
+    - Console and Debug logging providers configured in `Program.cs`
+    - Environment-specific log levels (Debug for Development, Information for Production)
+    - Structured logging configuration in `appsettings.json` and `appsettings.Development.json`
+    - Timestamp formatting: "yyyy-MM-dd HH:mm:ss"
+    - Scope inclusion enabled for better traceability
+    - Namespace-specific log level configuration:
+        - Production: ECommerce._ → Information, Microsoft._ → Warning
+        - Development: ECommerce._ → Debug, Microsoft._ → Information
 
 ### Changed
 
--   Updated `Program.cs` to include comprehensive logging configuration and exception handling middleware
--   Enhanced all API controllers to inject `ILogger<T>` for request/response logging
--   Updated all application services to include error and warning logging
--   Enhanced all repositories with debug and error logging for database operations
--   Improved error handling with contextual information throughout the application
+- Updated `Program.cs` to include comprehensive logging configuration and exception handling middleware
+- Enhanced all API controllers to inject `ILogger<T>` for request/response logging
+- Updated all application services to include error and warning logging
+- Enhanced all repositories with debug and error logging for database operations
+- Improved error handling with contextual information throughout the application
 
 ## [0.0.7] - 2025-10-27
 
 ### Added
 
--   **Products Table**: Complete product management system
-    -   Product entity with 24+ properties including pricing, inventory, and metadata
-    -   SKU (Stock Keeping Unit) unique identifier
-    -   Category system with 18 predefined categories (Electronics, Clothing, Books, etc.)
-    -   Product status tracking (Draft, Active, Inactive, OutOfStock, Discontinued)
-    -   Pricing with support for regular and discount prices
-    -   Inventory management (stock quantity, min stock level, max order quantity)
-    -   Product flags (is_active, is_deleted, is_featured, is_on_sale)
-    -   Multiple images and tags support using PostgreSQL arrays
-    -   Weight tracking for shipping calculations
--   **Database Indexes** for products:
-    -   Unique index on SKU
-    -   Indexes on: category, status, name, created_at, is_featured, is_on_sale
--   **Product Repository**: Full data access layer with methods:
-    -   CRUD operations (Create, Read, Update, Delete)
-    -   Search by ID, SKU, category, name
-    -   Filter by featured and on-sale products
-    -   Pagination support
-    -   Soft delete functionality
--   **Product API Controller**: RESTful endpoints at `/api/v1/products`
-    -   `GET /api/v1/products` - List all products (paginated)
-    -   `GET /api/v1/products/{id}` - Get product by ID
-    -   `GET /api/v1/products/sku/{sku}` - Get product by SKU
-    -   `GET /api/v1/products/category/{category}` - Filter by category
-    -   `GET /api/v1/products/featured` - Get featured products
-    -   `GET /api/v1/products/on-sale` - Get products on sale
-    -   `GET /api/v1/products/search` - Search by name
-    -   `POST /api/v1/products` - Create product (Admin/Manager only)
-    -   `PUT /api/v1/products/{id}` - Update product (Admin/Manager only)
-    -   `DELETE /api/v1/products/{id}` - Delete product (Admin only)
-    -   `PATCH /api/v1/products/{id}/soft-delete` - Soft delete (Admin/Manager only)
--   **Build Scripts Enhancement**:
-    -   Automatic SQL migration script generation during build
-    -   Creates individual SQL files for each migration
-    -   Generates complete idempotent migration script
--   **Migration Scripts**:
-    -   `migration-script.ps1` - PowerShell version
-    -   `migration-script.cmd` - Windows CMD version
-    -   Exports all migrations to `src/Infrastructure/SQL/`
+- **Products Table**: Complete product management system
+    - Product entity with 24+ properties including pricing, inventory, and metadata
+    - SKU (Stock Keeping Unit) unique identifier
+    - Category system with 18 predefined categories (Electronics, Clothing, Books, etc.)
+    - Product status tracking (Draft, Active, Inactive, OutOfStock, Discontinued)
+    - Pricing with support for regular and discount prices
+    - Inventory management (stock quantity, min stock level, max order quantity)
+    - Product flags (is_active, is_deleted, is_featured, is_on_sale)
+    - Multiple images and tags support using PostgreSQL arrays
+    - Weight tracking for shipping calculations
+- **Database Indexes** for products:
+    - Unique index on SKU
+    - Indexes on: category, status, name, created_at, is_featured, is_on_sale
+- **Product Repository**: Full data access layer with methods:
+    - CRUD operations (Create, Read, Update, Delete)
+    - Search by ID, SKU, category, name
+    - Filter by featured and on-sale products
+    - Pagination support
+    - Soft delete functionality
+- **Product API Controller**: RESTful endpoints at `/api/v1/products`
+    - `GET /api/v1/products` - List all products (paginated)
+    - `GET /api/v1/products/{id}` - Get product by ID
+    - `GET /api/v1/products/sku/{sku}` - Get product by SKU
+    - `GET /api/v1/products/category/{category}` - Filter by category
+    - `GET /api/v1/products/featured` - Get featured products
+    - `GET /api/v1/products/on-sale` - Get products on sale
+    - `GET /api/v1/products/search` - Search by name
+    - `POST /api/v1/products` - Create product (Admin/Manager only)
+    - `PUT /api/v1/products/{id}` - Update product (Admin/Manager only)
+    - `DELETE /api/v1/products/{id}` - Delete product (Admin only)
+    - `PATCH /api/v1/products/{id}/soft-delete` - Soft delete (Admin/Manager only)
+- **Build Scripts Enhancement**:
+    - Automatic SQL migration script generation during build
+    - Creates individual SQL files for each migration
+    - Generates complete idempotent migration script
+- **Migration Scripts**:
+    - `migration-script.ps1` - PowerShell version
+    - `migration-script.cmd` - Windows CMD version
+    - Exports all migrations to `src/Infrastructure/SQL/`
 
 ### Database Schema
 
@@ -423,55 +611,55 @@ CREATE TABLE products (
 
 ### Changed
 
--   Empty migration (no database changes)
--   Build version increment only
+- Empty migration (no database changes)
+- Build version increment only
 
 ## [0.0.5] - 2025-10-27
 
 ### Changed
 
--   Empty migration (no database changes)
--   Build version increment only
+- Empty migration (no database changes)
+- Build version increment only
 
 ## [0.0.4] - 2025-10-27
 
 ### Changed
 
--   Empty migration (no database changes)
--   Build version increment only
+- Empty migration (no database changes)
+- Build version increment only
 
 ## [0.0.3] - 2025-10-27
 
 ### Changed
 
--   Empty migration (no database changes)
--   Build version increment only
+- Empty migration (no database changes)
+- Build version increment only
 
 ## [0.0.2] - 2025-10-27
 
 ### Added
 
--   **Users Table**: Initial database schema creation
-    -   User entity with authentication and profile management
-    -   Email and username with unique constraints
-    -   Password hashing support
-    -   User access levels (Guest, Customer, Company, Admin, Manager, Developer)
-    -   Address fields (address, city, country)
-    -   User flags (is_active, is_banned, is_deleted, is_email_verified, is_debug_enabled)
-    -   Groups and favorite products arrays
-    -   Timestamps (created_at, updated_at) with automatic defaults
--   **Database Indexes**:
-    -   Unique indexes on email and username
-    -   Index on created_at for sorting
--   **User Repository**: Complete data access layer
--   **User API Controller**: RESTful endpoints at `/api/v1/users`
--   **Authentication System**:
-    -   JWT-based authentication
-    -   Password hashing with bcrypt
-    -   Role-based authorization
--   **Database Seeding**:
-    -   Automatic admin user creation on startup
-    -   Default credentials for development
+- **Users Table**: Initial database schema creation
+    - User entity with authentication and profile management
+    - Email and username with unique constraints
+    - Password hashing support
+    - User access levels (Guest, Customer, Company, Admin, Manager, Developer)
+    - Address fields (address, city, country)
+    - User flags (is_active, is_banned, is_deleted, is_email_verified, is_debug_enabled)
+    - Groups and favorite products arrays
+    - Timestamps (created_at, updated_at) with automatic defaults
+- **Database Indexes**:
+    - Unique indexes on email and username
+    - Index on created_at for sorting
+- **User Repository**: Complete data access layer
+- **User API Controller**: RESTful endpoints at `/api/v1/users`
+- **Authentication System**:
+    - JWT-based authentication
+    - Password hashing with bcrypt
+    - Role-based authorization
+- **Database Seeding**:
+    - Automatic admin user creation on startup
+    - Default credentials for development
 
 ### Database Schema
 
@@ -504,46 +692,60 @@ CREATE TABLE users (
 
 ### Added
 
--   Initial project setup
--   ASP.NET Core 9.0 backend
--   Clean Architecture structure (Domain, Application, Infrastructure, API)
--   PostgreSQL database integration with Entity Framework Core
--   OpenAPI/Swagger documentation with Scalar UI
--   Docker support
--   Build and deployment scripts
--   Project documentation (README.md, CONTRIBUTING.md, LICENSE.md)
+- Initial project setup
+- ASP.NET Core 9.0 backend
+- Clean Architecture structure (Domain, Application, Infrastructure, API)
+- PostgreSQL database integration with Entity Framework Core
+- OpenAPI/Swagger documentation with Scalar UI
+- Docker support
+- Build and deployment scripts
+- Project documentation (README.md, CONTRIBUTING.md, LICENSE.md)
 
 ### Project Structure
 
--   `src/Domain/` - Entities, Value Objects, Enums, Interfaces
--   `src/Application/` - Services, DTOs, Commands, Queries
--   `src/Infrastructure/` - Database context, Repositories, Configurations
--   `src/API/` - Controllers, Middlewares, Extensions
+- `src/Domain/` - Entities, Value Objects, Enums, Interfaces
+- `src/Application/` - Services, DTOs, Commands, Queries
+- `src/Infrastructure/` - Database context, Repositories, Configurations
+- `src/API/` - Controllers, Middlewares, Extensions
 
 ---
 
 ## Version History
 
--   **0.1.20** - Build version increment
--   **0.1.19** - Build version increment
--   **0.1.18** - Accounting Rules System & Enhanced User Security
--   **0.1.17** - Unit Tests & Documentation Updates
--   **0.0.10** - Complete E-Commerce Domain Entities
--   **0.0.9** - Integrated Accounting System
--   **0.0.8** - Comprehensive Logging System
--   **0.0.7** - Product Management System
--   **0.0.6** - Build version increment
--   **0.0.5** - Build version increment
--   **0.0.4** - Build version increment
--   **0.0.3** - Build version increment
--   **0.0.2** - User Management & Authentication
--   **0.0.1** - Initial Setup
+- **0.1.21** - Build version increment
+- **0.1.20** - Build version increment
+- **0.1.19** - Build version increment
+- **0.1.18** - Accounting Rules System & Enhanced User Security
+- **0.1.17** - Unit Tests & Documentation Updates
+- **0.1.16** - Build version increment
+- **0.1.15** - Financial Transactions Module
+- **0.1.14** - Extended Domain Entities (Notifications, Product Attributes/Variants, Promotions, Refunds, Shipments, Shipping Zones, Stores, Suppliers, Vendors)
+- **0.0.13** - Build version increment
+- **0.0.12** - Build version increment
+- **0.0.11** - Build version increment
+- **0.0.10** - Complete E-Commerce Domain Entities
+- **0.0.9** - Integrated Accounting System
+- **0.0.8** - Comprehensive Logging System
+- **0.0.7** - Product Management System
+- **0.0.6** - Build version increment
+- **0.0.5** - Build version increment
+- **0.0.4** - Build version increment
+- **0.0.3** - Build version increment
+- **0.0.2** - User Management & Authentication
+- **0.0.1** - Initial Setup
 
-[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.20...HEAD
+[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.21...HEAD
+[0.1.21]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.20...v0.1.21
 [0.1.20]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.19...v0.1.20
 [0.1.19]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.18...v0.1.19
 [0.1.18]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.17...v0.1.18
-[0.1.17]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.10...v0.1.17
+[0.1.17]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.16...v0.1.17
+[0.1.16]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.15...v0.1.16
+[0.1.15]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.14...v0.1.15
+[0.1.14]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.13...v0.1.14
+[0.0.13]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.12...v0.0.13
+[0.0.12]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.11...v0.0.12
+[0.0.11]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.10...v0.0.11
 [0.0.10]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.7...v0.0.8
