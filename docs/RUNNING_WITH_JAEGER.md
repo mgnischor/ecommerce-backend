@@ -14,15 +14,15 @@ docker-compose up -d
 
 This will start:
 
--   **PostgreSQL**: Database on port 5432
--   **Jaeger**: Distributed tracing on port 16686 (UI) and 4317 (OTLP)
--   **E-Commerce Backend**: API on port 80 (production mode)
+- **PostgreSQL**: Database on port 5432
+- **Jaeger**: Distributed tracing on port 16686 (UI) and 4317 (OTLP)
+- **E-Commerce Backend**: API on port 80 (production mode)
 
 #### 2. Access the services
 
--   **API Documentation**: http://localhost/docs
--   **Jaeger UI**: http://localhost:16686
--   **API Health**: http://localhost/api/v1/health (if implemented)
+- **API Documentation**: http://localhost/docs
+- **Jaeger UI**: http://localhost:16686
+- **API Health**: http://localhost/api/v1/health (if implemented)
 
 ### Development Mode (Port 5049)
 
@@ -34,15 +34,15 @@ docker-compose -f docker-compose.dev.yml up -d
 
 This will start:
 
--   **PostgreSQL**: Database on port 5432 (with `ecommerce` database)
--   **Jaeger**: Distributed tracing on port 16686 (UI) and 4317 (OTLP)
--   **E-Commerce Backend**: API on port 5049 (development mode with console exporter)
+- **PostgreSQL**: Database on port 5432 (with `ecommerce` database)
+- **Jaeger**: Distributed tracing on port 16686 (UI) and 4317 (OTLP)
+- **E-Commerce Backend**: API on port 5049 (development mode with console exporter)
 
 #### 2. Access the services
 
--   **API Documentation**: http://localhost:5049/docs
--   **Jaeger UI**: http://localhost:16686
--   **API Health**: http://localhost:5049/api/v1/health (if implemented)
+- **API Documentation**: http://localhost:5049/docs
+- **Jaeger UI**: http://localhost:16686
+- **API Health**: http://localhost:5049/api/v1/health (if implemented)
 
 ### 3. View traces in Jaeger
 
@@ -98,7 +98,7 @@ Ensure the configuration points to localhost:
     },
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend.Dev",
-        "ServiceVersion": "0.1.20",
+        "ServiceVersion": "0.1.21",
         "EnableConsoleExporter": true,
         "OtlpEndpoint": "http://localhost:4317"
     }
@@ -129,11 +129,11 @@ POST http://localhost/api/v1/orders
 
 ### Trace Details Include:
 
--   **Duration**: How long each operation took
--   **Tags**: Custom metadata (order ID, customer ID, etc.)
--   **Events**: Significant moments in the trace
--   **Errors**: Exception details if any occurred
--   **Database Queries**: SQL statements and execution time
+- **Duration**: How long each operation took
+- **Tags**: Custom metadata (order ID, customer ID, etc.)
+- **Events**: Significant moments in the trace
+- **Errors**: Exception details if any occurred
+- **Database Queries**: SQL statements and execution time
 
 ## Console Exporter (Development)
 
@@ -160,7 +160,7 @@ For production, configure your OTLP endpoint to point to your observability back
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.1.17",
+        "ServiceVersion": "0.1.21",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": "https://otlp-gateway-prod-us-central-0.grafana.net/otlp"
     }
@@ -173,7 +173,7 @@ For production, configure your OTLP endpoint to point to your observability back
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.1.17",
+        "ServiceVersion": "0.1.21",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": "https://api.honeycomb.io:443"
     }
@@ -186,7 +186,7 @@ For production, configure your OTLP endpoint to point to your observability back
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.1.17",
+        "ServiceVersion": "0.1.21",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": "http://jaeger-collector:4317"
     }
@@ -199,7 +199,7 @@ You can also configure OpenTelemetry via environment variables:
 
 ```powershell
 $env:OpenTelemetry__ServiceName="ECommerce.Backend"
-$env:OpenTelemetry__ServiceVersion="0.1.17"
+$env:OpenTelemetry__ServiceVersion="0.1.21"
 $env:OpenTelemetry__EnableConsoleExporter="true"
 $env:OpenTelemetry__OtlpEndpoint="http://localhost:4317"
 
@@ -255,27 +255,27 @@ ports:
 
 ### Search Traces
 
--   Filter by service, operation, tags
--   Set time range
--   Set min/max duration
+- Filter by service, operation, tags
+- Set time range
+- Set min/max duration
 
 ### Trace Timeline
 
--   Visualize span relationships
--   Identify bottlenecks
--   See parallel vs sequential operations
+- Visualize span relationships
+- Identify bottlenecks
+- See parallel vs sequential operations
 
 ### Service Dependencies
 
--   View service architecture
--   Identify service dependencies
--   Monitor inter-service communication
+- View service architecture
+- Identify service dependencies
+- Monitor inter-service communication
 
 ### Metrics
 
--   Request rate
--   Error rate
--   Duration percentiles (p50, p75, p95, p99)
+- Request rate
+- Error rate
+- Duration percentiles (p50, p75, p95, p99)
 
 ## Next Steps
 
@@ -286,6 +286,6 @@ ports:
 
 ## Resources
 
--   [Jaeger Documentation](https://www.jaegertracing.io/docs/)
--   [OpenTelemetry .NET](https://opentelemetry.io/docs/instrumentation/net/)
--   [Docker Compose Documentation](https://docs.docker.com/compose/)
+- [Jaeger Documentation](https://www.jaegertracing.io/docs/)
+- [OpenTelemetry .NET](https://opentelemetry.io/docs/instrumentation/net/)
+- [Docker Compose Documentation](https://docs.docker.com/compose/)
