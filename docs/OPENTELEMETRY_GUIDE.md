@@ -6,9 +6,9 @@ This document describes the OpenTelemetry implementation in the E-Commerce Backe
 
 OpenTelemetry provides comprehensive observability for the application through:
 
--   **Distributed Tracing**: Track requests across service boundaries
--   **Metrics**: Monitor application performance and health
--   **Instrumentation**: Automatic instrumentation for ASP.NET Core, HTTP clients, and Entity Framework Core
+- **Distributed Tracing**: Track requests across service boundaries
+- **Metrics**: Monitor application performance and health
+- **Instrumentation**: Automatic instrumentation for ASP.NET Core, HTTP clients, and Entity Framework Core
 
 ## Configuration
 
@@ -18,7 +18,7 @@ OpenTelemetry provides comprehensive observability for the application through:
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.1.20",
+        "ServiceVersion": "0.1.21",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": ""
     }
@@ -31,7 +31,7 @@ OpenTelemetry provides comprehensive observability for the application through:
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend.Dev",
-        "ServiceVersion": "0.1.20",
+        "ServiceVersion": "0.1.21",
         "EnableConsoleExporter": true,
         "OtlpEndpoint": "http://localhost:4317"
     }
@@ -40,10 +40,10 @@ OpenTelemetry provides comprehensive observability for the application through:
 
 ### Configuration Options
 
--   **ServiceName**: The name of the service (used in telemetry data)
--   **ServiceVersion**: The version of the service
--   **EnableConsoleExporter**: Enable console output for traces and metrics (useful for development)
--   **OtlpEndpoint**: OTLP (OpenTelemetry Protocol) endpoint for exporting data (e.g., Jaeger, Grafana Tempo)
+- **ServiceName**: The name of the service (used in telemetry data)
+- **ServiceVersion**: The version of the service
+- **EnableConsoleExporter**: Enable console output for traces and metrics (useful for development)
+- **OtlpEndpoint**: OTLP (OpenTelemetry Protocol) endpoint for exporting data (e.g., Jaeger, Grafana Tempo)
 
 ## Automatic Instrumentation
 
@@ -51,29 +51,29 @@ The following components are automatically instrumented:
 
 ### 1. ASP.NET Core
 
--   HTTP request/response tracking
--   Request duration and status codes
--   User agent and content length
--   Exception tracking
+- HTTP request/response tracking
+- Request duration and status codes
+- User agent and content length
+- Exception tracking
 
 ### 2. HTTP Client
 
--   Outgoing HTTP request tracking
--   Response status codes
--   Request URIs
+- Outgoing HTTP request tracking
+- Response status codes
+- Request URIs
 
 ### 3. Entity Framework Core
 
--   Database query tracking
--   SQL statement text
--   Query duration
--   Command timeout
+- Database query tracking
+- SQL statement text
+- Query duration
+- Command timeout
 
 ### 4. .NET Runtime
 
--   Garbage collection metrics
--   Thread pool metrics
--   Exception counters
+- Garbage collection metrics
+- Thread pool metrics
+- Exception counters
 
 ## Custom Tracing
 
@@ -335,11 +335,11 @@ Access Jaeger UI at: http://localhost:16686
 
 Use descriptive, hierarchical names:
 
--   ✅ `ProcessOrder`
--   ✅ `Payment.Charge`
--   ✅ `Inventory.Reserve`
--   ❌ `Execute`
--   ❌ `DoWork`
+- ✅ `ProcessOrder`
+- ✅ `Payment.Charge`
+- ✅ `Inventory.Reserve`
+- ❌ `Execute`
+- ❌ `DoWork`
 
 ### 2. Add Context with Tags
 
@@ -359,11 +359,11 @@ ActivityHelper.AddEvent("EmailSent");
 
 ### 4. Use Appropriate Activity Kinds
 
--   `ActivityKind.Internal` - Internal operations (default)
--   `ActivityKind.Client` - Outgoing requests
--   `ActivityKind.Server` - Incoming requests (handled automatically by ASP.NET Core)
--   `ActivityKind.Producer` - Message queue producers
--   `ActivityKind.Consumer` - Message queue consumers
+- `ActivityKind.Internal` - Internal operations (default)
+- `ActivityKind.Client` - Outgoing requests
+- `ActivityKind.Server` - Incoming requests (handled automatically by ASP.NET Core)
+- `ActivityKind.Producer` - Message queue producers
+- `ActivityKind.Consumer` - Message queue consumers
 
 ### 5. Always Use 'using' Statement
 
@@ -374,9 +374,9 @@ using var activity = ActivityHelper.StartActivity("OperationName");
 
 ### 6. Don't Over-Instrument
 
--   Instrument at logical boundaries (service methods, external calls)
--   Avoid instrumenting every method
--   Focus on business-critical operations
+- Instrument at logical boundaries (service methods, external calls)
+- Avoid instrumenting every method
+- Focus on business-critical operations
 
 ## Monitoring Metrics
 
@@ -384,20 +384,20 @@ The following metrics are automatically collected:
 
 ### ASP.NET Core Metrics
 
--   `http.server.request.duration` - HTTP request duration
--   `http.server.active_requests` - Active HTTP requests
+- `http.server.request.duration` - HTTP request duration
+- `http.server.active_requests` - Active HTTP requests
 
 ### HTTP Client Metrics
 
--   `http.client.request.duration` - HTTP client request duration
--   `http.client.active_requests` - Active HTTP client requests
+- `http.client.request.duration` - HTTP client request duration
+- `http.client.active_requests` - Active HTTP client requests
 
 ### .NET Runtime Metrics
 
--   `process.runtime.dotnet.gc.collections.count` - GC collection count
--   `process.runtime.dotnet.gc.heap.size` - GC heap size
--   `process.runtime.dotnet.thread_pool.threads.count` - Thread pool thread count
--   `process.runtime.dotnet.exceptions.count` - Exception count
+- `process.runtime.dotnet.gc.collections.count` - GC collection count
+- `process.runtime.dotnet.gc.heap.size` - GC heap size
+- `process.runtime.dotnet.thread_pool.threads.count` - Thread pool thread count
+- `process.runtime.dotnet.exceptions.count` - Exception count
 
 ## Troubleshooting
 
@@ -422,7 +422,7 @@ The following metrics are automatically collected:
 
 ## Resources
 
--   [OpenTelemetry .NET Documentation](https://opentelemetry.io/docs/instrumentation/net/)
--   [OpenTelemetry Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/)
--   [Jaeger Documentation](https://www.jaegertracing.io/docs/)
--   [Grafana Tempo Documentation](https://grafana.com/docs/tempo/)
+- [OpenTelemetry .NET Documentation](https://opentelemetry.io/docs/instrumentation/net/)
+- [OpenTelemetry Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/)
+- [Jaeger Documentation](https://www.jaegertracing.io/docs/)
+- [Grafana Tempo Documentation](https://grafana.com/docs/tempo/)
