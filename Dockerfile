@@ -1,11 +1,11 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 WORKDIR /src
-COPY ["ecommerce-backend.csproj", "./"]
-RUN dotnet restore "ecommerce-backend.csproj"
+COPY ["ECommerce.Backend.csproj", "./"]
+RUN dotnet restore "ECommerce.Backend.csproj"
 COPY . .
-RUN dotnet publish "ecommerce-backend.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "ECommerce.Backend.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
 ARG BUILD_DEVELOPMENT=1
 RUN apk upgrade --no-cache && \
     apk add --no-cache icu-libs
@@ -34,7 +34,7 @@ USER appuser
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Development stage - includes SDK and EF tools for migrations
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS development
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS development
 WORKDIR /app
 RUN apk upgrade --no-cache && \
     apk add --no-cache icu-libs
@@ -63,6 +63,6 @@ RUN echo '#!/bin/sh' > /app/entrypoint.sh && \
 EXPOSE 5049
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# Production stage  
+# Production stage
 FROM final AS production
 EXPOSE 80
