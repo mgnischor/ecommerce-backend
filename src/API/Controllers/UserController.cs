@@ -1,10 +1,12 @@
 using ECommerce.API.Constants;
+using ECommerce.API.DTOs;
 using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ECommerce.API.Controllers;
 
@@ -25,16 +27,19 @@ public sealed class UserController : ControllerBase
     private readonly IUserRepository _userRepository;
     private readonly PostgresqlContext _context;
     private readonly ILoggingService _logger;
+    private readonly IPasswordService _passwordService;
 
     public UserController(
         IUserRepository userRepository,
         PostgresqlContext context,
-        ILoggingService logger
+        ILoggingService logger,
+        IPasswordService passwordService
     )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _passwordService = passwordService ?? throw new ArgumentNullException(nameof(passwordService));
     }
 
     /// <summary>
@@ -63,10 +68,11 @@ public sealed class UserController : ControllerBase
     /// <response code="400">Invalid pagination parameters. Page number must be >= 1, page size must be between 1 and 100.</response>
     /// <response code="401">Unauthorized. Authentication required.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(IReadOnlyList<UserEntity>), StatusCodes.Status200OK)]
+    [Authorize(Roles = "Admin,Manager,Developer")]
+    [ProducesResponseType(typeof(IReadOnlyList<UserResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<IReadOnlyList<UserEntity>>> GetAllUsers(
+    public async Task<ActionResult<IReadOnlyList<UserResponseDto>>> GetAllUsers(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
         CancellationToken cancellationToken = default
@@ -103,7 +109,7 @@ public sealed class UserController : ControllerBase
         Response.Headers.Append("X-Page-Number", pageNumber.ToString());
         Response.Headers.Append("X-Page-Size", pageSize.ToString());
 
-        return Ok(users);
+        return Ok(users.Select(MapToResponseDto).ToList());
     }
 
     /// <summary>
@@ -128,10 +134,10 @@ public sealed class UserController : ControllerBase
     /// <response code="401">Unauthorized. Authentication required.</response>
     /// <response code="404">User not found with the specified ID.</response>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserEntity>> GetUserById(
+    public async Task<ActionResult<UserResponseDto>> GetUserById(
         Guid id,
         CancellationToken cancellationToken = default
     )
@@ -146,8 +152,13 @@ public sealed class UserController : ControllerBase
             return NotFound(new { Message = ErrorMessages.UserNotFoundById(id.ToString()) });
         }
 
+        if (!CanAccessUser(id))
+        {
+            return Forbid();
+        }
+
         _logger.LogInformation("Successfully retrieved user: {UserId}", id);
-        return Ok(user);
+        return Ok(MapToResponseDto(user));
     }
 
     /// <summary>
@@ -185,12 +196,13 @@ public sealed class UserController : ControllerBase
     /// <response code="401">Unauthorized. Authentication required.</response>
     /// <response code="409">Conflict. A user with the same email or username already exists.</response>
     [HttpPost]
-    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status201Created)]
+    [Authorize(Roles = "Admin,Manager,Developer")]
+    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<UserEntity>> CreateUser(
-        [FromBody] UserEntity newUser,
+    public async Task<ActionResult<UserResponseDto>> CreateUser(
+        [FromBody] CreateUserRequestDto newUser,
         CancellationToken cancellationToken = default
     )
     {
@@ -222,16 +234,46 @@ public sealed class UserController : ControllerBase
             );
         }
 
-        await _userRepository.AddAsync(newUser, cancellationToken);
+        var now = DateTime.UtcNow;
+        var currentUserId = GetCurrentUserIdOrDefault();
+        var createdUser = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            Email = newUser.Email,
+            Username = newUser.Username,
+            PasswordHash = _passwordService.HashPassword(newUser.Password),
+            AccessLevel = newUser.AccessLevel,
+            Address = newUser.Address,
+            City = newUser.City,
+            Country = newUser.Country,
+            IsActive = newUser.IsActive,
+            IsBanned = newUser.IsBanned,
+            IsDebugEnabled = newUser.IsDebugEnabled,
+            IsDeleted = newUser.IsDeleted,
+            IsEmailVerified = newUser.IsEmailVerified,
+            Groups = newUser.Groups ?? new List<Guid>(),
+            FavoriteProducts = newUser.FavoriteProducts ?? new List<Guid>(),
+            BirthDate = newUser.BirthDate,
+            CreatedAt = now,
+            UpdatedAt = now,
+            CreatedBy = currentUserId,
+            UpdatedBy = currentUserId,
+        };
+
+        await _userRepository.AddAsync(createdUser, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Successfully created user: {UserId}, Email: {Email}",
-            newUser.Id,
-            newUser.Email
+            createdUser.Id,
+            createdUser.Email
         );
 
-        return CreatedAtAction(nameof(GetUserById), new { id = newUser.Id }, newUser);
+        return CreatedAtAction(
+            nameof(GetUserById),
+            new { id = createdUser.Id },
+            MapToResponseDto(createdUser)
+        );
     }
 
     /// <summary>
@@ -276,9 +318,10 @@ public sealed class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> UpdateUser(
+    [Authorize(Roles = "Admin,Manager,Developer")]
+    public async Task<IActionResult> UpdateUserAsAdmin(
         Guid id,
-        [FromBody] UserEntity updatedUser,
+        [FromBody] UpdateUserAdminRequestDto updatedUser,
         CancellationToken cancellationToken = default
     )
     {
@@ -288,16 +331,6 @@ public sealed class UserController : ControllerBase
         {
             _logger.LogWarning("Attempt to update user with null data for ID: {UserId}", id);
             return BadRequest(ErrorMessages.UserDataRequired);
-        }
-
-        if (id != updatedUser.Id)
-        {
-            _logger.LogWarning(
-                "User ID mismatch in update request. URL ID: {UrlId}, Body ID: {BodyId}",
-                id,
-                updatedUser.Id
-            );
-            return BadRequest(ErrorMessages.IdMismatch);
         }
 
         var existingUser = await _userRepository.GetByIdAsync(id, cancellationToken);
@@ -323,7 +356,75 @@ public sealed class UserController : ControllerBase
             );
         }
 
-        _userRepository.Update(updatedUser);
+        existingUser.Email = updatedUser.Email;
+        existingUser.Username = updatedUser.Username;
+        existingUser.AccessLevel = updatedUser.AccessLevel;
+        existingUser.Address = updatedUser.Address;
+        existingUser.City = updatedUser.City;
+        existingUser.Country = updatedUser.Country;
+        existingUser.IsActive = updatedUser.IsActive;
+        existingUser.IsBanned = updatedUser.IsBanned;
+        existingUser.IsDebugEnabled = updatedUser.IsDebugEnabled;
+        existingUser.IsDeleted = updatedUser.IsDeleted;
+        existingUser.IsEmailVerified = updatedUser.IsEmailVerified;
+        existingUser.Groups = updatedUser.Groups ?? new List<Guid>();
+        existingUser.FavoriteProducts = updatedUser.FavoriteProducts ?? new List<Guid>();
+        existingUser.BirthDate = updatedUser.BirthDate;
+        existingUser.UpdatedAt = DateTime.UtcNow;
+        existingUser.UpdatedBy = GetCurrentUserIdOrDefault();
+
+        _userRepository.Update(existingUser);
+        await _userRepository.SaveChangesAsync(cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPut("{id:guid}/self")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> UpdateOwnUser(
+        Guid id,
+        [FromBody] UpdateOwnUserRequestDto updatedUser,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (!CanAccessUser(id))
+        {
+            return Forbid();
+        }
+
+        if (updatedUser == null)
+        {
+            return BadRequest(ErrorMessages.UserDataRequired);
+        }
+
+        var existingUser = await _userRepository.GetByIdAsync(id, cancellationToken);
+        if (existingUser == null)
+        {
+            return NotFound(new { Message = ErrorMessages.UserNotFoundById(id.ToString()) });
+        }
+
+        var emailExists = await _userRepository.ExistsByEmailAsync(
+            updatedUser.Email,
+            cancellationToken
+        );
+        if (emailExists && existingUser.Email != updatedUser.Email)
+        {
+            return Conflict(new { Message = ErrorMessages.UserEmailAlreadyExists(updatedUser.Email) });
+        }
+
+        existingUser.Email = updatedUser.Email;
+        existingUser.Username = updatedUser.Username;
+        existingUser.Address = updatedUser.Address;
+        existingUser.City = updatedUser.City;
+        existingUser.Country = updatedUser.Country;
+        existingUser.BirthDate = updatedUser.BirthDate;
+        existingUser.UpdatedAt = DateTime.UtcNow;
+        existingUser.UpdatedBy = GetCurrentUserIdOrDefault();
+
+        _userRepository.Update(existingUser);
         await _context.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Successfully updated user: {UserId}", id);
@@ -354,6 +455,7 @@ public sealed class UserController : ControllerBase
     /// <response code="401">Unauthorized. Authentication required.</response>
     /// <response code="404">User not found with the specified ID.</response>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin,Manager,Developer")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -438,5 +540,55 @@ public sealed class UserController : ControllerBase
     {
         Response.Headers.Append("Allow", "GET,POST,PUT,DELETE,OPTIONS");
         return NoContent();
+    }
+
+    private bool CanAccessUser(Guid userId)
+    {
+        if (User.IsInRole(nameof(ECommerce.Domain.Enums.UserAccessLevel.Admin))
+            || User.IsInRole(nameof(ECommerce.Domain.Enums.UserAccessLevel.Manager))
+            || User.IsInRole(nameof(ECommerce.Domain.Enums.UserAccessLevel.Developer)))
+        {
+            return true;
+        }
+
+        var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return Guid.TryParse(currentUserIdClaim, out var currentUserId) && currentUserId == userId;
+    }
+
+    private Guid GetCurrentUserIdOrDefault()
+    {
+        var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return Guid.TryParse(currentUserIdClaim, out var currentUserId) ? currentUserId : Guid.Empty;
+    }
+
+    private static UserResponseDto MapToResponseDto(UserEntity user)
+    {
+        return new UserResponseDto
+        {
+            Id = user.Id,
+            CreatedBy = user.CreatedBy,
+            UpdatedBy = user.UpdatedBy,
+            AccessLevel = user.AccessLevel,
+            Address = user.Address,
+            City = user.City,
+            Country = user.Country,
+            Email = user.Email,
+            Username = user.Username,
+            IsActive = user.IsActive,
+            IsBanned = user.IsBanned,
+            IsDebugEnabled = user.IsDebugEnabled,
+            IsDeleted = user.IsDeleted,
+            IsEmailVerified = user.IsEmailVerified,
+            Groups = user.Groups,
+            FavoriteProducts = user.FavoriteProducts,
+            BirthDate = user.BirthDate,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
+            FailedLoginAttempts = user.FailedLoginAttempts,
+            LockedUntil = user.LockedUntil,
+            LastFailedLoginAt = user.LastFailedLoginAt,
+            LastSuccessfulLoginAt = user.LastSuccessfulLoginAt,
+            LastLoginIpAddress = user.LastLoginIpAddress,
+        };
     }
 }

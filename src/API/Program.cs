@@ -62,6 +62,20 @@ builder.Services.AddScoped<IFinancialTransactionRepository, FinancialTransaction
 
 // Register logging service
 builder.Services.AddScoped<ILoggingService, LoggingService>();
+builder.Services.AddScoped<ECommerce.API.Filters.RateLimitingFilter>();
+
+var redisConnectionString = builder.Configuration["Redis:ConnectionString"];
+if (!string.IsNullOrWhiteSpace(redisConnectionString))
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnectionString;
+    });
+}
+else
+{
+    builder.Services.AddDistributedMemoryCache();
+}
 
 // Register accounting query services
 builder.Services.AddScoped<IAccountingQueryService, AccountingQueryService>();
@@ -131,32 +145,57 @@ var app = builder.Build();
 // Use global exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Apply migrations and seed database
-using (var scope = app.Services.CreateScope())
+app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
 {
+    app.UseHsts();
+}
+
+app.Use(
+    async (context, next) =>
+    {
+        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        context.Response.Headers["X-Frame-Options"] = "DENY";
+        context.Response.Headers["Referrer-Policy"] = "no-referrer";
+        context.Response.Headers["X-Permitted-Cross-Domain-Policies"] = "none";
+        context.Response.Headers["Permissions-Policy"] =
+            "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()";
+
+        if (!app.Environment.IsDevelopment())
+        {
+            context.Response.Headers["Strict-Transport-Security"] =
+                "max-age=31536000; includeSubDomains";
+        }
+
+        await next();
+    }
+);
+
+var runStartupMigrations = app.Configuration.GetValue<bool>("Database:RunMigrationsOnStartup");
+var runStartupSeeding = app.Configuration.GetValue<bool>("Database:RunSeedingOnStartup");
+
+if (runStartupMigrations || runStartupSeeding)
+{
+    using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<PostgresqlContext>();
-    var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-    try
+    if (runStartupMigrations)
     {
         logger.LogInformation("Applying database migrations");
         await context.Database.MigrateAsync();
         logger.LogInformation("Database migrations applied successfully");
+    }
 
+    if (runStartupSeeding)
+    {
         logger.LogInformation("Starting database seeding");
-        await DatabaseSeeder.SeedAdminUserAsync(context, passwordService);
         await DatabaseSeeder.SeedChartOfAccountsAsync(context);
         logger.LogInformation("Database seeding completed successfully");
     }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "An error occurred while applying migrations or seeding the database");
-        throw;
-    }
 }
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.MapOpenApi();
     app.MapScalarApiReference(
