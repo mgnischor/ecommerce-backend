@@ -197,7 +197,7 @@ namespace ECommerce.API.Filters;
 /// </example>
 /// <seealso cref="IActionFilter"/>
 /// <seealso cref="ConcurrentDictionary{TKey,TValue}"/>
-public sealed class RateLimitingFilter : IActionFilter
+public sealed class RateLimitingFilter : IAsyncActionFilter
 {
     /// <summary>
     /// Thread-safe storage for tracking request counts per client across all filter instances.
@@ -630,15 +630,23 @@ public sealed class RateLimitingFilter : IActionFilter
     /// <seealso cref="OnActionExecuted"/>
     /// <seealso cref="GetClientIdentifier"/>
     /// <seealso cref="CleanupExpiredEntries"/>
-    public void OnActionExecuting(ActionExecutingContext context)
+    public async Task OnActionExecutionAsync(
+        ActionExecutingContext context,
+        ActionExecutionDelegate next
+    )
     {
-        var handled = ProcessDistributedRateLimitAsync(context).ConfigureAwait(false).GetAwaiter().GetResult();
+        var handled = await ProcessDistributedRateLimitAsync(context);
         if (handled)
         {
+            await next();
             return;
         }
 
         ProcessFallbackRateLimit(context);
+        if (context.Result == null)
+        {
+            await next();
+        }
     }
 
     private async Task<bool> ProcessDistributedRateLimitAsync(ActionExecutingContext context)
@@ -833,11 +841,6 @@ public sealed class RateLimitingFilter : IActionFilter
     /// </example>
     /// <seealso cref="OnActionExecuting"/>
     /// <seealso cref="IActionFilter"/>
-    public void OnActionExecuted(ActionExecutedContext context)
-    {
-        // No action needed after execution
-    }
-
     /// <summary>
     /// Gets a unique identifier for the client making the request.
     /// </summary>

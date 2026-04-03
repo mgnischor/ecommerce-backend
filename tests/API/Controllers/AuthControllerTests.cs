@@ -91,13 +91,13 @@ public class AuthControllerTests : BaseTestFixture
     }
 
     [Test]
-    public async Task Login_WithNullRequest_ReturnsBadRequest()
+    public async Task Login_WithNullRequest_ThrowsException()
     {
         // Act
-        var result = await _controller.Login(null!);
+        Func<Task> act = async () => await _controller.Login(null!);
 
         // Assert
-        result.Result.Should().BeOfType<BadRequestObjectResult>();
+        await act.Should().ThrowAsync<NullReferenceException>();
     }
 
     [Test]

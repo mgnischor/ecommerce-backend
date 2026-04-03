@@ -50,6 +50,13 @@ services:
             - ASPNETCORE_ENVIRONMENT=Development
             - ASPNETCORE_URLS=http://+:5049
             - ConnectionStrings__DefaultConnection=Host=postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432
+            - Jwt__SecretKey=${JWT_SECRET_KEY}
+            - Jwt__Issuer=ECommerceBackend
+            - Jwt__Audience=ECommerceClient
+            - Jwt__ExpirationMinutes=60
+            - Database__RunMigrationsOnStartup=true
+            - Database__RunSeedingOnStartup=true
+            - Redis__ConnectionString=${REDIS_CONNECTION_STRING:-}
             - OpenTelemetry__ServiceName=ECommerce.Backend.Dev
             - OpenTelemetry__ServiceVersion=0.1.21
             - OpenTelemetry__EnableConsoleExporter=true

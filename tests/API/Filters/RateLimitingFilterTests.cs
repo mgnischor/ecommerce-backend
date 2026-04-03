@@ -22,7 +22,7 @@ public class RateLimitingFilterTests
     }
 
     [Test]
-    public void OnActionExecuting_WhenLimitExceeded_ReturnsTooManyRequests()
+    public async Task OnActionExecutionAsync_WhenLimitExceeded_ReturnsTooManyRequests()
     {
         var logger = new Mock<ILogger<RateLimitingFilter>>();
         var cache = new MemoryDistributedCache(
@@ -31,11 +31,11 @@ public class RateLimitingFilterTests
         var filter = new RateLimitingFilter(logger.Object, cache, maxRequests: 1, windowSeconds: 60);
 
         var context1 = CreateContext();
-        filter.OnActionExecuting(context1);
+        await filter.OnActionExecutionAsync(context1, () => Task.FromResult(CreateExecutedContext(context1)));
         context1.Result.Should().BeNull();
 
         var context2 = CreateContext();
-        filter.OnActionExecuting(context2);
+        await filter.OnActionExecutionAsync(context2, () => Task.FromResult(CreateExecutedContext(context2)));
         context2.Result.Should().BeOfType<ObjectResult>();
         (context2.Result as ObjectResult)!.StatusCode.Should().Be(StatusCodes.Status429TooManyRequests);
     }
@@ -51,5 +51,10 @@ public class RateLimitingFilterTests
             new Dictionary<string, object?>(),
             new object()
         );
+    }
+
+    private static ActionExecutedContext CreateExecutedContext(ActionExecutingContext context)
+    {
+        return new ActionExecutedContext(context, new List<IFilterMetadata>(), new object());
     }
 }

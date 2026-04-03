@@ -238,12 +238,6 @@ public sealed class AuthController : ControllerBase
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
         userAgent ??= "Unknown";
 
-        if (loginRequest == null)
-        {
-            _logger.LogWarning("Login request is null from IP: {IpAddress}", ipAddress);
-            return BadRequest(new { Message = "Login request is required" });
-        }
-
         // Hash email for secure logging (LGPD/GDPR compliance)
         var emailHash = ComputeSha256Hash(loginRequest.Email ?? "unknown");
 

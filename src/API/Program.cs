@@ -151,26 +151,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.Use(
-    async (context, next) =>
-    {
-        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
-        context.Response.Headers["X-Frame-Options"] = "DENY";
-        context.Response.Headers["Referrer-Policy"] = "no-referrer";
-        context.Response.Headers["X-Permitted-Cross-Domain-Policies"] = "none";
-        context.Response.Headers["Permissions-Policy"] =
-            "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()";
-
-        if (!app.Environment.IsDevelopment())
-        {
-            context.Response.Headers["Strict-Transport-Security"] =
-                "max-age=31536000; includeSubDomains";
-        }
-
-        await next();
-    }
-);
-
 var runStartupMigrations = app.Configuration.GetValue<bool>("Database:RunMigrationsOnStartup");
 var runStartupSeeding = app.Configuration.GetValue<bool>("Database:RunSeedingOnStartup");
 
@@ -217,5 +197,25 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.Use(
+    async (context, next) =>
+    {
+        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        context.Response.Headers["X-Frame-Options"] = "DENY";
+        context.Response.Headers["Referrer-Policy"] = "no-referrer";
+        context.Response.Headers["X-Permitted-Cross-Domain-Policies"] = "none";
+        context.Response.Headers["Permissions-Policy"] =
+            "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()";
+        context.Response.Headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'";
+
+        if (!app.Environment.IsDevelopment())
+        {
+            context.Response.Headers["Strict-Transport-Security"] =
+                "max-age=31536000; includeSubDomains";
+        }
+
+        await next();
+    }
+);
 app.MapControllers();
 app.Run();
