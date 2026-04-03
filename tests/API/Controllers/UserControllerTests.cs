@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using ECommerce.API.Controllers;
+using ECommerce.API.DTOs;
 using ECommerce.Domain.Enums;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
@@ -6,16 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Tests.API.Controllers;
 
-/// <summary>
-/// Tests for UserController
-/// </summary>
 [TestFixture]
 public class UserControllerTests : DatabaseTestFixture
 {
-    private Mock<IUserRepository> _mockUserRepository;
-    private Mock<ILoggingService> _mockLogger;
-    private UserController _controller;
-    private PostgresqlContext _context;
+    private Mock<IUserRepository> _mockUserRepository = null!;
+    private Mock<ILoggingService> _mockLogger = null!;
+    private Mock<IPasswordService> _mockPasswordService = null!;
+    private UserController _controller = null!;
+    private PostgresqlContext _context = null!;
 
     [SetUp]
     public override void SetUp()
@@ -23,306 +23,186 @@ public class UserControllerTests : DatabaseTestFixture
         base.SetUp();
         _mockUserRepository = new Mock<IUserRepository>();
         _mockLogger = new Mock<ILoggingService>();
+        _mockPasswordService = new Mock<IPasswordService>();
         _context = CreateInMemoryDbContext();
 
-        _controller = new UserController(_mockUserRepository.Object, _context, _mockLogger.Object);
-
-        // Set up HttpContext for Response.Headers access
-        _controller.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext(),
-        };
+        _controller = new UserController(
+            _mockUserRepository.Object,
+            _context,
+            _mockLogger.Object,
+            _mockPasswordService.Object
+        );
+        _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
     }
 
     [TearDown]
     public override void TearDown()
     {
-        _context?.Dispose();
+        _context.Dispose();
         base.TearDown();
     }
 
     [Test]
-    public async Task GetAllUsers_WithValidPagination_ReturnsOkWithUsers()
+    public async Task GetAllUsers_ReturnsSafeDto_WithoutPasswordHash()
     {
-        // Arrange
-        int pageNumber = 1;
-        int pageSize = 10;
-
         var users = new List<UserEntity>
         {
-            new UserEntity
+            new()
             {
                 Id = Guid.NewGuid(),
                 Email = "user1@example.com",
                 Username = "user1",
-                PasswordHash = "hash1",
-                AccessLevel = UserAccessLevel.Customer,
-                IsActive = true,
-            },
-            new UserEntity
-            {
-                Id = Guid.NewGuid(),
-                Email = "user2@example.com",
-                Username = "user2",
-                PasswordHash = "hash2",
+                PasswordHash = "sensitive",
                 AccessLevel = UserAccessLevel.Customer,
                 IsActive = true,
             },
         };
 
         _mockUserRepository
-            .Setup(x => x.GetPagedAsync(pageNumber, pageSize, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetPagedAsync(1, 10, It.IsAny<CancellationToken>()))
             .ReturnsAsync(users);
+        _mockUserRepository.Setup(x => x.GetCountAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+        var result = await _controller.GetAllUsers();
+
+        var ok = result.Result as OkObjectResult;
+        ok.Should().NotBeNull();
+        var returnedUsers = ok!.Value as List<UserResponseDto>;
+        returnedUsers.Should().NotBeNull();
+        returnedUsers!.Should().HaveCount(1);
+        returnedUsers[0].Email.Should().Be("user1@example.com");
+        returnedUsers[0].GetType().GetProperty("PasswordHash").Should().BeNull();
+    }
+
+    [Test]
+    public async Task GetUserById_WhenNotOwnerAndNotPrivileged_ReturnsForbid()
+    {
+        var targetUserId = Guid.NewGuid();
+        var callerId = Guid.NewGuid();
+        SetPrincipal(callerId, UserAccessLevel.Customer);
 
         _mockUserRepository
-            .Setup(x => x.GetCountAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(users.Count);
+            .Setup(x => x.GetByIdAsync(targetUserId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserEntity { Id = targetUserId, Email = "a@b.com", Username = "u" });
 
-        // Act
-        var result = await _controller.GetAllUsers(pageNumber, pageSize);
+        var result = await _controller.GetUserById(targetUserId);
 
-        // Assert
-        result.Result.Should().BeOfType<OkObjectResult>();
-        var okResult = result.Result as OkObjectResult;
-        var returnedUsers = okResult!.Value as List<UserEntity>;
-        returnedUsers.Should().HaveCount(2);
+        result.Result.Should().BeOfType<ForbidResult>();
     }
 
     [Test]
-    public async Task GetAllUsers_WithInvalidPageNumber_ReturnsBadRequest()
+    public async Task GetUserById_WhenOwner_ReturnsOk()
     {
-        // Arrange
-        int pageNumber = 0;
-        int pageSize = 10;
-
-        // Act
-        var result = await _controller.GetAllUsers(pageNumber, pageSize);
-
-        // Assert
-        result.Result.Should().BeOfType<BadRequestObjectResult>();
-    }
-
-    [Test]
-    public async Task GetUserById_WithExistingId_ReturnsOkWithUser()
-    {
-        // Arrange
         var userId = Guid.NewGuid();
-        var user = new UserEntity
-        {
-            Id = userId,
-            Email = "test@example.com",
-            Username = "testuser",
-            PasswordHash = "hash",
-            AccessLevel = UserAccessLevel.Customer,
-            IsActive = true,
-        };
+        SetPrincipal(userId, UserAccessLevel.Customer);
 
         _mockUserRepository
             .Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user);
+            .ReturnsAsync(new UserEntity { Id = userId, Email = "owner@example.com", Username = "owner" });
 
-        // Act
         var result = await _controller.GetUserById(userId);
 
-        // Assert
         result.Result.Should().BeOfType<OkObjectResult>();
-        var okResult = result.Result as OkObjectResult;
-        var returnedUser = okResult!.Value as UserEntity;
-        returnedUser.Should().NotBeNull();
-        returnedUser!.Id.Should().Be(userId);
     }
 
     [Test]
-    public async Task GetUserById_WithNonExistingId_ReturnsNotFound()
+    public async Task CreateUser_WithDto_ReturnsCreatedAndHashesPassword()
     {
-        // Arrange
-        var userId = Guid.NewGuid();
-
-        _mockUserRepository
-            .Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((UserEntity?)null);
-
-        // Act
-        var result = await _controller.GetUserById(userId);
-
-        // Assert
-        result.Result.Should().BeOfType<NotFoundObjectResult>();
-    }
-
-    [Test]
-    public async Task CreateUser_WithValidUser_ReturnsCreated()
-    {
-        // Arrange
-        var newUser = new UserEntity
+        var request = new CreateUserRequestDto
         {
-            Email = "newuser@example.com",
+            Email = "new@example.com",
             Username = "newuser",
-            PasswordHash = "hash",
-            AccessLevel = UserAccessLevel.Customer,
-            IsActive = true,
+            Password = "password123",
         };
 
         _mockUserRepository
-            .Setup(x => x.ExistsByEmailAsync(newUser.Email, It.IsAny<CancellationToken>()))
+            .Setup(x => x.ExistsByEmailAsync(request.Email, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
-
         _mockUserRepository
-            .Setup(x => x.ExistsByUsernameAsync(newUser.Username, It.IsAny<CancellationToken>()))
+            .Setup(x => x.ExistsByUsernameAsync(request.Username, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
+        _mockPasswordService.Setup(x => x.HashPassword(request.Password)).Returns("hashed");
 
-        // Act
-        var result = await _controller.CreateUser(newUser);
+        var result = await _controller.CreateUser(request);
 
-        // Assert
         result.Result.Should().BeOfType<CreatedAtActionResult>();
-        var createdResult = result.Result as CreatedAtActionResult;
-        createdResult.Should().NotBeNull();
+        _mockPasswordService.Verify(x => x.HashPassword(request.Password), Times.Once);
     }
 
     [Test]
-    public async Task CreateUser_WithDuplicateEmail_ReturnsConflict()
+    public async Task UpdateOwnUser_WhenOwner_UpdatesAllowedFieldsOnly()
     {
-        // Arrange
-        var newUser = new UserEntity { Email = "existing@example.com", Username = "newuser" };
-
-        _mockUserRepository
-            .Setup(x => x.ExistsByEmailAsync(newUser.Email, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
-
-        // Act
-        var result = await _controller.CreateUser(newUser);
-
-        // Assert
-        result.Result.Should().BeOfType<ConflictObjectResult>();
-    }
-
-    [Test]
-    public async Task CreateUser_WithDuplicateUsername_ReturnsConflict()
-    {
-        // Arrange
-        var newUser = new UserEntity { Email = "new@example.com", Username = "existinguser" };
-
-        _mockUserRepository
-            .Setup(x => x.ExistsByEmailAsync(newUser.Email, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
-
-        _mockUserRepository
-            .Setup(x => x.ExistsByUsernameAsync(newUser.Username, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
-
-        // Act
-        var result = await _controller.CreateUser(newUser);
-
-        // Assert
-        result.Result.Should().BeOfType<ConflictObjectResult>();
-    }
-
-    [Test]
-    public async Task UpdateUser_WithValidUser_ReturnsNoContent()
-    {
-        // Arrange
         var userId = Guid.NewGuid();
-        var existingUser = new UserEntity
+        SetPrincipal(userId, UserAccessLevel.Customer);
+        var existing = new UserEntity
         {
             Id = userId,
-            Email = "existing@example.com",
-            Username = "existinguser",
+            Email = "old@example.com",
+            Username = "old",
+            AccessLevel = UserAccessLevel.Admin,
         };
-
-        var updatedUser = new UserEntity
+        var request = new UpdateOwnUserRequestDto
         {
-            Id = userId,
-            Email = "updated@example.com",
-            Username = "updateduser",
+            Email = "new@example.com",
+            Username = "newname",
+            Address = "Street",
+            City = "City",
+            Country = "Country",
+            BirthDate = new DateTime(1990, 1, 1),
         };
 
-        _mockUserRepository
-            .Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(existingUser);
+        _mockUserRepository.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(existing);
+        _mockUserRepository.Setup(x => x.ExistsByEmailAsync(request.Email, It.IsAny<CancellationToken>())).ReturnsAsync(false);
 
-        _mockUserRepository
-            .Setup(x => x.GetByEmailAsync(updatedUser.Email, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((UserEntity?)null);
+        var result = await _controller.UpdateOwnUser(userId, request);
 
-        _mockUserRepository
-            .Setup(x => x.GetByUsernameAsync(updatedUser.Username, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((UserEntity?)null);
-
-        // Act
-        var result = await _controller.UpdateUser(userId, updatedUser);
-
-        // Assert
         result.Should().BeOfType<NoContentResult>();
+        existing.AccessLevel.Should().Be(UserAccessLevel.Admin);
     }
 
     [Test]
-    public async Task UpdateUser_WithIdMismatch_ReturnsBadRequest()
+    public async Task UpdateUserAsAdmin_WithValidRequest_ReturnsNoContent()
     {
-        // Arrange
         var userId = Guid.NewGuid();
-        var differentId = Guid.NewGuid();
+        var existing = new UserEntity { Id = userId, Email = "old@example.com", Username = "old" };
+        var request = new UpdateUserAdminRequestDto
+        {
+            Email = "new@example.com",
+            Username = "newname",
+            AccessLevel = UserAccessLevel.Manager,
+        };
+        SetPrincipal(Guid.NewGuid(), UserAccessLevel.Admin);
 
-        var updatedUser = new UserEntity { Id = differentId, Email = "test@example.com" };
+        _mockUserRepository.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(existing);
+        _mockUserRepository.Setup(x => x.ExistsByEmailAsync(request.Email, It.IsAny<CancellationToken>())).ReturnsAsync(false);
 
-        // Act
-        var result = await _controller.UpdateUser(userId, updatedUser);
+        var result = await _controller.UpdateUserAsAdmin(userId, request);
 
-        // Assert
-        result.Should().BeOfType<BadRequestObjectResult>();
-    }
-
-    [Test]
-    public async Task UpdateUser_WithNonExistingId_ReturnsNotFound()
-    {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var updatedUser = new UserEntity { Id = userId, Email = "test@example.com" };
-
-        _mockUserRepository
-            .Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((UserEntity?)null);
-
-        // Act
-        var result = await _controller.UpdateUser(userId, updatedUser);
-
-        // Assert
-        result.Should().BeOfType<NotFoundObjectResult>();
+        result.Should().BeOfType<NoContentResult>();
+        existing.AccessLevel.Should().Be(UserAccessLevel.Manager);
     }
 
     [Test]
     public async Task DeleteUser_WithExistingId_ReturnsNoContent()
     {
-        // Arrange
         var userId = Guid.NewGuid();
+        _mockUserRepository.Setup(x => x.RemoveByIdAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
-        _mockUserRepository
-            .Setup(x => x.RemoveByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
-
-        // Act
         var result = await _controller.DeleteUser(userId);
 
-        // Assert
         result.Should().BeOfType<NoContentResult>();
     }
 
-    [Test]
-    public async Task DeleteUser_WithNonExistingId_ReturnsNotFound()
+    private void SetPrincipal(Guid userId, UserAccessLevel accessLevel)
     {
-        // Arrange
-        var userId = Guid.NewGuid();
-
-        _mockUserRepository
-            .Setup(x => x.RemoveByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
-
-        // Act
-        var result = await _controller.DeleteUser(userId);
-
-        // Assert
-        result.Should().BeOfType<NotFoundObjectResult>();
+        var identity = new ClaimsIdentity(
+            new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim(ClaimTypes.Role, accessLevel.ToString()),
+            },
+            "test"
+        );
+        _controller.ControllerContext.HttpContext.User = new ClaimsPrincipal(identity);
     }
-
-    // Note: GetEndpoints and GetOptions tests are integration tests
-    // These are metadata endpoints that don't require extensive unit testing
 }

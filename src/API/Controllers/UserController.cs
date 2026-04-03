@@ -584,11 +584,6 @@ public sealed class UserController : ControllerBase
             BirthDate = user.BirthDate,
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt,
-            FailedLoginAttempts = user.FailedLoginAttempts,
-            LockedUntil = user.LockedUntil,
-            LastFailedLoginAt = user.LastFailedLoginAt,
-            LastSuccessfulLoginAt = user.LastSuccessfulLoginAt,
-            LastLoginIpAddress = user.LastLoginIpAddress,
         };
     }
 }

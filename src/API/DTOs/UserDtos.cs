@@ -24,11 +24,6 @@ public sealed class UserResponseDto
     public DateTime BirthDate { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public int FailedLoginAttempts { get; set; }
-    public DateTime? LockedUntil { get; set; }
-    public DateTime? LastFailedLoginAt { get; set; }
-    public DateTime? LastSuccessfulLoginAt { get; set; }
-    public string? LastLoginIpAddress { get; set; }
 }
 
 public sealed class CreateUserRequestDto

@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
 using System.Net;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace ECommerce.API.Filters;
 
@@ -233,7 +235,7 @@ public sealed class RateLimitingFilter : IActionFilter
     /// </remarks>
     /// <seealso cref="ClientRequestInfo"/>
     /// <seealso cref="ConcurrentDictionary{TKey,TValue}"/>
-    private static readonly ConcurrentDictionary<string, ClientRequestInfo> RequestCounts = new();
+    private static readonly ConcurrentDictionary<string, ClientRequestInfo> FallbackRequestCounts = new();
 
     /// <summary>
     /// Logger instance for recording rate limit violations and diagnostic information.
@@ -274,6 +276,7 @@ public sealed class RateLimitingFilter : IActionFilter
     /// </list>
     /// </remarks>
     private readonly ILogger<RateLimitingFilter> _logger;
+    private readonly IDistributedCache _distributedCache;
 
     /// <summary>
     /// Maximum number of requests allowed per client within the time window.
@@ -499,11 +502,13 @@ public sealed class RateLimitingFilter : IActionFilter
     /// </example>
     public RateLimitingFilter(
         ILogger<RateLimitingFilter> logger,
+        IDistributedCache distributedCache,
         int maxRequests = 100,
         int windowSeconds = 60
     )
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
 
         if (maxRequests < 1)
         {
@@ -627,15 +632,84 @@ public sealed class RateLimitingFilter : IActionFilter
     /// <seealso cref="CleanupExpiredEntries"/>
     public void OnActionExecuting(ActionExecutingContext context)
     {
+        var handled = ProcessDistributedRateLimitAsync(context).ConfigureAwait(false).GetAwaiter().GetResult();
+        if (handled)
+        {
+            return;
+        }
+
+        ProcessFallbackRateLimit(context);
+    }
+
+    private async Task<bool> ProcessDistributedRateLimitAsync(ActionExecutingContext context)
+    {
+        var clientId = GetClientIdentifier(context.HttpContext);
+        var now = DateTimeOffset.UtcNow;
+        var cacheKey = $"rate_limit:{clientId}";
+
+        try
+        {
+            var cached = await _distributedCache.GetStringAsync(cacheKey);
+            var requestInfo = !string.IsNullOrWhiteSpace(cached)
+                ? JsonSerializer.Deserialize<ClientRequestInfo>(cached) ?? new ClientRequestInfo()
+                : new ClientRequestInfo();
+
+            if (requestInfo.WindowStart == default
+                || now - requestInfo.WindowStart > TimeSpan.FromSeconds(_windowSeconds))
+            {
+                requestInfo.WindowStart = now;
+                requestInfo.Count = 1;
+            }
+            else
+            {
+                requestInfo.Count++;
+            }
+
+            var resetTime = requestInfo.WindowStart.AddSeconds(_windowSeconds);
+            var remaining = Math.Max(0, _maxRequests - requestInfo.Count);
+            AddRateLimitHeaders(context, remaining, resetTime);
+
+            if (requestInfo.Count > _maxRequests)
+            {
+                SetTooManyRequestsResult(context, clientId, requestInfo.Count, resetTime, now);
+                return true;
+            }
+
+            var ttl = resetTime - now;
+            if (ttl < TimeSpan.FromSeconds(1))
+            {
+                ttl = TimeSpan.FromSeconds(1);
+            }
+
+            await _distributedCache.SetStringAsync(
+                cacheKey,
+                JsonSerializer.Serialize(requestInfo),
+                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = ttl }
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Distributed rate limiting unavailable for client {ClientId}; using in-memory fallback",
+                clientId
+            );
+            return false;
+        }
+    }
+
+    private void ProcessFallbackRateLimit(ActionExecutingContext context)
+    {
         var clientId = GetClientIdentifier(context.HttpContext);
         var now = DateTimeOffset.UtcNow;
 
-        var requestInfo = RequestCounts.AddOrUpdate(
+        var requestInfo = FallbackRequestCounts.AddOrUpdate(
             clientId,
             new ClientRequestInfo { Count = 1, WindowStart = now },
             (_, existing) =>
             {
-                // Reset window if expired
                 if (now - existing.WindowStart > TimeSpan.FromSeconds(_windowSeconds))
                 {
                     return new ClientRequestInfo { Count = 1, WindowStart = now };
@@ -648,21 +722,46 @@ public sealed class RateLimitingFilter : IActionFilter
 
         var remaining = Math.Max(0, _maxRequests - requestInfo.Count);
         var resetTime = requestInfo.WindowStart.AddSeconds(_windowSeconds);
+        AddRateLimitHeaders(context, remaining, resetTime);
 
-        // Add rate limit headers
+        if (requestInfo.Count > _maxRequests)
+        {
+            SetTooManyRequestsResult(context, clientId, requestInfo.Count, resetTime, now);
+        }
+
+        if (FallbackRequestCounts.Count > 10000)
+        {
+            CleanupExpiredEntries(now);
+        }
+    }
+
+    private void AddRateLimitHeaders(
+        ActionExecutingContext context,
+        int remaining,
+        DateTimeOffset resetTime
+    )
+    {
         context.HttpContext.Response.Headers["X-RateLimit-Limit"] = _maxRequests.ToString();
         context.HttpContext.Response.Headers["X-RateLimit-Remaining"] = remaining.ToString();
         context.HttpContext.Response.Headers["X-RateLimit-Reset"] = resetTime
             .ToUnixTimeSeconds()
             .ToString();
+    }
 
-        // Check if limit exceeded
-        if (requestInfo.Count > _maxRequests)
+    private void SetTooManyRequestsResult(
+        ActionExecutingContext context,
+        string clientId,
+        int requestCount,
+        DateTimeOffset resetTime,
+        DateTimeOffset now
+    )
+    {
+        if (requestCount > _maxRequests)
         {
             _logger.LogWarning(
                 "Rate limit exceeded for client {ClientId}. Count: {Count}, Limit: {Limit}",
                 clientId,
-                requestInfo.Count,
+                requestCount,
                 _maxRequests
             );
 
@@ -680,12 +779,6 @@ public sealed class RateLimitingFilter : IActionFilter
             context.HttpContext.Response.Headers["Retry-After"] = (
                 (int)(resetTime - now).TotalSeconds
             ).ToString();
-        }
-
-        // Cleanup old entries periodically (every 1000 requests)
-        if (RequestCounts.Count > 10000)
-        {
-            CleanupExpiredEntries(now);
         }
     }
 
@@ -975,14 +1068,14 @@ public sealed class RateLimitingFilter : IActionFilter
     /// <seealso cref="OnActionExecuting"/>
     private void CleanupExpiredEntries(DateTimeOffset now)
     {
-        var expiredKeys = RequestCounts
+        var expiredKeys = FallbackRequestCounts
             .Where(kvp => now - kvp.Value.WindowStart > TimeSpan.FromSeconds(_windowSeconds * 2))
             .Select(kvp => kvp.Key)
             .ToList();
 
         foreach (var key in expiredKeys)
         {
-            RequestCounts.TryRemove(key, out _);
+            FallbackRequestCounts.TryRemove(key, out _);
         }
 
         if (expiredKeys.Count > 0)

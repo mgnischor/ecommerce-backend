@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using ECommerce.API.Constants;
 using ECommerce.API.DTOs;
 using ECommerce.API.Filters;
 using ECommerce.Application.Interfaces;
@@ -48,6 +49,9 @@ namespace ECommerce.API.Controllers;
 [Tags("Authentication")]
 public sealed class AuthController : ControllerBase
 {
+    private const string DummyPasswordHash =
+        "AAAAAAAAAAAAAAAAAAAAAA==;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+
     /// <summary>
     /// Repository for user data access and retrieval operations
     /// </summary>
@@ -231,12 +235,6 @@ public sealed class AuthController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        // Add security headers
-        Response.Headers.Append("X-Content-Type-Options", "nosniff");
-        Response.Headers.Append("X-Frame-Options", "DENY");
-        Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-        Response.Headers.Append("X-XSS-Protection", "1; mode=block");
-
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
         userAgent ??= "Unknown";
 
@@ -296,8 +294,7 @@ public sealed class AuthController : ControllerBase
         }
 
         // Use dummy hash for timing attack protection when user doesn't exist
-        var passwordHash =
-            user?.PasswordHash ?? "$2a$11$dummyhashfortimingattackprotection1234567890123456789012";
+        var passwordHash = user?.PasswordHash ?? DummyPasswordHash;
         var isPasswordValid = _passwordService.VerifyPassword(loginRequest.Password, passwordHash);
 
         // Authentication failed
@@ -336,7 +333,7 @@ public sealed class AuthController : ControllerBase
                 userAgent
             );
 
-            return Unauthorized(new { Message = "Invalid email or password" });
+            return Unauthorized(new { Message = ErrorMessages.InvalidCredentials });
         }
 
         // Check if user is active
@@ -350,7 +347,7 @@ public sealed class AuthController : ControllerBase
                 user.IsBanned,
                 user.IsDeleted
             );
-            return Unauthorized(new { Message = "User account is not active" });
+            return Unauthorized(new { Message = ErrorMessages.InvalidCredentials });
         }
 
         // Successful login - Reset failed attempts and update login info

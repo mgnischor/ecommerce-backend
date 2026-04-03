@@ -33,6 +33,10 @@ public class AuthControllerTests : BaseTestFixture
             _mockPasswordService.Object,
             _mockLogger.Object
         );
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext(),
+        };
     }
 
     [Test]
@@ -109,12 +113,44 @@ public class AuthControllerTests : BaseTestFixture
         _mockUserRepository
             .Setup(x => x.GetByEmailAsync(loginRequest.Email, It.IsAny<CancellationToken>()))
             .ReturnsAsync((UserEntity?)null);
+        _mockPasswordService
+            .Setup(x => x.VerifyPassword(loginRequest.Password, It.IsAny<string>()))
+            .Returns(false);
 
         // Act
         var result = await _controller.Login(loginRequest);
 
         // Assert
         result.Result.Should().BeOfType<UnauthorizedObjectResult>();
+    }
+
+    [Test]
+    public async Task Login_WithInactiveUser_ReturnsGenericInvalidCredentialsMessage()
+    {
+        var loginRequest = new LoginRequestDto
+        {
+            Email = "test@example.com",
+            Password = "password123",
+        };
+        var user = new UserEntity
+        {
+            Email = loginRequest.Email,
+            PasswordHash = "hashed_password",
+            IsActive = false,
+        };
+
+        _mockUserRepository
+            .Setup(x => x.GetByEmailAsync(loginRequest.Email, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockPasswordService
+            .Setup(x => x.VerifyPassword(loginRequest.Password, user.PasswordHash))
+            .Returns(true);
+
+        var result = await _controller.Login(loginRequest);
+
+        var unauthorized = result.Result as UnauthorizedObjectResult;
+        unauthorized.Should().NotBeNull();
+        unauthorized!.Value!.ToString().Should().Contain("Invalid email or password");
     }
 
     [Test]

@@ -15,7 +15,7 @@ namespace ECommerce.API.DTOs;
 /// </para>
 /// <list type="bullet">
 /// <item><description>Email: Required, must be valid email format</description></item>
-/// <item><description>Password: Required, minimum 4 characters</description></item>
+/// <item><description>Password: Required, minimum 8 characters</description></item>
 /// </list>
 /// <para>
 /// <strong>Usage Example:</strong>
@@ -46,7 +46,7 @@ public sealed class LoginRequestDto
     /// Gets or sets the user's password for authentication
     /// </summary>
     /// <value>
-    /// A string containing the user's password. Must be at least 4 characters long.
+    /// A string containing the user's password. Must be at least 8 characters long.
     /// This field is required for authentication.
     /// </value>
     /// <remarks>
@@ -56,6 +56,6 @@ public sealed class LoginRequestDto
     /// </remarks>
     /// <example>SecurePassword123</example>
     [Required(ErrorMessage = "Password is required")]
-    [MinLength(4, ErrorMessage = "Password must be at least 4 characters")]
+    [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
     public string Password { get; set; } = string.Empty;
 }
