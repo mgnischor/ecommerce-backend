@@ -324,7 +324,7 @@ public class FraudDetectionServiceTests : BaseTestFixture
     public void ValidateAddressConsistency_NoProfileData_ReturnsTrue()
     {
         // Arrange
-        var customer = new UserEntity { City = null, Country = null };
+        var customer = new UserEntity { City = null!, Country = null! };
 
         // Act
         var isValid = FraudDetectionService.ValidateAddressConsistency(
