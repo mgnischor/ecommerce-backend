@@ -1,7 +1,9 @@
+using System.Net;
 using System.Threading;
 using ECommerce.API.Controllers;
 using ECommerce.API.DTOs;
 using ECommerce.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Tests.API.Controllers;
@@ -33,6 +35,10 @@ public class AuthControllerTests : BaseTestFixture
             _mockPasswordService.Object,
             _mockLogger.Object
         );
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
+        _controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
     }
 
     [Test]
