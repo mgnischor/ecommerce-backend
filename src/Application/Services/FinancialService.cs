@@ -3,6 +3,8 @@ using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
+using ECommerce.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ECommerce.Application.Services;
 
@@ -28,6 +30,7 @@ namespace ECommerce.Application.Services;
 public class FinancialService : IFinancialService
 {
     private readonly IFinancialTransactionRepository _financialTransactionRepository;
+    private readonly PostgresqlContext _context;
     private readonly ILoggingService _logger;
     private static int _transactionCounter = 0;
     private static readonly object _lock = new object();
@@ -53,13 +56,31 @@ public class FinancialService : IFinancialService
     /// <exception cref="ArgumentNullException">Thrown when any required dependency is null</exception>
     public FinancialService(
         IFinancialTransactionRepository financialTransactionRepository,
+        PostgresqlContext context,
         ILoggingService logger
     )
     {
         _financialTransactionRepository =
             financialTransactionRepository
             ?? throw new ArgumentNullException(nameof(financialTransactionRepository));
+        _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    /// <summary>
+    /// Begins a new database transaction unless one is already active on this DbContext.
+    /// Returns null when this call should not own the transaction.
+    /// </summary>
+    private async Task<IDbContextTransaction?> BeginTransactionIfNoneAsync(
+        CancellationToken cancellationToken
+    )
+    {
+        if (_context.Database.CurrentTransaction is not null)
+        {
+            return null;
+        }
+
+        return await _context.Database.BeginTransactionAsync(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -76,6 +97,8 @@ public class FinancialService : IFinancialService
             "Recording sale financial transaction for inventory transaction {TransactionId}",
             inventoryTransaction.Id
         );
+
+        await using var dbTransaction = await BeginTransactionIfNoneAsync(cancellationToken);
 
         // Create revenue recognition transaction
         var revenueTransaction = new FinancialTransactionEntity
@@ -127,6 +150,11 @@ public class FinancialService : IFinancialService
         await _financialTransactionRepository.AddAsync(arTransaction, cancellationToken);
         await _financialTransactionRepository.SaveChangesAsync(cancellationToken);
 
+        if (dbTransaction is not null)
+        {
+            await dbTransaction.CommitAsync(cancellationToken);
+        }
+
         _logger.LogInformation(
             "Created sale financial transactions: Revenue={RevenueId}, AR={ARId}",
             revenueTransaction.Id,
@@ -150,6 +178,8 @@ public class FinancialService : IFinancialService
             "Recording purchase financial transaction for inventory transaction {TransactionId}",
             inventoryTransaction.Id
         );
+
+        await using var dbTransaction = await BeginTransactionIfNoneAsync(cancellationToken);
 
         // Create purchase expense transaction
         var expenseTransaction = new FinancialTransactionEntity
@@ -199,6 +229,11 @@ public class FinancialService : IFinancialService
         await _financialTransactionRepository.AddAsync(apTransaction, cancellationToken);
         await _financialTransactionRepository.SaveChangesAsync(cancellationToken);
 
+        if (dbTransaction is not null)
+        {
+            await dbTransaction.CommitAsync(cancellationToken);
+        }
+
         _logger.LogInformation(
             "Created purchase financial transactions: Expense={ExpenseId}, AP={APId}",
             expenseTransaction.Id,
@@ -223,6 +258,8 @@ public class FinancialService : IFinancialService
             payment.Id,
             orderId
         );
+
+        await using var dbTransaction = await BeginTransactionIfNoneAsync(cancellationToken);
 
         // Calculate payment processing fee
         var (feeAmount, netAmount) = CalculatePaymentFee(
@@ -289,6 +326,11 @@ public class FinancialService : IFinancialService
         }
 
         await _financialTransactionRepository.SaveChangesAsync(cancellationToken);
+
+        if (dbTransaction is not null)
+        {
+            await dbTransaction.CommitAsync(cancellationToken);
+        }
 
         _logger.LogInformation(
             "Created customer payment transaction: {TransactionId}, Amount={Amount}, Fee={FeeAmount}",
