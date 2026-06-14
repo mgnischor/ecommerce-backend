@@ -15,11 +15,39 @@ public sealed class PasswordService : IPasswordService
 
     private const char Delimiter = ';';
 
+    // Stable dummy hash used for timing-attack mitigation when the user does not exist.
+    // Computed once at startup with the same PBKDF2 parameters as a real password.
+    private static readonly string DummyHash = BuildDummyHash();
+
     private readonly ILoggingService _logger;
 
     public PasswordService(ILoggingService logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    public string GetDummyHash() => DummyHash;
+
+    private static string BuildDummyHash()
+    {
+        // Deterministic salt + derived key so the dummy hash is stable across restarts
+        // but still incurs the same PBKDF2 cost as a real verification.
+        var salt = new byte[SaltSize];
+        // Fill with a fixed, non-secret pattern - it is never used for any real account.
+        for (var i = 0; i < salt.Length; i++)
+        {
+            salt[i] = (byte)(i * 7 + 13);
+        }
+
+        var hash = Rfc2898DeriveBytes.Pbkdf2(
+            "__dummy_password__",
+            salt,
+            Iterations,
+            Algorithm,
+            KeySize
+        );
+
+        return string.Join(Delimiter, Convert.ToBase64String(salt), Convert.ToBase64String(hash));
     }
 
     public string HashPassword(string password)
