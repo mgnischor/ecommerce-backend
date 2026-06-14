@@ -1,9 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ECommerce.Application.Services;
@@ -75,15 +75,16 @@ public sealed class JwtService : IJwtService
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
-                issuer: _issuer,
-                audience: _audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_expirationMinutes),
-                signingCredentials: credentials
-            );
+            var descriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Issuer = _issuer,
+                Audience = _audience,
+                Expires = DateTime.UtcNow.AddMinutes(_expirationMinutes),
+                SigningCredentials = credentials,
+            };
 
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenString = new JsonWebTokenHandler().CreateToken(descriptor);
 
             _logger.LogInformation("Successfully generated JWT token for user: {UserId}", user.Id);
 
