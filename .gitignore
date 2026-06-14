@@ -155,3 +155,20 @@ x86/
 
 build-internal.cmd
 .vs/
+
+#----------------------------------------------------------------------------------
+# Secrets and environment-specific configuration
+# Never commit production secrets - use environment variables or a secrets manager
+#----------------------------------------------------------------------------------
+
+# Environment files (allow .env.example as a template)
+.env
+.env.*
+!.env.example
+
+# Production and staging appsettings that may contain real secrets
+appsettings.Production.json
+appsettings.Staging.json
+
+# .NET user secrets (stored outside the project, but guard against accidental copies)
+secrets.json
