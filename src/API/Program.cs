@@ -1,4 +1,5 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using ECommerce.API.Extensions;
 using ECommerce.API.Middlewares;
 using ECommerce.API.Services;
@@ -8,7 +9,10 @@ using ECommerce.Domain.Entities;
 using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence;
 using ECommerce.Infrastructure.Repositories;
+using ECommerce.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -75,6 +79,7 @@ builder.Services.AddScoped<
     InventoryTransactionService
 >();
 builder.Services.AddScoped<IFinancialService, FinancialService>();
+builder.Services.AddScoped<IPaymentGatewayService, FictitiousPaymentGatewayService>();
 
 // Configure JWT Authentication
 var jwtSecretKey =
@@ -86,6 +91,11 @@ var jwtIssuer =
 var jwtAudience =
     builder.Configuration["Jwt:Audience"]
     ?? throw new InvalidOperationException("JWT Audience is not configured");
+
+if (Encoding.UTF8.GetByteCount(jwtSecretKey) < 32)
+{
+    throw new InvalidOperationException("JWT SecretKey must be at least 256 bits (32 bytes) long.");
+}
 
 builder
     .Services.AddAuthentication(options =>
@@ -104,7 +114,7 @@ builder
             ValidIssuer = jwtIssuer,
             ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
-            ClockSkew = TimeSpan.Zero,
+            ClockSkew = TimeSpan.FromMinutes(1),
         };
     });
 
@@ -115,20 +125,69 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        var allowedOrigins =
-            builder
-                .Configuration["Cors:AllowedOrigins"]
-                ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            ??
-            [
-                "http://localhost:4200",
-                "https://localhost:4200",
-                "http://localhost:8080",
-                "https://localhost:8080",
-            ];
+        var configured = builder.Configuration["Cors:AllowedOrigins"];
+        var allowedOrigins = string.IsNullOrWhiteSpace(configured)
+            ? Array.Empty<string>()
+            : configured.Split(
+                ',',
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+            );
+
+        // In production we require an explicit allow-list.
+        if (allowedOrigins.Length == 0 && !builder.Environment.IsDevelopment())
+        {
+            throw new InvalidOperationException(
+                "Cors:AllowedOrigins must be configured for non-development environments."
+            );
+        }
+
+        // Never allow "*" together with credentials.
+        if (Array.Exists(allowedOrigins, o => o == "*"))
+        {
+            throw new InvalidOperationException(
+                "Cors:AllowedOrigins cannot contain '*' when credentials are allowed."
+            );
+        }
 
         policy.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
     });
+});
+
+// Register filters that need DI
+builder.Services.AddScoped<ECommerce.API.Filters.ApiExceptionFilter>();
+builder.Services.AddMemoryCache();
+
+// Configure rate limiting
+// - Global baseline: 100 req/min per client IP (sliding window)
+// - "auth" policy: 5 req/min per IP to protect against brute-force
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
+        RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1),
+                SegmentsPerWindow = 4,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }
+        )
+    );
+
+    options.AddFixedWindowLimiter(
+        "auth",
+        o =>
+        {
+            o.PermitLimit = 5;
+            o.Window = TimeSpan.FromMinutes(1);
+            o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            o.QueueLimit = 0;
+        }
+    );
 });
 
 builder.Services.AddControllers();
@@ -136,26 +195,61 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Use global exception handling middleware
+// Trust X-Forwarded-For / X-Forwarded-Proto from the immediate upstream proxy.
+// This must be the very first middleware so the real client IP and scheme are
+// visible to everything downstream (security headers, rate limiter, auth).
+// In production, restrict KnownProxies to only your actual reverse-proxy IPs.
+app.UseForwardedHeaders(
+    new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    }
+);
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+// Global middleware order: security headers first, then exception handling
+app.UseMiddleware<ECommerce.API.Middlewares.SecurityHeadersMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Apply migrations and seed database
-using (var scope = app.Services.CreateScope())
+// Apply migrations and seed database (gated by configuration)
+var autoMigrate = builder.Configuration.GetValue("Database:AutoMigrate", false);
+var seedAdmin = builder.Configuration.GetValue("Admin:SeedEnabled", false);
+
+if (autoMigrate || seedAdmin)
 {
+    using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<PostgresqlContext>();
     var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
     try
     {
-        logger.LogInformation("Applying database migrations");
-        await context.Database.MigrateAsync();
-        logger.LogInformation("Database migrations applied successfully");
+        if (autoMigrate)
+        {
+            logger.LogInformation("Applying database migrations");
+            await context.Database.MigrateAsync();
+            logger.LogInformation("Database migrations applied successfully");
+        }
 
-        logger.LogInformation("Starting database seeding");
-        await DatabaseSeeder.SeedAdminUserAsync(context, passwordService);
-        await DatabaseSeeder.SeedChartOfAccountsAsync(context);
-        logger.LogInformation("Database seeding completed successfully");
+        if (seedAdmin)
+        {
+            var adminEmail = builder.Configuration["Admin:Email"];
+            var adminPassword = builder.Configuration["Admin:Password"];
+
+            logger.LogInformation("Starting database seeding");
+            await DatabaseSeeder.SeedAdminUserAsync(
+                context,
+                passwordService,
+                adminEmail ?? string.Empty,
+                adminPassword ?? string.Empty
+            );
+            await DatabaseSeeder.SeedChartOfAccountsAsync(context);
+            logger.LogInformation("Database seeding completed successfully");
+        }
     }
     catch (Exception ex)
     {
@@ -184,6 +278,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
