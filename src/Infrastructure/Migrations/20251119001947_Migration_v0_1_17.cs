@@ -12,241 +12,269 @@ namespace ECommerce.src.Infrastructure.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_financial_transactions_InventoryTransactions_inventory_tran~",
-                table: "financial_transactions");
+                table: "financial_transactions"
+            );
 
             migrationBuilder.DropForeignKey(
                 name: "FK_financial_transactions_JournalEntries_journal_entry_id",
-                table: "financial_transactions");
+                table: "financial_transactions"
+            );
 
             migrationBuilder.DropForeignKey(
                 name: "FK_financial_transactions_Payments_payment_id",
-                table: "financial_transactions");
+                table: "financial_transactions"
+            );
 
             migrationBuilder.DropForeignKey(
                 name: "FK_InventoryTransactions_products_ProductId",
-                table: "InventoryTransactions");
+                table: "InventoryTransactions"
+            );
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_vendors",
-                schema: "public",
-                table: "vendors");
+            migrationBuilder.DropPrimaryKey(name: "PK_vendors", schema: "public", table: "vendors");
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_users",
-                schema: "public",
-                table: "users");
+            migrationBuilder.DropPrimaryKey(name: "PK_users", schema: "public", table: "users");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_suppliers",
                 schema: "public",
-                table: "suppliers");
+                table: "suppliers"
+            );
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_stores",
-                schema: "public",
-                table: "stores");
+            migrationBuilder.DropPrimaryKey(name: "PK_stores", schema: "public", table: "stores");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_shipments",
                 schema: "public",
-                table: "shipments");
+                table: "shipments"
+            );
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_refunds",
-                schema: "public",
-                table: "refunds");
+            migrationBuilder.DropPrimaryKey(name: "PK_refunds", schema: "public", table: "refunds");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_promotions",
                 schema: "public",
-                table: "promotions");
+                table: "promotions"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_products",
                 schema: "public",
-                table: "products");
+                table: "products"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_notifications",
                 schema: "public",
-                table: "notifications");
+                table: "notifications"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_shipping_zones",
                 schema: "public",
-                table: "shipping_zones");
+                table: "shipping_zones"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_product_variants",
                 schema: "public",
-                table: "product_variants");
+                table: "product_variants"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_product_attributes",
                 schema: "public",
-                table: "product_attributes");
+                table: "product_attributes"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_financial_transactions",
-                table: "financial_transactions");
+                table: "financial_transactions"
+            );
 
             migrationBuilder.RenameTable(
                 name: "vendors",
                 schema: "public",
                 newName: "Vendors",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "users",
                 schema: "public",
                 newName: "Users",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "suppliers",
                 schema: "public",
                 newName: "Suppliers",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "stores",
                 schema: "public",
                 newName: "Stores",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "shipments",
                 schema: "public",
                 newName: "Shipments",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "refunds",
                 schema: "public",
                 newName: "Refunds",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "promotions",
                 schema: "public",
                 newName: "Promotions",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "products",
                 schema: "public",
                 newName: "Products",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "notifications",
                 schema: "public",
                 newName: "Notifications",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "shipping_zones",
                 schema: "public",
                 newName: "ShippingZones",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "product_variants",
                 schema: "public",
                 newName: "ProductVariants",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "product_attributes",
                 schema: "public",
                 newName: "ProductAttributes",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "financial_transactions",
-                newName: "FinancialTransactions");
+                newName: "FinancialTransactions"
+            );
 
             migrationBuilder.RenameIndex(
                 name: "IX_financial_transactions_journal_entry_id",
                 table: "FinancialTransactions",
-                newName: "IX_FinancialTransactions_journal_entry_id");
+                newName: "IX_FinancialTransactions_journal_entry_id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Vendors",
                 schema: "public",
                 table: "Vendors",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Users",
                 schema: "public",
                 table: "Users",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Suppliers",
                 schema: "public",
                 table: "Suppliers",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Stores",
                 schema: "public",
                 table: "Stores",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Shipments",
                 schema: "public",
                 table: "Shipments",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Refunds",
                 schema: "public",
                 table: "Refunds",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Promotions",
                 schema: "public",
                 table: "Promotions",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Products",
                 schema: "public",
                 table: "Products",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Notifications",
                 schema: "public",
                 table: "Notifications",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_ShippingZones",
                 schema: "public",
                 table: "ShippingZones",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_ProductVariants",
                 schema: "public",
                 table: "ProductVariants",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_ProductAttributes",
                 schema: "public",
                 table: "ProductAttributes",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_FinancialTransactions",
                 table: "FinancialTransactions",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_FinancialTransactions_InventoryTransactions_inventory_trans~",
@@ -254,7 +282,8 @@ namespace ECommerce.src.Infrastructure.Migrations
                 column: "inventory_transaction_id",
                 principalTable: "InventoryTransactions",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.SetNull
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_FinancialTransactions_JournalEntries_journal_entry_id",
@@ -262,7 +291,8 @@ namespace ECommerce.src.Infrastructure.Migrations
                 column: "journal_entry_id",
                 principalTable: "JournalEntries",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.SetNull
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_FinancialTransactions_Payments_payment_id",
@@ -270,7 +300,8 @@ namespace ECommerce.src.Infrastructure.Migrations
                 column: "payment_id",
                 principalTable: "Payments",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.SetNull
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_InventoryTransactions_Products_ProductId",
@@ -279,7 +310,8 @@ namespace ECommerce.src.Infrastructure.Migrations
                 principalSchema: "public",
                 principalTable: "Products",
                 principalColumn: "id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Restrict
+            );
         }
 
         /// <inheritdoc />
@@ -287,241 +319,269 @@ namespace ECommerce.src.Infrastructure.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_FinancialTransactions_InventoryTransactions_inventory_trans~",
-                table: "FinancialTransactions");
+                table: "FinancialTransactions"
+            );
 
             migrationBuilder.DropForeignKey(
                 name: "FK_FinancialTransactions_JournalEntries_journal_entry_id",
-                table: "FinancialTransactions");
+                table: "FinancialTransactions"
+            );
 
             migrationBuilder.DropForeignKey(
                 name: "FK_FinancialTransactions_Payments_payment_id",
-                table: "FinancialTransactions");
+                table: "FinancialTransactions"
+            );
 
             migrationBuilder.DropForeignKey(
                 name: "FK_InventoryTransactions_Products_ProductId",
-                table: "InventoryTransactions");
+                table: "InventoryTransactions"
+            );
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Vendors",
-                schema: "public",
-                table: "Vendors");
+            migrationBuilder.DropPrimaryKey(name: "PK_Vendors", schema: "public", table: "Vendors");
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Users",
-                schema: "public",
-                table: "Users");
+            migrationBuilder.DropPrimaryKey(name: "PK_Users", schema: "public", table: "Users");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Suppliers",
                 schema: "public",
-                table: "Suppliers");
+                table: "Suppliers"
+            );
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Stores",
-                schema: "public",
-                table: "Stores");
+            migrationBuilder.DropPrimaryKey(name: "PK_Stores", schema: "public", table: "Stores");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Shipments",
                 schema: "public",
-                table: "Shipments");
+                table: "Shipments"
+            );
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Refunds",
-                schema: "public",
-                table: "Refunds");
+            migrationBuilder.DropPrimaryKey(name: "PK_Refunds", schema: "public", table: "Refunds");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Promotions",
                 schema: "public",
-                table: "Promotions");
+                table: "Promotions"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Products",
                 schema: "public",
-                table: "Products");
+                table: "Products"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Notifications",
                 schema: "public",
-                table: "Notifications");
+                table: "Notifications"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_ShippingZones",
                 schema: "public",
-                table: "ShippingZones");
+                table: "ShippingZones"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_ProductVariants",
                 schema: "public",
-                table: "ProductVariants");
+                table: "ProductVariants"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_ProductAttributes",
                 schema: "public",
-                table: "ProductAttributes");
+                table: "ProductAttributes"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_FinancialTransactions",
-                table: "FinancialTransactions");
+                table: "FinancialTransactions"
+            );
 
             migrationBuilder.RenameTable(
                 name: "Vendors",
                 schema: "public",
                 newName: "vendors",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "Users",
                 schema: "public",
                 newName: "users",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "Suppliers",
                 schema: "public",
                 newName: "suppliers",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "Stores",
                 schema: "public",
                 newName: "stores",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "Shipments",
                 schema: "public",
                 newName: "shipments",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "Refunds",
                 schema: "public",
                 newName: "refunds",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "Promotions",
                 schema: "public",
                 newName: "promotions",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "Products",
                 schema: "public",
                 newName: "products",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "Notifications",
                 schema: "public",
                 newName: "notifications",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "ShippingZones",
                 schema: "public",
                 newName: "shipping_zones",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "ProductVariants",
                 schema: "public",
                 newName: "product_variants",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "ProductAttributes",
                 schema: "public",
                 newName: "product_attributes",
-                newSchema: "public");
+                newSchema: "public"
+            );
 
             migrationBuilder.RenameTable(
                 name: "FinancialTransactions",
-                newName: "financial_transactions");
+                newName: "financial_transactions"
+            );
 
             migrationBuilder.RenameIndex(
                 name: "IX_FinancialTransactions_journal_entry_id",
                 table: "financial_transactions",
-                newName: "IX_financial_transactions_journal_entry_id");
+                newName: "IX_financial_transactions_journal_entry_id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_vendors",
                 schema: "public",
                 table: "vendors",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_users",
                 schema: "public",
                 table: "users",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_suppliers",
                 schema: "public",
                 table: "suppliers",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_stores",
                 schema: "public",
                 table: "stores",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_shipments",
                 schema: "public",
                 table: "shipments",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_refunds",
                 schema: "public",
                 table: "refunds",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_promotions",
                 schema: "public",
                 table: "promotions",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_products",
                 schema: "public",
                 table: "products",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_notifications",
                 schema: "public",
                 table: "notifications",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_shipping_zones",
                 schema: "public",
                 table: "shipping_zones",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_product_variants",
                 schema: "public",
                 table: "product_variants",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_product_attributes",
                 schema: "public",
                 table: "product_attributes",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_financial_transactions",
                 table: "financial_transactions",
-                column: "id");
+                column: "id"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_financial_transactions_InventoryTransactions_inventory_tran~",
@@ -529,7 +589,8 @@ namespace ECommerce.src.Infrastructure.Migrations
                 column: "inventory_transaction_id",
                 principalTable: "InventoryTransactions",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.SetNull
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_financial_transactions_JournalEntries_journal_entry_id",
@@ -537,7 +598,8 @@ namespace ECommerce.src.Infrastructure.Migrations
                 column: "journal_entry_id",
                 principalTable: "JournalEntries",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.SetNull
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_financial_transactions_Payments_payment_id",
@@ -545,7 +607,8 @@ namespace ECommerce.src.Infrastructure.Migrations
                 column: "payment_id",
                 principalTable: "Payments",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.SetNull
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_InventoryTransactions_products_ProductId",
@@ -554,7 +617,8 @@ namespace ECommerce.src.Infrastructure.Migrations
                 principalSchema: "public",
                 principalTable: "products",
                 principalColumn: "id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Restrict
+            );
         }
     }
 }
