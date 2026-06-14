@@ -12,23 +12,39 @@ namespace ECommerce.Infrastructure.Persistence;
 public static class DatabaseSeeder
 {
     /// <summary>
-    /// Seeds the admin user if it doesn't exist
+    /// Seeds the admin user if it doesn't exist.
     /// </summary>
     /// <param name="context">Database context</param>
     /// <param name="passwordService">Password hashing service</param>
+    /// <param name="adminEmail">Email for the admin account (required).</param>
+    /// <param name="adminPassword">Password for the admin account (required, min 12 chars).</param>
     public static async Task SeedAdminUserAsync(
         PostgresqlContext context,
-        IPasswordService passwordService
+        IPasswordService passwordService,
+        string adminEmail,
+        string adminPassword
     )
     {
-        if (context == null)
-            throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(passwordService);
 
-        if (passwordService == null)
-            throw new ArgumentNullException(nameof(passwordService));
+        if (string.IsNullOrWhiteSpace(adminEmail))
+        {
+            throw new ArgumentException(
+                "Admin email is required when seeding is enabled.",
+                nameof(adminEmail)
+            );
+        }
+
+        if (string.IsNullOrWhiteSpace(adminPassword) || adminPassword.Length < 12)
+        {
+            throw new ArgumentException(
+                "Admin password must be at least 12 characters when seeding is enabled.",
+                nameof(adminPassword)
+            );
+        }
 
         // Check if admin user already exists
-        var adminEmail = "admin@ecommerce.com.br";
         var adminExists = await context.Users.AnyAsync(u => u.Email == adminEmail);
 
         if (!adminExists)
@@ -38,7 +54,7 @@ public static class DatabaseSeeder
                 Id = Guid.NewGuid(),
                 Username = "admin",
                 Email = adminEmail,
-                PasswordHash = passwordService.HashPassword("admin"),
+                PasswordHash = passwordService.HashPassword(adminPassword),
                 AccessLevel = UserAccessLevel.Admin,
                 IsActive = true,
                 IsEmailVerified = true,
@@ -84,100 +100,303 @@ public static class DatabaseSeeder
         // ===================================================================
 
         // Current Assets - Realizable within 12 months
-        accounts.AddRange(new[]
-        {
-            CreateAccount("1.1.01.001", "Cash", "Cash on hand and equivalents", AccountType.Asset),
-            CreateAccount("1.1.02.001", "Bank - Checking Account", "Balance in checking accounts", AccountType.Asset),
-            CreateAccount("1.1.02.002", "Short-term Investments", "Short-term financial investments", AccountType.Asset),
-            CreateAccount("1.1.03.001", "Inventory", "Merchandise for resale", AccountType.Asset),
-            CreateAccount("1.1.04.001", "Accounts Receivable - Customers", "Amounts to be received from credit sales", AccountType.Asset),
-            CreateAccount("1.1.04.002", "Credit Card Receivables", "Amounts to be received from card processors", AccountType.Asset),
-        });
+        accounts.AddRange(
+            new[]
+            {
+                CreateAccount(
+                    "1.1.01.001",
+                    "Cash",
+                    "Cash on hand and equivalents",
+                    AccountType.Asset
+                ),
+                CreateAccount(
+                    "1.1.02.001",
+                    "Bank - Checking Account",
+                    "Balance in checking accounts",
+                    AccountType.Asset
+                ),
+                CreateAccount(
+                    "1.1.02.002",
+                    "Short-term Investments",
+                    "Short-term financial investments",
+                    AccountType.Asset
+                ),
+                CreateAccount(
+                    "1.1.03.001",
+                    "Inventory",
+                    "Merchandise for resale",
+                    AccountType.Asset
+                ),
+                CreateAccount(
+                    "1.1.04.001",
+                    "Accounts Receivable - Customers",
+                    "Amounts to be received from credit sales",
+                    AccountType.Asset
+                ),
+                CreateAccount(
+                    "1.1.04.002",
+                    "Credit Card Receivables",
+                    "Amounts to be received from card processors",
+                    AccountType.Asset
+                ),
+            }
+        );
 
         // Non-Current Assets - Realizable after 12 months
-        accounts.AddRange(new[]
-        {
-            CreateAccount("1.2.01.001", "Property, Plant & Equipment - Computers", "Computers, servers, equipment", AccountType.Asset),
-            CreateAccount("1.2.01.002", "Property, Plant & Equipment - Furniture", "Office furniture and fixtures", AccountType.Asset),
-            CreateAccount("1.2.02.001", "Intangible - Software", "Software licenses and development", AccountType.Asset),
-        });
+        accounts.AddRange(
+            new[]
+            {
+                CreateAccount(
+                    "1.2.01.001",
+                    "Property, Plant & Equipment - Computers",
+                    "Computers, servers, equipment",
+                    AccountType.Asset
+                ),
+                CreateAccount(
+                    "1.2.01.002",
+                    "Property, Plant & Equipment - Furniture",
+                    "Office furniture and fixtures",
+                    AccountType.Asset
+                ),
+                CreateAccount(
+                    "1.2.02.001",
+                    "Intangible - Software",
+                    "Software licenses and development",
+                    AccountType.Asset
+                ),
+            }
+        );
 
         // ===================================================================
         // LIABILITIES - Obligations owed by the entity
         // ===================================================================
 
         // Current Liabilities - Due within 12 months
-        accounts.AddRange(new[]
-        {
-            CreateAccount("2.1.01.001", "Accounts Payable - Suppliers", "Payables to merchandise suppliers", AccountType.Liability),
-            CreateAccount("2.1.02.001", "Salaries Payable", "Salaries and employment charges payable", AccountType.Liability),
-            CreateAccount("2.1.03.001", "Taxes Payable", "Taxes and contributions payable", AccountType.Liability),
-            CreateAccount("2.1.04.001", "Loans and Financing", "Short-term loans", AccountType.Liability),
-            CreateAccount("2.1.05.001", "Customer Advances", "Amounts received in advance", AccountType.Liability),
-        });
+        accounts.AddRange(
+            new[]
+            {
+                CreateAccount(
+                    "2.1.01.001",
+                    "Accounts Payable - Suppliers",
+                    "Payables to merchandise suppliers",
+                    AccountType.Liability
+                ),
+                CreateAccount(
+                    "2.1.02.001",
+                    "Salaries Payable",
+                    "Salaries and employment charges payable",
+                    AccountType.Liability
+                ),
+                CreateAccount(
+                    "2.1.03.001",
+                    "Taxes Payable",
+                    "Taxes and contributions payable",
+                    AccountType.Liability
+                ),
+                CreateAccount(
+                    "2.1.04.001",
+                    "Loans and Financing",
+                    "Short-term loans",
+                    AccountType.Liability
+                ),
+                CreateAccount(
+                    "2.1.05.001",
+                    "Customer Advances",
+                    "Amounts received in advance",
+                    AccountType.Liability
+                ),
+            }
+        );
 
         // Non-Current Liabilities - Due after 12 months
-        accounts.AddRange(new[]
-        {
-            CreateAccount("2.2.01.001", "Long-term Loans", "Financing due after 12 months", AccountType.Liability),
-        });
+        accounts.AddRange(
+            new[]
+            {
+                CreateAccount(
+                    "2.2.01.001",
+                    "Long-term Loans",
+                    "Financing due after 12 months",
+                    AccountType.Liability
+                ),
+            }
+        );
 
         // ===================================================================
         // EQUITY - Owner's equity / Net worth
         // ===================================================================
 
-        accounts.AddRange(new[]
-        {
-            CreateAccount("3.1.01.001", "Share Capital", "Capital invested by shareholders", AccountType.Equity),
-            CreateAccount("3.2.01.001", "Retained Earnings", "Profits retained in the company", AccountType.Equity),
-            CreateAccount("3.3.01.001", "Accumulated Profit/Loss", "Current period accumulated result", AccountType.Equity),
-        });
+        accounts.AddRange(
+            new[]
+            {
+                CreateAccount(
+                    "3.1.01.001",
+                    "Share Capital",
+                    "Capital invested by shareholders",
+                    AccountType.Equity
+                ),
+                CreateAccount(
+                    "3.2.01.001",
+                    "Retained Earnings",
+                    "Profits retained in the company",
+                    AccountType.Equity
+                ),
+                CreateAccount(
+                    "3.3.01.001",
+                    "Accumulated Profit/Loss",
+                    "Current period accumulated result",
+                    AccountType.Equity
+                ),
+            }
+        );
 
         // ===================================================================
         // REVENUE - Income from operations
         // ===================================================================
 
-        accounts.AddRange(new[]
-        {
-            CreateAccount("4.1.01.001", "Product Sales Revenue", "Gross sales revenue", AccountType.Revenue),
-            CreateAccount("4.1.02.001", "Service Revenue", "Revenue from services", AccountType.Revenue),
-            CreateAccount("4.1.03.001", "Sales Returns", "Cancelled sales and returns (deduction)", AccountType.Revenue),
-            CreateAccount("4.1.04.001", "Sales Discounts", "Discounts given to customers (deduction)", AccountType.Revenue),
-            CreateAccount("4.1.05.001", "Sales Taxes", "VAT, sales tax (deduction)", AccountType.Revenue),
-            CreateAccount("4.2.01.001", "Other Operating Income", "Miscellaneous operating income", AccountType.Revenue),
-            CreateAccount("4.3.01.001", "Financial Income", "Interest, investment income, foreign exchange gains", AccountType.Revenue),
-        });
+        accounts.AddRange(
+            new[]
+            {
+                CreateAccount(
+                    "4.1.01.001",
+                    "Product Sales Revenue",
+                    "Gross sales revenue",
+                    AccountType.Revenue
+                ),
+                CreateAccount(
+                    "4.1.02.001",
+                    "Service Revenue",
+                    "Revenue from services",
+                    AccountType.Revenue
+                ),
+                CreateAccount(
+                    "4.1.03.001",
+                    "Sales Returns",
+                    "Cancelled sales and returns (deduction)",
+                    AccountType.Revenue
+                ),
+                CreateAccount(
+                    "4.1.04.001",
+                    "Sales Discounts",
+                    "Discounts given to customers (deduction)",
+                    AccountType.Revenue
+                ),
+                CreateAccount(
+                    "4.1.05.001",
+                    "Sales Taxes",
+                    "VAT, sales tax (deduction)",
+                    AccountType.Revenue
+                ),
+                CreateAccount(
+                    "4.2.01.001",
+                    "Other Operating Income",
+                    "Miscellaneous operating income",
+                    AccountType.Revenue
+                ),
+                CreateAccount(
+                    "4.3.01.001",
+                    "Financial Income",
+                    "Interest, investment income, foreign exchange gains",
+                    AccountType.Revenue
+                ),
+            }
+        );
 
         // ===================================================================
         // EXPENSES - Costs and operating expenses
         // ===================================================================
 
         // Cost of Goods Sold
-        accounts.AddRange(new[]
-        {
-            CreateAccount("5.1.01.001", "Cost of Goods Sold", "COGS - Direct cost of sales", AccountType.Expense),
-            CreateAccount("5.1.02.001", "Freight on Sales", "Shipping cost for deliveries", AccountType.Expense),
-        });
+        accounts.AddRange(
+            new[]
+            {
+                CreateAccount(
+                    "5.1.01.001",
+                    "Cost of Goods Sold",
+                    "COGS - Direct cost of sales",
+                    AccountType.Expense
+                ),
+                CreateAccount(
+                    "5.1.02.001",
+                    "Freight on Sales",
+                    "Shipping cost for deliveries",
+                    AccountType.Expense
+                ),
+            }
+        );
 
         // Operating Expenses
-        accounts.AddRange(new[]
-        {
-            CreateAccount("5.2.01.001", "Inventory Loss", "Loss, shrinkage and obsolescence", AccountType.Expense),
-            CreateAccount("5.2.01.002", "Other Operating Expenses", "Miscellaneous operating expenses", AccountType.Expense),
-            CreateAccount("5.2.02.001", "Personnel Expenses", "Salaries, benefits and payroll taxes", AccountType.Expense),
-            CreateAccount("5.2.03.001", "Marketing Expenses", "Advertising, promotion and digital marketing", AccountType.Expense),
-            CreateAccount("5.2.04.001", "Technology Expenses", "Servers, hosting, SaaS subscriptions", AccountType.Expense),
-            CreateAccount("5.2.05.001", "Administrative Expenses", "Rent, utilities, telephone", AccountType.Expense),
-            CreateAccount("5.2.06.001", "Credit Card Fees", "Fees from card processors", AccountType.Expense),
-            CreateAccount("5.2.07.001", "Marketplace Fees", "Commissions from marketplaces and platforms", AccountType.Expense),
-        });
+        accounts.AddRange(
+            new[]
+            {
+                CreateAccount(
+                    "5.2.01.001",
+                    "Inventory Loss",
+                    "Loss, shrinkage and obsolescence",
+                    AccountType.Expense
+                ),
+                CreateAccount(
+                    "5.2.01.002",
+                    "Other Operating Expenses",
+                    "Miscellaneous operating expenses",
+                    AccountType.Expense
+                ),
+                CreateAccount(
+                    "5.2.02.001",
+                    "Personnel Expenses",
+                    "Salaries, benefits and payroll taxes",
+                    AccountType.Expense
+                ),
+                CreateAccount(
+                    "5.2.03.001",
+                    "Marketing Expenses",
+                    "Advertising, promotion and digital marketing",
+                    AccountType.Expense
+                ),
+                CreateAccount(
+                    "5.2.04.001",
+                    "Technology Expenses",
+                    "Servers, hosting, SaaS subscriptions",
+                    AccountType.Expense
+                ),
+                CreateAccount(
+                    "5.2.05.001",
+                    "Administrative Expenses",
+                    "Rent, utilities, telephone",
+                    AccountType.Expense
+                ),
+                CreateAccount(
+                    "5.2.06.001",
+                    "Credit Card Fees",
+                    "Fees from card processors",
+                    AccountType.Expense
+                ),
+                CreateAccount(
+                    "5.2.07.001",
+                    "Marketplace Fees",
+                    "Commissions from marketplaces and platforms",
+                    AccountType.Expense
+                ),
+            }
+        );
 
         // Financial Expenses
-        accounts.AddRange(new[]
-        {
-            CreateAccount("5.3.01.001", "Interest Expense", "Interest on loans and financing", AccountType.Expense),
-            CreateAccount("5.3.02.001", "Bank Fees", "Bank charges and transaction fees", AccountType.Expense),
-        });
+        accounts.AddRange(
+            new[]
+            {
+                CreateAccount(
+                    "5.3.01.001",
+                    "Interest Expense",
+                    "Interest on loans and financing",
+                    AccountType.Expense
+                ),
+                CreateAccount(
+                    "5.3.02.001",
+                    "Bank Fees",
+                    "Bank charges and transaction fees",
+                    AccountType.Expense
+                ),
+            }
+        );
 
         // Add all accounts to database
         await context.ChartOfAccounts.AddRangeAsync(accounts);
@@ -188,7 +407,8 @@ public static class DatabaseSeeder
         string code,
         string name,
         string description,
-        AccountType type)
+        AccountType type
+    )
     {
         return new ChartOfAccountsEntity
         {
@@ -201,7 +421,7 @@ public static class DatabaseSeeder
             IsActive = true,
             Balance = 0,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
     }
 }
