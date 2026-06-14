@@ -4,6 +4,7 @@ using System.Text.Json;
 using ECommerce.API.Middlewares;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 
 namespace ECommerce.Tests.API.Middlewares;
 
@@ -15,6 +16,7 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
 {
     private Mock<ILogger<ExceptionHandlingMiddleware>> _mockLogger;
     private Mock<RequestDelegate> _mockNext;
+    private Mock<IHostEnvironment> _mockEnvironment;
     private DefaultHttpContext _httpContext;
 
     [SetUp]
@@ -23,6 +25,10 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
         base.SetUp();
         _mockLogger = new Mock<ILogger<ExceptionHandlingMiddleware>>();
         _mockNext = new Mock<RequestDelegate>();
+        _mockEnvironment = new Mock<IHostEnvironment>();
+        // Use Development by default so existing assertions that check for exception
+        // messages in the response body continue to work.
+        _mockEnvironment.Setup(e => e.EnvironmentName).Returns("Development");
         _httpContext = new DefaultHttpContext();
         _httpContext.Response.Body = new MemoryStream();
     }
@@ -31,7 +37,8 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public void Constructor_WithNullNext_ThrowsException()
     {
         // Act
-        Action act = () => new ExceptionHandlingMiddleware(null!, _mockLogger.Object);
+        Action act = () =>
+            new ExceptionHandlingMiddleware(null!, _mockLogger.Object, _mockEnvironment.Object);
 
         // Assert
         act.Should().Throw<ArgumentNullException>().WithParameterName("next");
@@ -41,7 +48,8 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public void Constructor_WithNullLogger_ThrowsException()
     {
         // Act
-        Action act = () => new ExceptionHandlingMiddleware(_mockNext.Object, null!);
+        Action act = () =>
+            new ExceptionHandlingMiddleware(_mockNext.Object, null!, _mockEnvironment.Object);
 
         // Assert
         act.Should().Throw<ArgumentNullException>().WithParameterName("logger");
@@ -51,7 +59,11 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public async Task InvokeAsync_WithNoException_CallsNext()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         _mockNext.Setup(next => next(_httpContext)).Returns(Task.CompletedTask);
 
         // Act
@@ -65,7 +77,11 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public async Task InvokeAsync_WithArgumentNullException_ReturnsBadRequest()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         _mockNext
             .Setup(next => next(_httpContext))
             .Throws(new ArgumentNullException("testParam", "Test error"));
@@ -75,14 +91,18 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
 
         // Assert
         _httpContext.Response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
-        _httpContext.Response.ContentType.Should().Be("application/json");
+        _httpContext.Response.ContentType.Should().Be("application/problem+json");
     }
 
     [Test]
     public async Task InvokeAsync_WithArgumentException_ReturnsBadRequest()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         _mockNext
             .Setup(next => next(_httpContext))
             .Throws(new ArgumentException("Invalid argument"));
@@ -98,7 +118,11 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public async Task InvokeAsync_WithInvalidOperationException_ReturnsBadRequest()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         _mockNext
             .Setup(next => next(_httpContext))
             .Throws(new InvalidOperationException("Invalid operation"));
@@ -114,7 +138,11 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public async Task InvokeAsync_WithUnauthorizedAccessException_ReturnsUnauthorized()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         _mockNext
             .Setup(next => next(_httpContext))
             .Throws(new UnauthorizedAccessException("Unauthorized"));
@@ -130,7 +158,11 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public async Task InvokeAsync_WithKeyNotFoundException_ReturnsNotFound()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         _mockNext
             .Setup(next => next(_httpContext))
             .Throws(new KeyNotFoundException("Item not found"));
@@ -146,7 +178,11 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public async Task InvokeAsync_WithUnknownException_ReturnsInternalServerError()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         _mockNext.Setup(next => next(_httpContext)).Throws(new Exception("Unexpected error"));
 
         // Act
@@ -160,7 +196,11 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public async Task InvokeAsync_WithException_LogsError()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         var exception = new InvalidOperationException("Test error");
         _mockNext.Setup(next => next(_httpContext)).Throws(exception);
 
@@ -185,7 +225,11 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public async Task InvokeAsync_WithException_WritesJsonResponse()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         var exceptionMessage = "Test error message";
         _mockNext
             .Setup(next => next(_httpContext))
@@ -207,7 +251,11 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public async Task InvokeAsync_WithException_IncludesRequestPath()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         _httpContext.Request.Path = "/api/test";
         _mockNext
             .Setup(next => next(_httpContext))
@@ -226,7 +274,11 @@ public class ExceptionHandlingMiddlewareTests : BaseTestFixture
     public async Task InvokeAsync_WithException_SetsProblemDetailsProperties()
     {
         // Arrange
-        var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+        var middleware = new ExceptionHandlingMiddleware(
+            _mockNext.Object,
+            _mockLogger.Object,
+            _mockEnvironment.Object
+        );
         var exceptionMessage = "Test error";
         _httpContext.Request.Path = "/api/test";
         _mockNext.Setup(next => next(_httpContext)).Throws(new ArgumentException(exceptionMessage));
