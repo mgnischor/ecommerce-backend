@@ -11,14 +11,17 @@ public sealed class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+    private readonly IHostEnvironment _environment;
 
     public ExceptionHandlingMiddleware(
         RequestDelegate next,
-        ILogger<ExceptionHandlingMiddleware> logger
+        ILogger<ExceptionHandlingMiddleware> logger,
+        IHostEnvironment environment
     )
     {
         _next = next ?? throw new ArgumentNullException(nameof(next));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _environment = environment ?? throw new ArgumentNullException(nameof(environment));
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -37,22 +40,37 @@ public sealed class ExceptionHandlingMiddleware
     {
         _logger.LogError(
             exception,
-            "An unhandled exception occurred. Path: {Path}, Method: {Method}, StatusCode: {StatusCode}",
+            "An unhandled exception occurred. Path: {Path}, Method: {Method}",
             context.Request.Path,
-            context.Request.Method,
-            context.Response.StatusCode
+            context.Request.Method
         );
 
         var statusCode = GetStatusCode(exception);
+        var isServerError = statusCode >= 500;
+        var includeExceptionDetails = _environment.IsDevelopment();
+
+        // For server errors in non-development environments, do not leak the
+        // exception message - it may contain sensitive information (SQL, paths, etc.).
+        var detail =
+            isServerError && !includeExceptionDetails
+                ? "An unexpected error occurred while processing your request."
+                : exception.Message;
+
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,
             Title = GetTitle(exception),
-            Detail = exception.Message,
+            Detail = detail,
             Instance = context.Request.Path,
         };
 
-        context.Response.ContentType = "application/json";
+        if (includeExceptionDetails && isServerError)
+        {
+            problemDetails.Extensions["exceptionType"] = exception.GetType().Name;
+            problemDetails.Extensions["stackTrace"] = exception.StackTrace;
+        }
+
+        context.Response.ContentType = "application/problem+json";
         context.Response.StatusCode = statusCode;
 
         var options = new JsonSerializerOptions
