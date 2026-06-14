@@ -56,6 +56,7 @@ public sealed class LoginRequestDto
     /// </remarks>
     /// <example>SecurePassword123</example>
     [Required(ErrorMessage = "Password is required")]
-    [MinLength(4, ErrorMessage = "Password must be at least 4 characters")]
+    [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
+    [MaxLength(128, ErrorMessage = "Password must be at most 128 characters")]
     public string Password { get; set; } = string.Empty;
 }
