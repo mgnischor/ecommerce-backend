@@ -19,4 +19,11 @@ public interface IPasswordService
     /// <param name="hashedPassword">Hashed password</param>
     /// <returns>True if password matches, false otherwise</returns>
     bool VerifyPassword(string password, string hashedPassword);
+
+    /// <summary>
+    /// Returns a stable dummy hash to be used for timing-attack mitigation
+    /// when the requested user does not exist. The dummy hash has the same
+    /// format/cost as a real hash so that VerifyPassword takes the same time.
+    /// </summary>
+    string GetDummyHash();
 }
