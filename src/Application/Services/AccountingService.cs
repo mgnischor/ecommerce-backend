@@ -3,6 +3,8 @@ using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
+using ECommerce.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ECommerce.Application.Services;
 
@@ -16,6 +18,7 @@ public class AccountingService : IAccountingService
     private readonly IJournalEntryRepository _journalEntryRepository;
     private readonly IAccountingEntryRepository _accountingEntryRepository;
     private readonly IAccountingRuleRepository _accountingRuleRepository;
+    private readonly PostgresqlContext _context;
     private readonly ILoggingService _logger;
 
     // OpenTelemetry activity source for custom tracing
@@ -29,6 +32,7 @@ public class AccountingService : IAccountingService
         IJournalEntryRepository journalEntryRepository,
         IAccountingEntryRepository accountingEntryRepository,
         IAccountingRuleRepository accountingRuleRepository,
+        PostgresqlContext context,
         ILoggingService logger
     )
     {
@@ -44,7 +48,35 @@ public class AccountingService : IAccountingService
         _accountingRuleRepository =
             accountingRuleRepository
             ?? throw new ArgumentNullException(nameof(accountingRuleRepository));
+        _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    /// <summary>
+    /// Begins a new database transaction unless one is already active on this DbContext
+    /// (which can happen when this service is invoked from inside another transactional
+    /// scope). Returns null when this call should not own the transaction.
+    /// <para>
+    /// Usage:
+    /// <code>
+    /// await using var tx = await BeginTransactionIfNoneAsync(ct);
+    /// // ... work ...
+    /// if (tx is not null) await tx.CommitAsync(ct);
+    /// </code>
+    /// If the method throws before <c>CommitAsync</c> is called, <c>await using</c>
+    /// disposes the transaction, which causes EF Core to roll it back.
+    /// </para>
+    /// </summary>
+    private async Task<IDbContextTransaction?> BeginTransactionIfNoneAsync(
+        CancellationToken cancellationToken
+    )
+    {
+        if (_context.Database.CurrentTransaction is not null)
+        {
+            return null;
+        }
+
+        return await _context.Database.BeginTransactionAsync(cancellationToken);
     }
 
     public async Task<JournalEntryEntity> RecordPurchaseAsync(
@@ -67,6 +99,8 @@ public class AccountingService : IAccountingService
             transaction.Quantity,
             transaction.TotalCost
         );
+
+        await using var dbTransaction = await BeginTransactionIfNoneAsync(cancellationToken);
 
         try
         {
@@ -145,6 +179,11 @@ public class AccountingService : IAccountingService
                 journalEntry.EntryNumber
             );
 
+            if (dbTransaction is not null)
+            {
+                await dbTransaction.CommitAsync(cancellationToken);
+            }
+
             return journalEntry;
         }
         catch (Exception ex)
@@ -164,6 +203,8 @@ public class AccountingService : IAccountingService
         CancellationToken cancellationToken = default
     )
     {
+        await using var dbTransaction = await BeginTransactionIfNoneAsync(cancellationToken);
+
         // Debit: COGS (increases expense/cost)
         // Credit: Inventory (decreases asset)
 
@@ -233,6 +274,11 @@ public class AccountingService : IAccountingService
         _chartOfAccountsRepository.Update(creditAccount);
         await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
 
+        if (dbTransaction is not null)
+        {
+            await dbTransaction.CommitAsync(cancellationToken);
+        }
+
         return journalEntry;
     }
 
@@ -242,6 +288,8 @@ public class AccountingService : IAccountingService
         CancellationToken cancellationToken = default
     )
     {
+        await using var dbTransaction = await BeginTransactionIfNoneAsync(cancellationToken);
+
         // Debit: Inventory (increases asset)
         // Credit: COGS (decreases expense/cost)
 
@@ -311,6 +359,11 @@ public class AccountingService : IAccountingService
         _chartOfAccountsRepository.Update(creditAccount);
         await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
 
+        if (dbTransaction is not null)
+        {
+            await dbTransaction.CommitAsync(cancellationToken);
+        }
+
         return journalEntry;
     }
 
@@ -320,6 +373,8 @@ public class AccountingService : IAccountingService
         CancellationToken cancellationToken = default
     )
     {
+        await using var dbTransaction = await BeginTransactionIfNoneAsync(cancellationToken);
+
         // Debit: Suppliers (decreases liability)
         // Credit: Inventory (decreases asset)
 
@@ -389,6 +444,11 @@ public class AccountingService : IAccountingService
         _chartOfAccountsRepository.Update(creditAccount);
         await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
 
+        if (dbTransaction is not null)
+        {
+            await dbTransaction.CommitAsync(cancellationToken);
+        }
+
         return journalEntry;
     }
 
@@ -398,6 +458,8 @@ public class AccountingService : IAccountingService
         CancellationToken cancellationToken = default
     )
     {
+        await using var dbTransaction = await BeginTransactionIfNoneAsync(cancellationToken);
+
         var rule = await GetAccountingRuleAsync(
             InventoryTransactionType.Adjustment,
             transaction,
@@ -472,6 +534,11 @@ public class AccountingService : IAccountingService
         _chartOfAccountsRepository.Update(creditAccount);
         await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
 
+        if (dbTransaction is not null)
+        {
+            await dbTransaction.CommitAsync(cancellationToken);
+        }
+
         return journalEntry;
     }
 
@@ -481,6 +548,8 @@ public class AccountingService : IAccountingService
         CancellationToken cancellationToken = default
     )
     {
+        await using var dbTransaction = await BeginTransactionIfNoneAsync(cancellationToken);
+
         // Debit: Inventory Loss (increases expense)
         // Credit: Inventory (decreases asset)
 
@@ -549,6 +618,11 @@ public class AccountingService : IAccountingService
         _chartOfAccountsRepository.Update(debitAccount);
         _chartOfAccountsRepository.Update(creditAccount);
         await _chartOfAccountsRepository.SaveChangesAsync(cancellationToken);
+
+        if (dbTransaction is not null)
+        {
+            await dbTransaction.CommitAsync(cancellationToken);
+        }
 
         return journalEntry;
     }
@@ -672,7 +746,10 @@ public class AccountingService : IAccountingService
         CancellationToken cancellationToken = default
     )
     {
-        using var activity = ActivitySource.StartActivity("GetOrCreateAccount", ActivityKind.Internal);
+        using var activity = ActivitySource.StartActivity(
+            "GetOrCreateAccount",
+            ActivityKind.Internal
+        );
         activity?.SetTag("account.code", accountCode);
         activity?.SetTag("account.name", accountName);
         activity?.SetTag("account.type", accountType.ToString());
@@ -711,7 +788,7 @@ public class AccountingService : IAccountingService
                 AccountType = accountType,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
             };
 
             try
@@ -729,9 +806,11 @@ public class AccountingService : IAccountingService
 
                 return newAccount;
             }
-            catch (Exception ex) when (ex.Message.Contains("IX_ChartOfAccounts_AccountCode") ||
-                                      ex.Message.Contains("duplicar valor da chave") ||
-                                      ex.Message.Contains("duplicate key"))
+            catch (Exception ex)
+                when (ex.Message.Contains("IX_ChartOfAccounts_AccountCode")
+                    || ex.Message.Contains("duplicar valor da chave")
+                    || ex.Message.Contains("duplicate key")
+                )
             {
                 // Race condition: another thread created the account between our check and insert
                 // Retry getting the account
