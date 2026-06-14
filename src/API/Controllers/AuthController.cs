@@ -231,11 +231,7 @@ public sealed class AuthController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        // Add security headers
-        Response.Headers.Append("X-Content-Type-Options", "nosniff");
-        Response.Headers.Append("X-Frame-Options", "DENY");
-        Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-        Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+        // Security headers are added globally by SecurityHeadersMiddleware.
 
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
         userAgent ??= "Unknown";
@@ -295,9 +291,10 @@ public sealed class AuthController : ControllerBase
             );
         }
 
-        // Use dummy hash for timing attack protection when user doesn't exist
-        var passwordHash =
-            user?.PasswordHash ?? "$2a$11$dummyhashfortimingattackprotection1234567890123456789012";
+        // Use dummy hash for timing attack protection when user doesn't exist.
+        // The dummy hash is generated with the same PBKDF2 parameters as real hashes
+        // so the verification path takes the same time regardless of user existence.
+        var passwordHash = user?.PasswordHash ?? _passwordService.GetDummyHash();
         var isPasswordValid = _passwordService.VerifyPassword(loginRequest.Password, passwordHash);
 
         // Authentication failed
