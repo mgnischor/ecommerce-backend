@@ -127,9 +127,13 @@ public sealed class ProductRepository : IProductRepository
         CancellationToken cancellationToken = default
     )
     {
+        // Case-insensitive search portable across providers.
+        // On PostgreSQL this maps to LOWER(name) LIKE LOWER(@p) - consider a
+        // functional index on LOWER(name) for large catalogs.
+        var normalized = (searchTerm ?? string.Empty).ToLower();
         return await _context
             .Products.AsNoTracking()
-            .Where(p => !p.IsDeleted && p.Name.Contains(searchTerm))
+            .Where(p => !p.IsDeleted && p.Name.ToLower().Contains(normalized))
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);
     }
@@ -146,7 +150,10 @@ public sealed class ProductRepository : IProductRepository
         CancellationToken cancellationToken = default
     )
     {
-        return await _context.Products.AnyAsync(p => p.Sku == sku, cancellationToken);
+        return await _context.Products.AnyAsync(
+            p => !p.IsDeleted && p.Sku == sku,
+            cancellationToken
+        );
     }
 
     /// <inheritdoc />
