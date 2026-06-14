@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ECommerce.API.Constants;
+using ECommerce.API.DTOs;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
@@ -36,7 +37,7 @@ public sealed class OrderController : ControllerBase
     public OrderController(
         PostgresqlContext context,
         IInventoryTransactionService inventoryService,
-        LoggingService<OrderController> logger
+        ILoggingService logger
     )
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -48,7 +49,7 @@ public sealed class OrderController : ControllerBase
     /// <summary>
     /// Creates a new order with business rule validation
     /// </summary>
-    /// <param name="order">Order entity with items</param>
+    /// <param name="request">Order creation request payload</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Created order with ID and status</returns>
     /// <response code="201">Order created successfully</response>
@@ -59,28 +60,67 @@ public sealed class OrderController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<OrderEntity>> CreateOrder(
-        [FromBody] OrderEntity order,
+        [FromBody] CreateOrderRequestDto request,
         CancellationToken cancellationToken = default
     )
     {
-        if (order == null)
+        if (request == null)
             return BadRequest(ErrorMessages.OrderDataRequired);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
         var userId = GetCurrentUserId();
         if (userId == Guid.Empty)
             return Unauthorized(new { Message = ErrorMessages.UserIdNotFoundInToken });
 
-        // Load order items from database to validate business rules
-        var orderItems = await _context
-            .OrderItems.Where(item => item.OrderId == order.Id)
-            .ToListAsync(cancellationToken);
+        // Build the order on the server - never trust client-supplied Id/Status/totals.
+        var orderId = Guid.NewGuid();
+        var now = DateTime.UtcNow;
 
-        var itemCount = orderItems.Count;
+        // Compute totals server-side from the request items.
+        var subTotal = request.Items.Sum(i => i.UnitPrice * i.Quantity);
+        var totalAmount =
+            subTotal + request.ShippingCost + request.TaxAmount - request.DiscountAmount;
+
+        var order = new OrderEntity
+        {
+            Id = orderId,
+            CustomerId = request.CustomerId,
+            CreatedBy = userId,
+            OrderNumber = request.OrderNumber,
+            Status = OrderStatus.Pending,
+            SubTotal = subTotal,
+            ShippingCost = request.ShippingCost,
+            TaxAmount = request.TaxAmount,
+            DiscountAmount = request.DiscountAmount,
+            TotalAmount = totalAmount,
+            CreatedAt = now,
+            UpdatedAt = now,
+        };
+
+        var orderItems = request
+            .Items.Select(i => new OrderItemEntity
+            {
+                Id = Guid.NewGuid(),
+                OrderId = orderId,
+                ProductId = i.ProductId,
+                ProductName = i.ProductName,
+                ProductSku = i.ProductSku,
+                Quantity = i.Quantity,
+                UnitPrice = i.UnitPrice,
+                DiscountAmount = i.DiscountAmount,
+                TaxAmount = i.TaxAmount,
+                TotalPrice = (i.UnitPrice * i.Quantity) - i.DiscountAmount + i.TaxAmount,
+                CreatedAt = now,
+                UpdatedAt = now,
+            })
+            .ToList();
 
         // Apply business rules validation
         var (isValid, errorMessage) = OrderProcessingPolicy.CanCreateOrder(
             order.TotalAmount,
-            itemCount,
+            orderItems.Count,
             order.CustomerId
         );
 
@@ -112,9 +152,8 @@ public sealed class OrderController : ControllerBase
         }
 
         // Validate order total calculation using SubTotal from entity
-        var itemsTotal = order.SubTotal;
         var (totalValid, totalError) = OrderProcessingPolicy.ValidateOrderTotal(
-            itemsTotal,
+            order.SubTotal,
             order.ShippingCost,
             order.TaxAmount,
             order.DiscountAmount,
@@ -129,12 +168,6 @@ public sealed class OrderController : ControllerBase
             );
             return BadRequest(new { Message = totalError });
         }
-
-        // Set initial values
-        order.Id = Guid.NewGuid();
-        order.Status = OrderStatus.Pending;
-        order.CreatedAt = DateTime.UtcNow;
-        order.UpdatedAt = DateTime.UtcNow;
 
         // Reserve inventory for each order item
         foreach (var item in orderItems)
@@ -179,6 +212,7 @@ public sealed class OrderController : ControllerBase
         }
 
         _context.Orders.Add(order);
+        _context.OrderItems.AddRange(orderItems);
         await _context.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
