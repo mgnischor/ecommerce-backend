@@ -4,7 +4,7 @@
         <AssemblyName>ECommerce.Tests</AssemblyName>
         <Authors>Miguel Nischor</Authors>
         <Company>Miguel Nischor</Company>
-        <Copyright>Copyright © 2025 Miguel Nischor</Copyright>
+        <Copyright>Copyright © 2025-2026 Miguel Nischor</Copyright>
         <Description>Unit tests for E-Commerce Backend API</Description>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
@@ -34,8 +34,8 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="FluentAssertions" Version="8.10.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.9" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.10" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
         <PackageReference Include="Moq" Version="4.20.72" />
         <PackageReference Include="NUnit" Version="4.6.1" />
         <PackageReference Include="NUnit.Analyzers" Version="4.14.0">
