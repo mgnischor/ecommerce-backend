@@ -147,8 +147,9 @@ The solution follows **Clean Architecture** principles with four distinct layers
 │                       Presentation Layer                     │
 │                         (src/API)                            │
 │  • Controllers (Auth, Products, Users, Accounting,          │
-│    Orders, Finance, Notifications, Suppliers, Vendors,      │
-│    Stores, Shipments, ShippingZones, Promotions, Refunds,   │
+│    Orders, Finance, Notifications, Payments,                │
+│    InventoryTransactions, Suppliers, Vendors, Stores,       │
+│    Shipments, ShippingZones, Promotions, Refunds,           │
 │    ProductAttributes, ProductVariants)                      │
 │  • Middlewares (Exception Handling)                         │
 │  • OpenAPI/Scalar Documentation                             │
@@ -444,10 +445,6 @@ For detailed information about all build scripts, see **[scripts/README.md](scri
 
 ## ⚙️ Configuration
 
----
-
-## ⚙️ Configuration
-
 ### Application Settings
 
 Configuration is managed through `appsettings.json` and `appsettings.Development.json`. Settings can be overridden via environment variables using the double-underscore syntax.
@@ -628,7 +625,7 @@ Content-Type: application/json
 | GET    | `/products`                          | List all products (paginated) | No            |
 | GET    | `/products/{id}`                     | Get product by ID             | No            |
 | GET    | `/products/sku/{sku}`                | Get product by SKU            | No            |
-| GET    | `/products/category/{id}`            | Get products by category      | No            |
+| GET    | `/products/category/{category}`      | Get products by category      | No            |
 | GET    | `/products/featured`                 | Get featured products         | No            |
 | GET    | `/products/on-sale`                  | Get products on sale          | No            |
 | GET    | `/products/search?searchTerm={term}` | Search products               | No            |
@@ -668,14 +665,12 @@ Content-Type: application/json
 
 ### Order Endpoints
 
-| Method | Endpoint              | Description                 | Auth  |
-| ------ | --------------------- | --------------------------- | ----- |
-| GET    | `/orders`             | List all orders (paginated) | Yes   |
-| GET    | `/orders/{id}`        | Get order by ID             | Yes   |
-| POST   | `/orders`             | Create new order            | Yes   |
-| PUT    | `/orders/{id}`        | Update order                | Yes   |
-| PATCH  | `/orders/{id}/cancel` | Cancel order                | Yes   |
-| DELETE | `/orders/{id}`        | Delete order                | Admin |
+| Method | Endpoint              | Description         | Auth          |
+| ------ | --------------------- | ------------------- | ------------- |
+| GET    | `/orders/{id}`        | Get order by ID     | Yes           |
+| POST   | `/orders`             | Create new order    | Yes           |
+| PATCH  | `/orders/{id}/status` | Update order status | Admin/Manager |
+| POST   | `/orders/{id}/cancel` | Cancel order        | Yes           |
 
 ### Finance Endpoints
 
@@ -684,11 +679,13 @@ Content-Type: application/json
 | GET    | `/finance/transactions`                                | List financial transactions (paginated) | Yes  |
 | GET    | `/finance/transactions/{id}`                           | Get transaction by ID                   | Yes  |
 | GET    | `/finance/transactions/period?startDate={}&endDate={}` | Get transactions by period              | Yes  |
+| GET    | `/finance/transactions/unreconciled`                   | List unreconciled transactions          | Yes  |
+| GET    | `/finance/transactions/order/{orderId}`                | Get transactions for an order           | Yes  |
 | GET    | `/finance/cash-flow`                                   | Cash flow report                        | Yes  |
 | GET    | `/finance/accounts-receivable`                         | Accounts receivable aging               | Yes  |
 | GET    | `/finance/accounts-payable`                            | Accounts payable aging                  | Yes  |
 | GET    | `/finance/dashboard`                                   | Financial dashboard KPIs                | Yes  |
-| POST   | `/finance/reconcile/{id}`                              | Reconcile a transaction                 | Yes  |
+| POST   | `/finance/transactions/{id}/reconcile`                 | Reconcile a transaction                 | Yes  |
 
 ### Notification Endpoints
 
@@ -722,7 +719,6 @@ Content-Type: application/json
 | GET    | `/vendors/featured`           | Get featured vendors         | No   |
 | GET    | `/vendors/search?term={term}` | Search vendors               | No   |
 | POST   | `/vendors`                    | Register as vendor           | Yes  |
-| PUT    | `/vendors/{id}`               | Update vendor                | Yes  |
 
 ### Store Endpoints
 
@@ -736,14 +732,15 @@ Content-Type: application/json
 
 ### Shipment Endpoints
 
-| Method | Endpoint                     | Description                    | Auth          |
-| ------ | ---------------------------- | ------------------------------ | ------------- |
-| GET    | `/shipments`                 | List all shipments (paginated) | Yes           |
-| GET    | `/shipments/{id}`            | Get shipment by ID             | Yes           |
-| GET    | `/shipments/order/{orderId}` | Get shipments for an order     | Yes           |
-| POST   | `/shipments`                 | Create shipment                | Admin/Manager |
-| PUT    | `/shipments/{id}`            | Update shipment                | Admin/Manager |
-| PATCH  | `/shipments/{id}/deliver`    | Mark as delivered              | Admin/Manager |
+| Method | Endpoint                               | Description                    | Auth          |
+| ------ | -------------------------------------- | ------------------------------ | ------------- |
+| GET    | `/shipments`                           | List all shipments (paginated) | Yes           |
+| GET    | `/shipments/{id}`                      | Get shipment by ID             | Yes           |
+| GET    | `/shipments/order/{orderId}`           | Get shipments for an order     | Yes           |
+| GET    | `/shipments/tracking/{trackingNumber}` | Track shipment (public)        | No            |
+| POST   | `/shipments`                           | Create shipment                | Admin/Manager |
+| PUT    | `/shipments/{id}`                      | Update shipment                | Admin/Manager |
+| DELETE | `/shipments/{id}`                      | Delete shipment                | Admin/Manager |
 
 ### Shipping Zone Endpoints
 
@@ -768,14 +765,26 @@ Content-Type: application/json
 
 ### Refund Endpoints
 
-| Method | Endpoint                   | Description                  | Auth          |
-| ------ | -------------------------- | ---------------------------- | ------------- |
-| GET    | `/refunds`                 | List all refunds (paginated) | Admin/Manager |
-| GET    | `/refunds/{id}`            | Get refund by ID             | Yes           |
-| GET    | `/refunds/order/{orderId}` | Get refunds for an order     | Yes           |
-| POST   | `/refunds`                 | Request a refund             | Yes           |
-| PATCH  | `/refunds/{id}/approve`    | Approve refund               | Admin/Manager |
-| PATCH  | `/refunds/{id}/reject`     | Reject refund                | Admin/Manager |
+| Method | Endpoint                         | Description                  | Auth          |
+| ------ | -------------------------------- | ---------------------------- | ------------- |
+| GET    | `/refunds`                       | List all refunds (paginated) | Admin/Manager |
+| GET    | `/refunds/{id}`                  | Get refund by ID             | Yes           |
+| GET    | `/refunds/order/{orderId}`       | Get refunds for an order     | Yes           |
+| GET    | `/refunds/customer/{customerId}` | Get refunds for a customer   | Yes           |
+| POST   | `/refunds`                       | Request a refund             | Yes           |
+| PUT    | `/refunds/{id}`                  | Update refund                | Admin/Manager |
+| PATCH  | `/refunds/{id}/approve`          | Approve refund               | Admin/Manager |
+| PATCH  | `/refunds/{id}/reject`           | Reject refund                | Admin/Manager |
+| DELETE | `/refunds/{id}`                  | Delete refund                | Admin/Manager |
+
+### Payment Endpoints
+
+| Method | Endpoint                    | Description               | Auth |
+| ------ | --------------------------- | ------------------------- | ---- |
+| POST   | `/payments/process`         | Process a payment         | Yes  |
+| POST   | `/payments/{id}/refund`     | Refund a payment          | Yes  |
+| GET    | `/payments/{id}`            | Get payment by ID         | Yes  |
+| GET    | `/payments/order/{orderId}` | Get payments for an order | Yes  |
 
 ### Product Attribute Endpoints
 
@@ -813,10 +822,6 @@ Access the **Scalar UI** at `/docs` for interactive API exploration:
 - View request/response schemas
 - Download OpenAPI specification (JSON/YAML)
 - Explore all available operations
-
----
-
-## 📊 Observability
 
 ---
 
