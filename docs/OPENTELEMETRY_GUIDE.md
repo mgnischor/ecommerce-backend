@@ -318,7 +318,7 @@ services:
             - COLLECTOR_OTLP_ENABLED=true
 
     postgres:
-        image: postgres:16
+        image: postgres:18
         environment:
             - POSTGRES_USER=ecommerce
             - POSTGRES_PASSWORD=ecommerce
