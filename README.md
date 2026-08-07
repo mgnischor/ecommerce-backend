@@ -3,7 +3,7 @@
 <div align="center">
 
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?logo=postgresql)](https://www.postgresql.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-316192?logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE.md)
 [![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-Enabled-FF6F00?logo=opentelemetry)](https://opentelemetry.io/)
@@ -213,9 +213,9 @@ The solution follows **Clean Architecture** principles with four distinct layers
 
 ### Data & Persistence
 
-- **PostgreSQL 16** - Robust relational database
+- **PostgreSQL 18** - Robust relational database
 - **Entity Framework Core 10.0** - ORM with code-first migrations
-- **Npgsql 10.0.1** - PostgreSQL provider for EF Core
+- **Npgsql 10.0.3** - PostgreSQL provider for EF Core
 
 ### Authentication & Security
 
@@ -259,7 +259,7 @@ Ensure you have the following installed:
 
 - [.NET SDK 10.0+](https://dotnet.microsoft.com/download)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop) (for Docker-based development)
-- [PostgreSQL 16+](https://www.postgresql.org/download/) (for local development without Docker)
+- [PostgreSQL 18+](https://www.postgresql.org/download/) (for local development without Docker)
 - [Git](https://git-scm.com/downloads)
 
 ### Build and Run Options
@@ -331,7 +331,7 @@ cd scripts
 
 **Containers created:**
 
-- `ecommerce-postgres` - PostgreSQL 16 Alpine
+- `ecommerce-postgres` - PostgreSQL 18 Alpine
 - `ecommerce-backend-dev` - Development mode
 - `ecommerce-backend-prod` - Production mode
 
