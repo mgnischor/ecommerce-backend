@@ -2,6 +2,7 @@ using System.Security.Claims;
 using ECommerce.API.Constants;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Policies;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -398,11 +399,11 @@ public sealed class RefundController : ControllerBase
         if (refund == null)
             return BadRequest(ErrorMessages.RefundDataRequired);
 
-        // Basic validation of refund reason
-        if (string.IsNullOrWhiteSpace(refund.Reason))
+        // Validate refund reason against return policy
+        if (!ReturnsPolicy.IsValidReturnReason(refund.Reason))
         {
-            _logger.LogWarning("Refund reason is required");
-            return BadRequest(new { Message = ErrorMessages.RefundReasonRequired });
+            _logger.LogWarning("Invalid refund reason provided");
+            return BadRequest(new { Message = ErrorMessages.RefundReasonInvalid });
         }
 
         _logger.LogInformation(
