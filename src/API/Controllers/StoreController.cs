@@ -2,6 +2,7 @@ using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Policies;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -219,6 +220,7 @@ public sealed class StoreController : ControllerBase
     ///         "city": "New York",
     ///         "state": "NY",
     ///         "zipCode": "10001",
+    ///         "country": "USA",
     ///         "isActive": true,
     ///         "displayOrder": 1
     ///     }
@@ -242,6 +244,31 @@ public sealed class StoreController : ControllerBase
     {
         if (store == null)
             return BadRequest(ErrorMessages.StoreDataRequired);
+
+        if (!StorePolicy.IsValidStoreName(store.Name))
+        {
+            _logger.LogWarning("Attempt to create store with invalid name: {Name}", store.Name);
+            return BadRequest(new { Message = ErrorMessages.StoreNameInvalid });
+        }
+
+        if (
+            !AddressPolicy.IsValidAddress(
+                store.Address,
+                store.City,
+                store.PostalCode,
+                store.Country
+            )
+        )
+        {
+            _logger.LogWarning("Attempt to create store with invalid address: {Name}", store.Name);
+            return BadRequest(new { Message = ErrorMessages.StoreAddressInvalid });
+        }
+
+        if (!AddressPolicy.IsValidStateCode(store.State))
+        {
+            _logger.LogWarning("Attempt to create store with invalid state: {Name}", store.Name);
+            return BadRequest(new { Message = ErrorMessages.StoreStateInvalid });
+        }
 
         store.Id = Guid.NewGuid();
         store.CreatedAt = DateTime.UtcNow;
@@ -273,6 +300,7 @@ public sealed class StoreController : ControllerBase
     ///         "city": "New York",
     ///         "state": "NY",
     ///         "zipCode": "10001",
+    ///         "country": "USA",
     ///         "isActive": true,
     ///         "displayOrder": 1
     ///     }
@@ -303,6 +331,35 @@ public sealed class StoreController : ControllerBase
 
         if (id != store.Id)
             return BadRequest(ErrorMessages.IdMismatch);
+
+        if (!StorePolicy.IsValidStoreName(store.Name))
+        {
+            _logger.LogWarning(
+                "Attempt to update store {StoreId} with invalid name: {Name}",
+                id,
+                store.Name
+            );
+            return BadRequest(new { Message = ErrorMessages.StoreNameInvalid });
+        }
+
+        if (
+            !AddressPolicy.IsValidAddress(
+                store.Address,
+                store.City,
+                store.PostalCode,
+                store.Country
+            )
+        )
+        {
+            _logger.LogWarning("Attempt to update store {StoreId} with invalid address", id);
+            return BadRequest(new { Message = ErrorMessages.StoreAddressInvalid });
+        }
+
+        if (!AddressPolicy.IsValidStateCode(store.State))
+        {
+            _logger.LogWarning("Attempt to update store {StoreId} with invalid state", id);
+            return BadRequest(new { Message = ErrorMessages.StoreStateInvalid });
+        }
 
         var existingStore = await _context.Stores.FindAsync(new object[] { id }, cancellationToken);
 
