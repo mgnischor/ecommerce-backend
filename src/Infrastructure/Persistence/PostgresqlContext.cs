@@ -56,6 +56,13 @@ public class PostgresqlContext : DbContext
     // Stores
     public DbSet<StoreEntity> Stores { get; set; }
 
+    // Gift Cards, Loyalty, Invoices, Customers & Inventory Planning
+    public DbSet<GiftCardEntity> GiftCards { get; set; }
+    public DbSet<LoyaltyRewardEntity> LoyaltyRewards { get; set; }
+    public DbSet<InvoiceEntity> Invoices { get; set; }
+    public DbSet<CustomerEntity> Customers { get; set; }
+    public DbSet<InventoryPlanEntity> InventoryPlans { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PostgresqlContext).Assembly);
