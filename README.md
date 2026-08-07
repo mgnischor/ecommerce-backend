@@ -150,7 +150,8 @@ The solution follows **Clean Architecture** principles with four distinct layers
 │    Orders, Finance, Notifications, Payments,                │
 │    InventoryTransactions, Suppliers, Vendors, Stores,       │
 │    Shipments, ShippingZones, Promotions, Refunds,           │
-│    ProductAttributes, ProductVariants)                      │
+│    ProductAttributes, ProductVariants, GiftCards, Rewards,  │
+│    Invoices, Customers, InventoryPlanning)                  │
 │  • Middlewares (Exception Handling)                         │
 │  • OpenAPI/Scalar Documentation                             │
 │  • OpenTelemetry Configuration                              │
@@ -785,6 +786,65 @@ Content-Type: application/json
 | POST   | `/payments/{id}/refund`     | Refund a payment          | Yes  |
 | GET    | `/payments/{id}`            | Get payment by ID         | Yes  |
 | GET    | `/payments/order/{orderId}` | Get payments for an order | Yes  |
+
+### Gift Card Endpoints
+
+| Method | Endpoint                            | Description                     | Auth                   |
+| ------ | ----------------------------------- | ------------------------------- | ---------------------- |
+| GET    | `/giftcards/{id}`                   | Get gift card by ID             | Yes                    |
+| GET    | `/giftcards/number/{cardNumber}`    | Get gift card by number         | Yes                    |
+| POST   | `/giftcards`                        | Create a gift card              | Admin/Manager/Developer |
+| PUT    | `/giftcards/{id}`                   | Update a gift card              | Admin/Manager/Developer |
+| POST   | `/giftcards/{id}/redeem`            | Redeem from gift card balance   | Admin/Manager/Developer |
+| POST   | `/giftcards/{id}/reload`            | Reload a gift card balance      | Admin/Manager/Developer |
+| DELETE | `/giftcards/{id}`                   | Delete a gift card              | Admin/Manager/Developer |
+
+### Rewards Endpoints
+
+| Method | Endpoint                       | Description                        | Auth                   |
+| ------ | ------------------------------ | ---------------------------------- | ---------------------- |
+| GET    | `/rewards/{id}`                | Get loyalty account by ID          | Yes                    |
+| GET    | `/rewards/customer/{customerId}` | Get loyalty account for a customer | Yes                    |
+| GET    | `/rewards/{id}/value`          | Get reward value for point balance | Yes                    |
+| POST   | `/rewards`                     | Create a loyalty account           | Admin/Manager/Developer |
+| PUT    | `/rewards/{id}`                | Update a loyalty account           | Admin/Manager/Developer |
+| POST   | `/rewards/{id}/earn`           | Earn points on an account          | Admin/Manager/Developer |
+| POST   | `/rewards/{id}/redeem`         | Redeem points for a reward         | Admin/Manager/Developer |
+| DELETE | `/rewards/{id}`                | Delete a loyalty account           | Admin/Manager/Developer |
+
+### Invoice Endpoints
+
+| Method | Endpoint                        | Description                     | Auth                   |
+| ------ | ------------------------------- | ------------------------------- | ---------------------- |
+| GET    | `/invoices/{id}`                | Get invoice by ID               | Yes                    |
+| GET    | `/invoices/number/{invoiceNumber}` | Get invoice by number           | Yes                    |
+| POST   | `/invoices`                     | Create an invoice               | Admin/Manager/Developer |
+| PUT    | `/invoices/{id}`                | Update an invoice               | Admin/Manager/Developer |
+| POST   | `/invoices/{id}/pay`            | Record an invoice payment       | Admin/Manager/Developer |
+| POST   | `/invoices/{id}/credit-note`    | Issue a credit note             | Admin/Manager/Developer |
+| DELETE | `/invoices/{id}`                | Delete an invoice               | Admin/Manager/Developer |
+
+### Customer Endpoints
+
+| Method | Endpoint               | Description                            | Auth                   |
+| ------ | ---------------------- | -------------------------------------- | ---------------------- |
+| GET    | `/customers/{id}`      | Get customer by ID                     | Yes                    |
+| GET    | `/customers/user/{userId}` | Get customer by user ID                | Yes                    |
+| GET    | `/customers/{id}/segment` | Get customer segmentation analysis     | Yes                    |
+| POST   | `/customers`           | Create a customer                      | Admin/Manager/Developer |
+| PUT    | `/customers/{id}`      | Update a customer                      | Admin/Manager/Developer |
+| DELETE | `/customers/{id}`      | Delete a customer                      | Admin/Manager/Developer |
+
+### Inventory Planning Endpoints
+
+| Method | Endpoint                              | Description                           | Auth                   |
+| ------ | ------------------------------------- | ------------------------------------- | ---------------------- |
+| GET    | `/inventory-planning/{id}`            | Get inventory plan by ID              | Yes                    |
+| GET    | `/inventory-planning/product/{productId}` | Get inventory plan for a product   | Yes                    |
+| GET    | `/inventory-planning/{id}/analysis`   | Get forecasting and stock analysis    | Yes                    |
+| POST   | `/inventory-planning`                 | Create an inventory plan              | Admin/Manager/Developer |
+| PUT    | `/inventory-planning/{id}`            | Update an inventory plan              | Admin/Manager/Developer |
+| DELETE | `/inventory-planning/{id}`            | Delete an inventory plan              | Admin/Manager/Developer |
 
 ### Product Attribute Endpoints
 
