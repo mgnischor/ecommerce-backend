@@ -3,6 +3,7 @@ using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Policies;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -494,6 +495,24 @@ public sealed class NotificationController : ControllerBase
     {
         if (notification == null)
             return BadRequest("Notification data is required");
+
+        if (!EmailPolicy.IsValidEmailSubject(notification.Title))
+        {
+            _logger.LogWarning(
+                "Attempt to create notification with invalid title for user: {UserId}",
+                notification.UserId
+            );
+            return BadRequest("Notification title must be between 1 and 150 characters");
+        }
+
+        if (!EmailPolicy.IsValidEmailBodyLength(notification.Message))
+        {
+            _logger.LogWarning(
+                "Attempt to create notification with invalid message for user: {UserId}",
+                notification.UserId
+            );
+            return BadRequest("Notification message cannot exceed 100000 characters");
+        }
 
         notification.Id = Guid.NewGuid();
         notification.CreatedAt = DateTime.UtcNow;
