@@ -4,6 +4,7 @@ using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Policies;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -643,20 +644,22 @@ public sealed class ShipmentController : ControllerBase
             return BadRequest(new { Message = ErrorMessages.TrackingNumberRequired });
         }
 
-        if (string.IsNullOrWhiteSpace(shipment.Carrier) || shipment.Carrier.Length > 100)
+        if (!ShippingRatePolicy.IsValidCarrierCode(shipment.Carrier))
         {
             return BadRequest(new { Message = ErrorMessages.CarrierNameRequired });
         }
 
         try
         {
-            // Verify order exists
-            var orderExists = await _context.Orders.AnyAsync(
-                o => o.Id == shipment.OrderId && !o.IsDeleted,
-                cancellationToken
-            );
+            // Verify order exists and is ready for fulfillment
+            var order = await _context
+                .Orders.AsNoTracking()
+                .FirstOrDefaultAsync(
+                    o => o.Id == shipment.OrderId && !o.IsDeleted,
+                    cancellationToken
+                );
 
-            if (!orderExists)
+            if (order == null)
             {
                 _logger.LogWarning(
                     "Attempt to create shipment for non-existent order: {OrderId}",
@@ -665,6 +668,16 @@ public sealed class ShipmentController : ControllerBase
                 return BadRequest(
                     new { Message = ErrorMessages.OrderNotFoundById(shipment.OrderId.ToString()) }
                 );
+            }
+
+            if (!OrderFulfillmentPolicy.CanStartFulfillment(order.Status))
+            {
+                _logger.LogWarning(
+                    "Attempt to create shipment for order not ready for fulfillment: {OrderId}, Status: {Status}",
+                    shipment.OrderId,
+                    order.Status
+                );
+                return BadRequest(new { Message = ErrorMessages.OrderNotReadyForShipment });
             }
 
             // Check for duplicate tracking number
@@ -827,6 +840,11 @@ public sealed class ShipmentController : ControllerBase
         )
         {
             return BadRequest(new { Message = ErrorMessages.TrackingNumberRequired });
+        }
+
+        if (!ShippingRatePolicy.IsValidCarrierCode(shipment.Carrier))
+        {
+            return BadRequest(new { Message = ErrorMessages.CarrierNameRequired });
         }
 
         try
