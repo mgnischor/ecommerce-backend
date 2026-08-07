@@ -153,11 +153,17 @@ public sealed class InventoryPlanningController(
         {
             var plan = await _context
                 .InventoryPlans.AsNoTracking()
-                .FirstOrDefaultAsync(p => p.ProductId == productId && !p.IsDeleted, cancellationToken);
+                .FirstOrDefaultAsync(
+                    p => p.ProductId == productId && !p.IsDeleted,
+                    cancellationToken
+                );
 
             if (plan == null)
             {
-                _logger.LogInformation("Inventory plan not found for product: {ProductId}", productId);
+                _logger.LogInformation(
+                    "Inventory plan not found for product: {ProductId}",
+                    productId
+                );
                 return NotFound(new { Message = ErrorMessages.InventoryPlanNotFound });
             }
 
@@ -165,7 +171,11 @@ public sealed class InventoryPlanningController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving inventory plan for product: {ProductId}", productId);
+            _logger.LogError(
+                ex,
+                "Error retrieving inventory plan for product: {ProductId}",
+                productId
+            );
             return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
@@ -251,7 +261,9 @@ public sealed class InventoryPlanningController(
                     "Duplicate inventory plan attempt for product: {ProductId}",
                     plan.ProductId
                 );
-                return Conflict(new { Message = "An inventory plan already exists for this product" });
+                return Conflict(
+                    new { Message = "An inventory plan already exists for this product" }
+                );
             }
 
             var newPlan = new InventoryPlanEntity
@@ -285,7 +297,11 @@ public sealed class InventoryPlanningController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating inventory plan for product: {ProductId}", plan.ProductId);
+            _logger.LogError(
+                ex,
+                "Error creating inventory plan for product: {ProductId}",
+                plan.ProductId
+            );
             return StatusCode(500, new { Message = ErrorMessages.ProcessingRequestError });
         }
     }
@@ -460,7 +476,10 @@ public sealed class InventoryPlanningController(
             if (!string.IsNullOrWhiteSpace(historicalSales))
             {
                 salesHistory = historicalSales
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Split(
+                        ',',
+                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+                    )
                     .Select(v => int.TryParse(v, out var value) ? value : 0)
                     .ToArray();
             }

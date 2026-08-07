@@ -154,11 +154,17 @@ public sealed class RewardsController(
         {
             var reward = await _context
                 .LoyaltyRewards.AsNoTracking()
-                .FirstOrDefaultAsync(l => l.CustomerId == customerId && !l.IsDeleted, cancellationToken);
+                .FirstOrDefaultAsync(
+                    l => l.CustomerId == customerId && !l.IsDeleted,
+                    cancellationToken
+                );
 
             if (reward == null)
             {
-                _logger.LogInformation("Loyalty reward not found for customer: {CustomerId}", customerId);
+                _logger.LogInformation(
+                    "Loyalty reward not found for customer: {CustomerId}",
+                    customerId
+                );
                 return NotFound(new { Message = ErrorMessages.LoyaltyRewardNotFound });
             }
 
@@ -166,7 +172,11 @@ public sealed class RewardsController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving loyalty reward for customer: {CustomerId}", customerId);
+            _logger.LogError(
+                ex,
+                "Error retrieving loyalty reward for customer: {CustomerId}",
+                customerId
+            );
             return StatusCode(500, ErrorMessages.ProcessingRequestError);
         }
     }
@@ -280,7 +290,11 @@ public sealed class RewardsController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating loyalty reward for customer: {CustomerId}", reward.CustomerId);
+            _logger.LogError(
+                ex,
+                "Error creating loyalty reward for customer: {CustomerId}",
+                reward.CustomerId
+            );
             return StatusCode(500, new { Message = ErrorMessages.ProcessingRequestError });
         }
     }
@@ -556,7 +570,12 @@ public sealed class RewardsController(
                 return BadRequest(new { Message = ErrorMessages.PointsExpired });
             }
 
-            if (!RewardsProgramPolicy.HasEnoughPointsForReward(reward.PointBalance, request.RewardCost))
+            if (
+                !RewardsProgramPolicy.HasEnoughPointsForReward(
+                    reward.PointBalance,
+                    request.RewardCost
+                )
+            )
             {
                 _logger.LogWarning("Insufficient points for redemption: {RewardId}", id);
                 return BadRequest(new { Message = ErrorMessages.InsufficientPoints });

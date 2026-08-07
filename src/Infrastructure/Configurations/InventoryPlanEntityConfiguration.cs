@@ -8,7 +8,8 @@ namespace ECommerce.Infrastructure.Configurations;
 /// Configuration for the InventoryPlanEntity.
 /// Maps the InventoryPlanEntity properties to the corresponding database columns and sets up constraints and indexes.
 /// </summary>
-internal sealed class InventoryPlanEntityConfiguration : IEntityTypeConfiguration<InventoryPlanEntity>
+internal sealed class InventoryPlanEntityConfiguration
+    : IEntityTypeConfiguration<InventoryPlanEntity>
 {
     public void Configure(EntityTypeBuilder<InventoryPlanEntity> builder)
     {
@@ -19,9 +20,21 @@ internal sealed class InventoryPlanEntityConfiguration : IEntityTypeConfiguratio
 
         builder.Property(p => p.ProductId).HasColumnName("product_id").IsRequired();
 
-        builder.Property(p => p.CurrentStock).HasColumnName("current_stock").IsRequired().HasDefaultValue(0);
-        builder.Property(p => p.ReorderPoint).HasColumnName("reorder_point").IsRequired().HasDefaultValue(0);
-        builder.Property(p => p.AverageDailySales).HasColumnName("average_daily_sales").IsRequired().HasDefaultValue(0);
+        builder
+            .Property(p => p.CurrentStock)
+            .HasColumnName("current_stock")
+            .IsRequired()
+            .HasDefaultValue(0);
+        builder
+            .Property(p => p.ReorderPoint)
+            .HasColumnName("reorder_point")
+            .IsRequired()
+            .HasDefaultValue(0);
+        builder
+            .Property(p => p.AverageDailySales)
+            .HasColumnName("average_daily_sales")
+            .IsRequired()
+            .HasDefaultValue(0);
         builder.Property(p => p.LeadTimeDays).HasColumnName("lead_time_days");
         builder.Property(p => p.ServiceLevelPercent).HasColumnName("service_level_percent");
 

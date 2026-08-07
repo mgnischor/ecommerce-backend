@@ -492,7 +492,8 @@ public static class ErrorMessages
     /// <summary>
     /// Message when redeem amount exceeds the available balance
     /// </summary>
-    public const string InsufficientGiftCardBalance = "Gift card balance is insufficient for this redemption";
+    public const string InsufficientGiftCardBalance =
+        "Gift card balance is insufficient for this redemption";
 
     /// <summary>
     /// Message when gift card number already exists
@@ -620,12 +621,14 @@ public static class ErrorMessages
     /// <summary>
     /// Message when average daily sales is negative
     /// </summary>
-    public const string InvalidAverageDailySales = "Average daily sales must be a non-negative value";
+    public const string InvalidAverageDailySales =
+        "Average daily sales must be a non-negative value";
 
     /// <summary>
     /// Message when historical sales data is missing for forecasting
     /// </summary>
-    public const string HistoricalSalesRequired = "Historical sales data is required for forecasting";
+    public const string HistoricalSalesRequired =
+        "Historical sales data is required for forecasting";
 
     #endregion
 

@@ -8,7 +8,8 @@ namespace ECommerce.Infrastructure.Configurations;
 /// Configuration for the LoyaltyRewardEntity.
 /// Maps the LoyaltyRewardEntity properties to the corresponding database columns and sets up constraints and indexes.
 /// </summary>
-internal sealed class LoyaltyRewardEntityConfiguration : IEntityTypeConfiguration<LoyaltyRewardEntity>
+internal sealed class LoyaltyRewardEntityConfiguration
+    : IEntityTypeConfiguration<LoyaltyRewardEntity>
 {
     public void Configure(EntityTypeBuilder<LoyaltyRewardEntity> builder)
     {
@@ -20,8 +21,14 @@ internal sealed class LoyaltyRewardEntityConfiguration : IEntityTypeConfiguratio
         builder.Property(l => l.CustomerId).HasColumnName("customer_id").IsRequired();
 
         builder.Property(l => l.PointBalance).HasColumnName("point_balance").IsRequired();
-        builder.Property(l => l.TotalPointsEarned).HasColumnName("total_points_earned").IsRequired();
-        builder.Property(l => l.TotalPointsRedeemed).HasColumnName("total_points_redeemed").IsRequired();
+        builder
+            .Property(l => l.TotalPointsEarned)
+            .HasColumnName("total_points_earned")
+            .IsRequired();
+        builder
+            .Property(l => l.TotalPointsRedeemed)
+            .HasColumnName("total_points_redeemed")
+            .IsRequired();
 
         builder
             .Property(l => l.LastEarnedAt)

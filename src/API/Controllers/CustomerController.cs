@@ -234,7 +234,10 @@ public sealed class CustomerController(
 
             if (existingCustomer)
             {
-                _logger.LogWarning("Duplicate customer attempt for user: {UserId}", customer.UserId);
+                _logger.LogWarning(
+                    "Duplicate customer attempt for user: {UserId}",
+                    customer.UserId
+                );
                 return Conflict(new { Message = "A customer record already exists for this user" });
             }
 
@@ -262,7 +265,11 @@ public sealed class CustomerController(
                 newCustomer.UserId
             );
 
-            return CreatedAtAction(nameof(GetCustomerById), new { id = newCustomer.Id }, newCustomer);
+            return CreatedAtAction(
+                nameof(GetCustomerById),
+                new { id = newCustomer.Id },
+                newCustomer
+            );
         }
         catch (Exception ex)
         {

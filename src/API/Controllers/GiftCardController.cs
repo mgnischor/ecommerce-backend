@@ -170,7 +170,10 @@ public sealed class GiftCardController(
         {
             var giftCard = await _context
                 .GiftCards.AsNoTracking()
-                .FirstOrDefaultAsync(g => g.CardNumber == cardNumber && !g.IsDeleted, cancellationToken);
+                .FirstOrDefaultAsync(
+                    g => g.CardNumber == cardNumber && !g.IsDeleted,
+                    cancellationToken
+                );
 
             if (giftCard == null)
             {
@@ -260,7 +263,10 @@ public sealed class GiftCardController(
 
             if (duplicateNumber)
             {
-                _logger.LogWarning("Duplicate gift card number attempt: {CardNumber}", giftCard.CardNumber);
+                _logger.LogWarning(
+                    "Duplicate gift card number attempt: {CardNumber}",
+                    giftCard.CardNumber
+                );
                 return Conflict(new { Message = ErrorMessages.GiftCardNumberAlreadyExists });
             }
 
@@ -291,11 +297,19 @@ public sealed class GiftCardController(
                 GetCurrentUserId() ?? "Unknown"
             );
 
-            return CreatedAtAction(nameof(GetGiftCardById), new { id = newGiftCard.Id }, newGiftCard);
+            return CreatedAtAction(
+                nameof(GetGiftCardById),
+                new { id = newGiftCard.Id },
+                newGiftCard
+            );
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating gift card with number: {CardNumber}", giftCard.CardNumber);
+            _logger.LogError(
+                ex,
+                "Error creating gift card with number: {CardNumber}",
+                giftCard.CardNumber
+            );
             return StatusCode(500, new { Message = ErrorMessages.ProcessingRequestError });
         }
     }
@@ -490,7 +504,10 @@ public sealed class GiftCardController(
 
             if (!GiftCardPolicy.IsWithinValidityPeriod(giftCard.IssuedAt, giftCard.ExpiresAt))
             {
-                _logger.LogWarning("Redemption attempted outside validity period: {GiftCardId}", id);
+                _logger.LogWarning(
+                    "Redemption attempted outside validity period: {GiftCardId}",
+                    id
+                );
                 return BadRequest(new { Message = ErrorMessages.GiftCardExpired });
             }
 

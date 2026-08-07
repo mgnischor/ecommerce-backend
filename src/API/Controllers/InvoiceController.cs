@@ -165,7 +165,10 @@ public sealed class InvoiceController(
         {
             var invoice = await _context
                 .Invoices.AsNoTracking()
-                .FirstOrDefaultAsync(i => i.InvoiceNumber == invoiceNumber && !i.IsDeleted, cancellationToken);
+                .FirstOrDefaultAsync(
+                    i => i.InvoiceNumber == invoiceNumber && !i.IsDeleted,
+                    cancellationToken
+                );
 
             if (invoice == null)
             {
@@ -267,7 +270,10 @@ public sealed class InvoiceController(
 
             if (duplicateNumber)
             {
-                _logger.LogWarning("Duplicate invoice number attempt: {InvoiceNumber}", invoice.InvoiceNumber);
+                _logger.LogWarning(
+                    "Duplicate invoice number attempt: {InvoiceNumber}",
+                    invoice.InvoiceNumber
+                );
                 return Conflict(new { Message = ErrorMessages.InvoiceNumberAlreadyExists });
             }
 
@@ -289,7 +295,8 @@ public sealed class InvoiceController(
                 Total = total,
                 PaidAmount = invoice.PaidAmount,
                 IsPaid = InvoicePolicy.IsInvoicePaid(invoice.PaidAmount, total),
-                DueDate = invoice.DueDate == default ? DateTime.UtcNow.AddDays(30) : invoice.DueDate,
+                DueDate =
+                    invoice.DueDate == default ? DateTime.UtcNow.AddDays(30) : invoice.DueDate,
                 IssuedAt = DateTime.UtcNow,
                 IsDeleted = false,
                 CreatedAt = DateTime.UtcNow,
@@ -311,7 +318,11 @@ public sealed class InvoiceController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating invoice with number: {InvoiceNumber}", invoice.InvoiceNumber);
+            _logger.LogError(
+                ex,
+                "Error creating invoice with number: {InvoiceNumber}",
+                invoice.InvoiceNumber
+            );
             return StatusCode(500, new { Message = ErrorMessages.ProcessingRequestError });
         }
     }
@@ -412,7 +423,10 @@ public sealed class InvoiceController(
                 invoice.ShippingCost
             );
             existingInvoice.PaidAmount = invoice.PaidAmount;
-            existingInvoice.IsPaid = InvoicePolicy.IsInvoicePaid(invoice.PaidAmount, existingInvoice.Total);
+            existingInvoice.IsPaid = InvoicePolicy.IsInvoicePaid(
+                invoice.PaidAmount,
+                existingInvoice.Total
+            );
             existingInvoice.DueDate = invoice.DueDate;
             existingInvoice.UpdatedAt = DateTime.UtcNow;
             existingInvoice.UpdatedBy = Guid.TryParse(GetCurrentUserId(), out var userId)

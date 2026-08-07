@@ -98,7 +98,10 @@ internal sealed class InvoiceEntityConfiguration : IEntityTypeConfiguration<Invo
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.HasIndex(i => i.InvoiceNumber).IsUnique().HasDatabaseName("ix_invoices_invoice_number");
+        builder
+            .HasIndex(i => i.InvoiceNumber)
+            .IsUnique()
+            .HasDatabaseName("ix_invoices_invoice_number");
         builder.HasIndex(i => i.OrderId).HasDatabaseName("ix_invoices_order_id");
         builder.HasIndex(i => i.CustomerId).HasDatabaseName("ix_invoices_customer_id");
         builder.HasIndex(i => i.IsPaid).HasDatabaseName("ix_invoices_is_paid");

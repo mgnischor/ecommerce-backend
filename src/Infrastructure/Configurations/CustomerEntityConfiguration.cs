@@ -26,7 +26,11 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Cus
             .HasColumnType("decimal(18,2)")
             .HasDefaultValue(0);
 
-        builder.Property(c => c.TotalOrders).HasColumnName("total_orders").IsRequired().HasDefaultValue(0);
+        builder
+            .Property(c => c.TotalOrders)
+            .HasColumnName("total_orders")
+            .IsRequired()
+            .HasDefaultValue(0);
 
         builder
             .Property(c => c.LastOrderDate)
