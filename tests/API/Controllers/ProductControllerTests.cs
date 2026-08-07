@@ -393,6 +393,7 @@ public class ProductControllerTests : DatabaseTestFixture
             Price = 199.99m,
             Category = ProductCategory.Electronics,
             StockQuantity = 100,
+            Weight = 1.0m,
             IsActive = true,
         };
 
@@ -424,6 +425,7 @@ public class ProductControllerTests : DatabaseTestFixture
             Name = "New Product",
             Sku = "SKU001",
             Price = 199.99m,
+            Weight = 1.0m,
         };
 
         _mockProductRepository
@@ -456,6 +458,7 @@ public class ProductControllerTests : DatabaseTestFixture
             Name = "Updated Product",
             Sku = "SKU001",
             Price = 149.99m,
+            Weight = 1.0m,
         };
 
         _mockProductRepository
