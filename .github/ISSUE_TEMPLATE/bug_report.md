@@ -33,7 +33,7 @@ assignees: ""
 
 -   **OS**: [e.g., Windows 11, Ubuntu 22.04, macOS 14]
 -   **.NET Version**: [e.g., .NET 9.0]
--   **Database**: [e.g., PostgreSQL 16]
+-   **Database**: [e.g., PostgreSQL 18]
 -   **Browser** (if applicable): [e.g., Chrome 120, Firefox 121]
 -   **Deployment Method**: [e.g., Docker, Local, Kubernetes]
 
