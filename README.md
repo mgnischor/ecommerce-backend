@@ -61,12 +61,14 @@ The **E-Commerce Backend API** is a robust, scalable solution designed for moder
 - **Authentication & Authorization**
     - JWT-based authentication with configurable expiration
     - Role-based access control (Admin, Manager, Customer)
-    - Password hashing using BCrypt
+    - Password hashing using BCrypt with timing-attack mitigation (dummy hash comparison)
+    - Account lockout after 5 failed login attempts (15-minute lock), rate-limited login endpoint
     - Token refresh and validation
 
 - **Product Management**
     - Full CRUD operations with pagination
     - Advanced search and filtering (category, price, rating)
+    - Case-insensitive search that automatically excludes soft-deleted products
     - Featured products and sales management
     - SKU-based inventory tracking
     - Product specifications with value objects
@@ -99,6 +101,11 @@ The **E-Commerce Backend API** is a robust, scalable solution designed for moder
     - Business rule validation (min/max amounts, item limits, cancellation window)
     - Inventory deduction on order creation via inventory transaction service
     - Multi-address support (shipping and billing)
+
+- **Payment Processing**
+    - Configurable payment gateway abstraction (`IPaymentGatewayService`)
+    - Fictitious gateway for simulating payment processing and refunds
+    - Payment status tracking (process, refund, query by ID/order)
 
 - **Financial Transactions**
     - Centralized ledger of all monetary movements (sales, purchases, refunds, expenses)
@@ -135,6 +142,13 @@ The **E-Commerce Backend API** is a robust, scalable solution designed for moder
 - **Product Catalog Extensions**
     - Product attributes system (filterable, searchable, variant-specific)
     - Product variants with independent SKU, pricing, and stock per attribute combination
+
+- **Security & Data Integrity**
+    - Global soft-delete query filter applied across all entities with `IsDeleted`
+    - Security headers middleware (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+    - Rate limiting with global (100 req/min) and authentication (5 req/min) policies
+    - CORS with explicit allowed-origin allow-list
+    - Database transaction management in accounting and financial services
 
 ---
 
@@ -387,12 +401,13 @@ cd scripts
 
 #### 4. Default Credentials
 
-On first run, an admin user is automatically seeded:
+The admin user is seeded on startup only when `Admin:SeedEnabled` is `true`, using credentials from configuration:
 
-- **Email**: `admin@ecommerce.com.br`
-- **Password**: `admin`
+- **Development defaults** (from `appsettings.Development.json`):
+    - **Email**: `admin@ecommerce.local`
+    - **Password**: `ChangeMe!Dev#2026`
 
-> ⚠️ **Important**: Change these credentials immediately in production!
+> ⚠️ **Important**: Configure `Admin:Email` and `Admin:Password` via environment variables and change these credentials immediately in production!
 
 ### Docker Compose (Alternative)
 
@@ -490,13 +505,62 @@ $env:Jwt__Audience = "ECommerceClient"
 $env:Jwt__ExpirationMinutes = "60"
 ```
 
+#### CORS Configuration
+
+CORS is configured via an explicit allowed-origin allow-list. In non-development environments, at least one origin is required, and `"*"` is rejected.
+
+```json
+{
+    "Cors": {
+        "AllowedOrigins": "http://localhost:4200,https://localhost:8080"
+    }
+}
+```
+
+**Environment Variables:**
+
+```powershell
+$env:Cors__AllowedOrigins = "http://localhost:4200,https://localhost:8080"
+```
+
+#### Admin Seeding
+
+The admin user is seeded on startup when enabled. Credentials are read from configuration.
+
+```json
+{
+    "Admin": {
+        "SeedEnabled": true,
+        "Email": "admin@ecommerce.local",
+        "Password": "your-strong-password"
+    }
+}
+```
+
+#### Database Auto-Migration
+
+```json
+{
+    "Database": {
+        "AutoMigrate": true
+    }
+}
+```
+
+#### Rate Limiting
+
+The rate limiter is configured with two policies:
+
+- **Global**: 100 requests/minute per client IP (sliding window)
+- **Auth** (login endpoint): 5 requests/minute per client IP (fixed window, brute-force protection)
+
 #### OpenTelemetry Configuration
 
 ```json
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.1.21",
+        "ServiceVersion": "0.1.24",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": ""
     }
@@ -507,7 +571,7 @@ $env:Jwt__ExpirationMinutes = "60"
 
 ```powershell
 $env:OpenTelemetry__ServiceName = "ECommerce.Backend"
-$env:OpenTelemetry__ServiceVersion = "0.1.21"
+$env:OpenTelemetry__ServiceVersion = "0.1.24"
 $env:OpenTelemetry__EnableConsoleExporter = "true"
 $env:OpenTelemetry__OtlpEndpoint = "http://localhost:4317"
 ```
@@ -560,11 +624,11 @@ dotnet ef migrations remove
 
 ### Database Seeding
 
-The application automatically seeds the database on first run:
+The application seeds the database on startup when `Admin:SeedEnabled` is enabled:
 
 1. **Admin User**
-    - Email: `admin@ecommerce.com.br`
-    - Password: `admin`
+    - Email: from `Admin:Email` configuration (development default: `admin@ecommerce.local`)
+    - Password: from `Admin:Password` configuration
     - Role: Admin
 
 2. **Chart of Accounts** (40+ accounts)
@@ -603,8 +667,8 @@ POST /api/v1/login
 Content-Type: application/json
 
 {
-  "email": "admin@ecommerce.com.br",
-  "password": "admin"
+  "email": "admin@ecommerce.local",
+  "password": "ChangeMe!Dev#2026"
 }
 ```
 
@@ -616,7 +680,7 @@ Content-Type: application/json
     "expiresIn": 3600,
     "tokenType": "Bearer",
     "userId": "...",
-    "email": "admin@ecommerce.com.br",
+    "email": "admin@ecommerce.local",
     "accessLevel": "Admin"
 }
 ```
@@ -676,6 +740,15 @@ Content-Type: application/json
 | PUT    | `/orders/{id}`        | Update order                | Yes   |
 | PATCH  | `/orders/{id}/cancel` | Cancel order                | Yes   |
 | DELETE | `/orders/{id}`        | Delete order                | Admin |
+
+### Payment Endpoints
+
+| Method | Endpoint                    | Description             | Auth |
+| ------ | --------------------------- | ----------------------- | ---- |
+| POST   | `/payments/process`         | Process a payment       | Yes  |
+| POST   | `/payments/{id}/refund`     | Refund a payment        | Yes  |
+| GET    | `/payments/{id}`            | Get payment by ID       | Yes  |
+| GET    | `/payments/order/{orderId}` | Get payment by order ID | Yes  |
 
 ### Finance Endpoints
 
@@ -1057,26 +1130,28 @@ Comprehensive documentation is available in the `docs/` directory:
 ### Best Practices
 
 ✅ **Never commit secrets** - Use environment variables or secure vaults
-✅ **Strong JWT secret** - Minimum 32 characters, randomly generated
-✅ **HTTPS in production** - Enable SSL/TLS certificates
+✅ **Strong JWT secret** - Minimum 32 characters, randomly generated (enforced at startup)
+✅ **HTTPS in production** - HTTPS redirection enabled outside development
 ✅ **Input validation** - All DTOs use data annotations
 ✅ **SQL injection protection** - EF Core parameterized queries
-✅ **CORS configuration** - Configure allowed origins in production
-✅ **Rate limiting** - Implement rate limiting middleware (planned)
-✅ **Security headers** - Add HSTS, CSP, X-Frame-Options (planned)
+✅ **CORS configuration** - Explicit allowed-origin allow-list required outside development
+✅ **Rate limiting** - Global (100 req/min) and auth-specific (5 req/min) policies
+✅ **Security headers** - HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy via `SecurityHeadersMiddleware`
+✅ **Account lockout** - 5 failed logins lock the account for 15 minutes
+✅ **Timing-attack mitigation** - Dummy BCrypt hash comparison for non-existent users
 
 ### Production Checklist
 
 Before deploying to production:
 
-- [ ] Change default admin credentials
-- [ ] Use strong, randomly generated JWT secret key
-- [ ] Enable HTTPS with valid SSL certificates
-- [ ] Configure CORS for specific origins
+- [ ] Change default admin credentials (via `Admin:Email` / `Admin:Password`)
+- [ ] Use strong, randomly generated JWT secret key (minimum 32 chars, enforced at startup)
+- [ ] Enable HTTPS with valid SSL certificates (redirection is enabled outside development)
+- [x] Configure CORS for specific origins (required at startup in production)
 - [ ] Set up database backups and disaster recovery
 - [ ] Enable application insights and monitoring
-- [ ] Review and implement security headers
-- [ ] Configure rate limiting and throttling
+- [x] Review and implement security headers (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+- [x] Configure rate limiting and throttling (global 100 req/min, auth 5 req/min)
 - [ ] Set up Web Application Firewall (WAF)
 - [ ] Perform security audit and penetration testing
 
