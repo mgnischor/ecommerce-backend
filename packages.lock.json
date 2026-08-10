@@ -77,6 +77,15 @@
                     "Microsoft.EntityFrameworkCore.Design": "10.0.10"
                 }
             },
+            "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": {
+                "type": "Direct",
+                "requested": "[10.0.10, )",
+                "resolved": "10.0.10",
+                "contentHash": "jgYLn+CG1/EgZ3lsAuRUvb0RFhr1q23/z4U85arQ8XgABVZAuJIVecLaShMxsB/AS0ufY+Z4OCv1facaiEyc5g==",
+                "dependencies": {
+                    "Microsoft.EntityFrameworkCore.Relational": "10.0.10"
+                }
+            },
             "Microsoft.OpenApi": {
                 "type": "Direct",
                 "requested": "[2.11.0, )",
@@ -131,6 +140,15 @@
                 "contentHash": "R1omQOrQpGlS0Cp5UIr/TAiuEA48JrPlgr1NPV5gESiTU7HhWU+ILe2EBSYb1fKdsSavZ7nZkHcUxAzofPqr2A==",
                 "dependencies": {
                     "OpenTelemetry": "1.17.0"
+                }
+            },
+            "OpenTelemetry.Exporter.Prometheus.AspNetCore": {
+                "type": "Direct",
+                "requested": "[1.17.0-beta.1, )",
+                "resolved": "1.17.0-beta.1",
+                "contentHash": "eecXu43HkY7LFJDutrQ6kpwvUOMDeqLMtU+UeN225ckXw33qN/StTcdW6mTHH1jDSYdFM29vvDXB3jnFwPHkXg==",
+                "dependencies": {
+                    "OpenTelemetry": "[1.17.0, 2.0.0)"
                 }
             },
             "OpenTelemetry.Extensions.Hosting": {
