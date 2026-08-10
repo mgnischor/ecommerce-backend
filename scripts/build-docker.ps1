@@ -37,7 +37,7 @@ docker run -d `
   -e POSTGRES_PASSWORD=ecommerce `
   -e POSTGRES_DB=ecommerce `
   -p 5432:5432 `
-  postgres:16-alpine
+  postgres:18-alpine
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Failed to start PostgreSQL container" -ForegroundColor Red

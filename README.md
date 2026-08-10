@@ -3,7 +3,7 @@
 <div align="center">
 
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?logo=postgresql)](https://www.postgresql.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-316192?logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE.md)
 [![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-Enabled-FF6F00?logo=opentelemetry)](https://opentelemetry.io/)
@@ -161,9 +161,11 @@ The solution follows **Clean Architecture** principles with four distinct layers
 │                       Presentation Layer                     │
 │                         (src/API)                            │
 │  • Controllers (Auth, Products, Users, Accounting,          │
-│    Orders, Finance, Notifications, Suppliers, Vendors,      │
-│    Stores, Shipments, ShippingZones, Promotions, Refunds,   │
-│    ProductAttributes, ProductVariants)                      │
+│    Orders, Finance, Notifications, Payments,                │
+│    InventoryTransactions, Suppliers, Vendors, Stores,       │
+│    Shipments, ShippingZones, Promotions, Refunds,           │
+│    ProductAttributes, ProductVariants, GiftCards, Rewards,  │
+│    Invoices, Customers, InventoryPlanning)                  │
 │  • Middlewares (Exception Handling)                         │
 │  • OpenAPI/Scalar Documentation                             │
 │  • OpenTelemetry Configuration                              │
@@ -227,9 +229,9 @@ The solution follows **Clean Architecture** principles with four distinct layers
 
 ### Data & Persistence
 
-- **PostgreSQL 16** - Robust relational database
+- **PostgreSQL 18** - Robust relational database
 - **Entity Framework Core 10.0** - ORM with code-first migrations
-- **Npgsql 10.0.1** - PostgreSQL provider for EF Core
+- **Npgsql 10.0.3** - PostgreSQL provider for EF Core
 
 ### Authentication & Security
 
@@ -273,7 +275,7 @@ Ensure you have the following installed:
 
 - [.NET SDK 10.0+](https://dotnet.microsoft.com/download)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop) (for Docker-based development)
-- [PostgreSQL 16+](https://www.postgresql.org/download/) (for local development without Docker)
+- [PostgreSQL 18+](https://www.postgresql.org/download/) (for local development without Docker)
 - [Git](https://git-scm.com/downloads)
 
 ### Build and Run Options
@@ -345,7 +347,7 @@ cd scripts
 
 **Containers created:**
 
-- `ecommerce-postgres` - PostgreSQL 16 Alpine
+- `ecommerce-postgres` - PostgreSQL 18 Alpine
 - `ecommerce-backend-dev` - Development mode
 - `ecommerce-backend-prod` - Production mode
 
@@ -454,10 +456,6 @@ docker-compose down -v
 ### Script Reference
 
 For detailed information about all build scripts, see **[scripts/README.md](scripts/README.md)**.
-
----
-
-## ⚙️ Configuration
 
 ---
 
@@ -692,7 +690,7 @@ Content-Type: application/json
 | GET    | `/products`                          | List all products (paginated) | No            |
 | GET    | `/products/{id}`                     | Get product by ID             | No            |
 | GET    | `/products/sku/{sku}`                | Get product by SKU            | No            |
-| GET    | `/products/category/{id}`            | Get products by category      | No            |
+| GET    | `/products/category/{category}`      | Get products by category      | No            |
 | GET    | `/products/featured`                 | Get featured products         | No            |
 | GET    | `/products/on-sale`                  | Get products on sale          | No            |
 | GET    | `/products/search?searchTerm={term}` | Search products               | No            |
@@ -732,14 +730,12 @@ Content-Type: application/json
 
 ### Order Endpoints
 
-| Method | Endpoint              | Description                 | Auth  |
-| ------ | --------------------- | --------------------------- | ----- |
-| GET    | `/orders`             | List all orders (paginated) | Yes   |
-| GET    | `/orders/{id}`        | Get order by ID             | Yes   |
-| POST   | `/orders`             | Create new order            | Yes   |
-| PUT    | `/orders/{id}`        | Update order                | Yes   |
-| PATCH  | `/orders/{id}/cancel` | Cancel order                | Yes   |
-| DELETE | `/orders/{id}`        | Delete order                | Admin |
+| Method | Endpoint              | Description         | Auth          |
+| ------ | --------------------- | ------------------- | ------------- |
+| GET    | `/orders/{id}`        | Get order by ID     | Yes           |
+| POST   | `/orders`             | Create new order    | Yes           |
+| PATCH  | `/orders/{id}/status` | Update order status | Admin/Manager |
+| POST   | `/orders/{id}/cancel` | Cancel order        | Yes           |
 
 ### Payment Endpoints
 
@@ -757,11 +753,13 @@ Content-Type: application/json
 | GET    | `/finance/transactions`                                | List financial transactions (paginated) | Yes  |
 | GET    | `/finance/transactions/{id}`                           | Get transaction by ID                   | Yes  |
 | GET    | `/finance/transactions/period?startDate={}&endDate={}` | Get transactions by period              | Yes  |
+| GET    | `/finance/transactions/unreconciled`                   | List unreconciled transactions          | Yes  |
+| GET    | `/finance/transactions/order/{orderId}`                | Get transactions for an order           | Yes  |
 | GET    | `/finance/cash-flow`                                   | Cash flow report                        | Yes  |
 | GET    | `/finance/accounts-receivable`                         | Accounts receivable aging               | Yes  |
 | GET    | `/finance/accounts-payable`                            | Accounts payable aging                  | Yes  |
 | GET    | `/finance/dashboard`                                   | Financial dashboard KPIs                | Yes  |
-| POST   | `/finance/reconcile/{id}`                              | Reconcile a transaction                 | Yes  |
+| POST   | `/finance/transactions/{id}/reconcile`                 | Reconcile a transaction                 | Yes  |
 
 ### Notification Endpoints
 
@@ -795,7 +793,6 @@ Content-Type: application/json
 | GET    | `/vendors/featured`           | Get featured vendors         | No   |
 | GET    | `/vendors/search?term={term}` | Search vendors               | No   |
 | POST   | `/vendors`                    | Register as vendor           | Yes  |
-| PUT    | `/vendors/{id}`               | Update vendor                | Yes  |
 
 ### Store Endpoints
 
@@ -809,14 +806,15 @@ Content-Type: application/json
 
 ### Shipment Endpoints
 
-| Method | Endpoint                     | Description                    | Auth          |
-| ------ | ---------------------------- | ------------------------------ | ------------- |
-| GET    | `/shipments`                 | List all shipments (paginated) | Yes           |
-| GET    | `/shipments/{id}`            | Get shipment by ID             | Yes           |
-| GET    | `/shipments/order/{orderId}` | Get shipments for an order     | Yes           |
-| POST   | `/shipments`                 | Create shipment                | Admin/Manager |
-| PUT    | `/shipments/{id}`            | Update shipment                | Admin/Manager |
-| PATCH  | `/shipments/{id}/deliver`    | Mark as delivered              | Admin/Manager |
+| Method | Endpoint                               | Description                    | Auth          |
+| ------ | -------------------------------------- | ------------------------------ | ------------- |
+| GET    | `/shipments`                           | List all shipments (paginated) | Yes           |
+| GET    | `/shipments/{id}`                      | Get shipment by ID             | Yes           |
+| GET    | `/shipments/order/{orderId}`           | Get shipments for an order     | Yes           |
+| GET    | `/shipments/tracking/{trackingNumber}` | Track shipment (public)        | No            |
+| POST   | `/shipments`                           | Create shipment                | Admin/Manager |
+| PUT    | `/shipments/{id}`                      | Update shipment                | Admin/Manager |
+| DELETE | `/shipments/{id}`                      | Delete shipment                | Admin/Manager |
 
 ### Shipping Zone Endpoints
 
@@ -841,14 +839,85 @@ Content-Type: application/json
 
 ### Refund Endpoints
 
-| Method | Endpoint                   | Description                  | Auth          |
-| ------ | -------------------------- | ---------------------------- | ------------- |
-| GET    | `/refunds`                 | List all refunds (paginated) | Admin/Manager |
-| GET    | `/refunds/{id}`            | Get refund by ID             | Yes           |
-| GET    | `/refunds/order/{orderId}` | Get refunds for an order     | Yes           |
-| POST   | `/refunds`                 | Request a refund             | Yes           |
-| PATCH  | `/refunds/{id}/approve`    | Approve refund               | Admin/Manager |
-| PATCH  | `/refunds/{id}/reject`     | Reject refund                | Admin/Manager |
+| Method | Endpoint                         | Description                  | Auth          |
+| ------ | -------------------------------- | ---------------------------- | ------------- |
+| GET    | `/refunds`                       | List all refunds (paginated) | Admin/Manager |
+| GET    | `/refunds/{id}`                  | Get refund by ID             | Yes           |
+| GET    | `/refunds/order/{orderId}`       | Get refunds for an order     | Yes           |
+| GET    | `/refunds/customer/{customerId}` | Get refunds for a customer   | Yes           |
+| POST   | `/refunds`                       | Request a refund             | Yes           |
+| PUT    | `/refunds/{id}`                  | Update refund                | Admin/Manager |
+| PATCH  | `/refunds/{id}/approve`          | Approve refund               | Admin/Manager |
+| PATCH  | `/refunds/{id}/reject`           | Reject refund                | Admin/Manager |
+| DELETE | `/refunds/{id}`                  | Delete refund                | Admin/Manager |
+
+### Payment Endpoints
+
+| Method | Endpoint                    | Description               | Auth |
+| ------ | --------------------------- | ------------------------- | ---- |
+| POST   | `/payments/process`         | Process a payment         | Yes  |
+| POST   | `/payments/{id}/refund`     | Refund a payment          | Yes  |
+| GET    | `/payments/{id}`            | Get payment by ID         | Yes  |
+| GET    | `/payments/order/{orderId}` | Get payments for an order | Yes  |
+
+### Gift Card Endpoints
+
+| Method | Endpoint                            | Description                     | Auth                   |
+| ------ | ----------------------------------- | ------------------------------- | ---------------------- |
+| GET    | `/giftcards/{id}`                   | Get gift card by ID             | Yes                    |
+| GET    | `/giftcards/number/{cardNumber}`    | Get gift card by number         | Yes                    |
+| POST   | `/giftcards`                        | Create a gift card              | Admin/Manager/Developer |
+| PUT    | `/giftcards/{id}`                   | Update a gift card              | Admin/Manager/Developer |
+| POST   | `/giftcards/{id}/redeem`            | Redeem from gift card balance   | Admin/Manager/Developer |
+| POST   | `/giftcards/{id}/reload`            | Reload a gift card balance      | Admin/Manager/Developer |
+| DELETE | `/giftcards/{id}`                   | Delete a gift card              | Admin/Manager/Developer |
+
+### Rewards Endpoints
+
+| Method | Endpoint                       | Description                        | Auth                   |
+| ------ | ------------------------------ | ---------------------------------- | ---------------------- |
+| GET    | `/rewards/{id}`                | Get loyalty account by ID          | Yes                    |
+| GET    | `/rewards/customer/{customerId}` | Get loyalty account for a customer | Yes                    |
+| GET    | `/rewards/{id}/value`          | Get reward value for point balance | Yes                    |
+| POST   | `/rewards`                     | Create a loyalty account           | Admin/Manager/Developer |
+| PUT    | `/rewards/{id}`                | Update a loyalty account           | Admin/Manager/Developer |
+| POST   | `/rewards/{id}/earn`           | Earn points on an account          | Admin/Manager/Developer |
+| POST   | `/rewards/{id}/redeem`         | Redeem points for a reward         | Admin/Manager/Developer |
+| DELETE | `/rewards/{id}`                | Delete a loyalty account           | Admin/Manager/Developer |
+
+### Invoice Endpoints
+
+| Method | Endpoint                        | Description                     | Auth                   |
+| ------ | ------------------------------- | ------------------------------- | ---------------------- |
+| GET    | `/invoices/{id}`                | Get invoice by ID               | Yes                    |
+| GET    | `/invoices/number/{invoiceNumber}` | Get invoice by number           | Yes                    |
+| POST   | `/invoices`                     | Create an invoice               | Admin/Manager/Developer |
+| PUT    | `/invoices/{id}`                | Update an invoice               | Admin/Manager/Developer |
+| POST   | `/invoices/{id}/pay`            | Record an invoice payment       | Admin/Manager/Developer |
+| POST   | `/invoices/{id}/credit-note`    | Issue a credit note             | Admin/Manager/Developer |
+| DELETE | `/invoices/{id}`                | Delete an invoice               | Admin/Manager/Developer |
+
+### Customer Endpoints
+
+| Method | Endpoint               | Description                            | Auth                   |
+| ------ | ---------------------- | -------------------------------------- | ---------------------- |
+| GET    | `/customers/{id}`      | Get customer by ID                     | Yes                    |
+| GET    | `/customers/user/{userId}` | Get customer by user ID                | Yes                    |
+| GET    | `/customers/{id}/segment` | Get customer segmentation analysis     | Yes                    |
+| POST   | `/customers`           | Create a customer                      | Admin/Manager/Developer |
+| PUT    | `/customers/{id}`      | Update a customer                      | Admin/Manager/Developer |
+| DELETE | `/customers/{id}`      | Delete a customer                      | Admin/Manager/Developer |
+
+### Inventory Planning Endpoints
+
+| Method | Endpoint                              | Description                           | Auth                   |
+| ------ | ------------------------------------- | ------------------------------------- | ---------------------- |
+| GET    | `/inventory-planning/{id}`            | Get inventory plan by ID              | Yes                    |
+| GET    | `/inventory-planning/product/{productId}` | Get inventory plan for a product   | Yes                    |
+| GET    | `/inventory-planning/{id}/analysis`   | Get forecasting and stock analysis    | Yes                    |
+| POST   | `/inventory-planning`                 | Create an inventory plan              | Admin/Manager/Developer |
+| PUT    | `/inventory-planning/{id}`            | Update an inventory plan              | Admin/Manager/Developer |
+| DELETE | `/inventory-planning/{id}`            | Delete an inventory plan              | Admin/Manager/Developer |
 
 ### Product Attribute Endpoints
 
@@ -886,10 +955,6 @@ Access the **Scalar UI** at `/docs` for interactive API exploration:
 - View request/response schemas
 - Download OpenAPI specification (JSON/YAML)
 - Explore all available operations
-
----
-
-## 📊 Observability
 
 ---
 

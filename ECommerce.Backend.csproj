@@ -5,7 +5,7 @@
         <AssemblyVersion>0.0.1</AssemblyVersion>
         <Authors>Miguel Nischor</Authors>
         <Company>Miguel Nischor</Company>
-        <Copyright>Copyright © 2025 Miguel Nischor</Copyright>
+        <Copyright>Copyright © 2025-2026 Miguel Nischor</Copyright>
         <Description>A backend API for an e-commerce platform built with ASP.NET Core.</Description>
         <FileVersion>0.0.1</FileVersion>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>

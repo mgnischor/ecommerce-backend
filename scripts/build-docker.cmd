@@ -30,7 +30,7 @@ docker run -d ^
   -e POSTGRES_PASSWORD=ecommerce ^
   -e POSTGRES_DB=ecommerce ^
   -p 5432:5432 ^
-  postgres:16-alpine
+  postgres:18-alpine
 
 echo Waiting for PostgreSQL to be ready...
 timeout /t 5 /nobreak >nul

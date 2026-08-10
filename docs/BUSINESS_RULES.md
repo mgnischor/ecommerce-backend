@@ -150,6 +150,221 @@ Business policies define the core business rules and constraints.
 -   Volumetric weight calculation
 -   Package dimension validation
 
+### GiftCardPolicy
+
+**Location:** `src/Domain/Policies/GiftCardPolicy.cs`
+
+**Purpose:** Defines business rules for gift card validation and redemption
+
+**Key Rules:**
+
+-   Card number format: 13-19 digits (alphanumeric with optional dashes)
+-   Balance limits: $0.01 to $5,000
+-   Cards are inactive when revoked
+-   Default validity period: 24 months from issuance
+-   Redemptions cannot exceed the available balance
+-   Reloads are only allowed for reloadable cards below the maximum balance
+
+### RewardsProgramPolicy
+
+**Location:** `src/Domain/Policies/RewardsProgramPolicy.cs`
+
+**Purpose:** Defines business rules for the customer rewards and loyalty program
+
+**Key Rules:**
+
+-   Earn 1 point per dollar spent
+-   Earn bonus points for product reviews (capped at 100 points)
+-   Rewards require a positive point cost
+-   Points value: 100 points = $1.00
+-   Points expire after 365 days of inactivity
+-   Loyalty tiers: Bronze, Silver, Gold, Platinum with earning multipliers
+
+### TaxPolicy
+
+**Location:** `src/Domain/Policies/TaxPolicy.cs`
+
+**Purpose:** Defines business rules for tax calculation and tax compliance
+
+**Key Rules:**
+
+-   Tax rates must be between 0% and 100%
+-   Tax-exempt categories: Books, Groceries, Medical, Prescription, Education
+-   Digital products are always taxable
+-   Physical products are exempt in designated tax-free zones
+-   Supports gross-to-base price extraction for tax-inclusive pricing
+
+### CustomerSegmentationPolicy
+
+**Location:** `src/Domain/Policies/CustomerSegmentationPolicy.cs`
+
+**Purpose:** Defines business rules for customer segmentation and lifecycle analysis
+
+**Key Rules:**
+
+-   Segments: VIP, Regular, New, Occasional
+-   High-value threshold: $5,000 in total spending
+-   Churn threshold: 90 days without an order
+-   At-risk detection: inactivity beyond 2x the customer's normal order cadence
+-   Dormant threshold: 365 days without login
+-   Churn risk levels: Critical, High, Medium, Low
+
+### OrderFulfillmentPolicy
+
+**Location:** `src/Domain/Policies/OrderFulfillmentPolicy.cs`
+
+**Purpose:** Defines business rules for order fulfillment and shipment planning
+
+**Key Rules:**
+
+-   Fulfillment only starts for Confirmed or Processing orders
+-   Shipments split when exceeding 20 items per package
+-   Ready to ship requires payment and available inventory
+-   Palletization required above 500 kg
+-   Default fulfillment window: 24 hours
+-   Shipments only combine for the same customer and address
+
+### ReturnsPolicy
+
+**Location:** `src/Domain/Policies/ReturnsPolicy.cs`
+
+**Purpose:** Defines business rules for product returns
+
+**Key Rules:**
+
+-   Default return window: 30 days
+-   Only delivered or completed physical orders are returnable
+-   Digital products are non-returnable once downloaded or opened
+-   Returns over $500 always require inspection
+-   Refund percentage based on condition score (3-10 scale)
+-   Auto-approval threshold: $50 with proof photos required
+
+### SearchPolicy
+
+**Location:** `src/Domain/Policies/SearchPolicy.cs`
+
+**Purpose:** Defines business rules for product search and catalog queries
+
+**Key Rules:**
+
+-   Search term length: 2-100 characters (empty returns all)
+-   Page numbers start at 1
+-   Page size limits: 1-100 (default 20)
+-   Falls back to relevance sorting for unknown sort options
+-   Price range validation (min cannot exceed max)
+
+### EmailPolicy
+
+**Location:** `src/Domain/Policies/EmailPolicy.cs`
+
+**Purpose:** Defines business rules for email and communication delivery
+
+**Key Rules:**
+
+-   Subject length: 1-150 characters
+-   Body length: maximum 100,000 characters
+-   Transactional types: Order, Payment, Shipment, Account
+-   Transactional emails never require separate marketing consent
+-   Marketing emails only sent between 8:00 and 21:00
+
+### InventoryPlanningPolicy
+
+**Location:** `src/Domain/Policies/InventoryPlanningPolicy.cs`
+
+**Purpose:** Defines business rules for inventory planning and demand forecasting
+
+**Key Rules:**
+
+-   Simple moving average sales forecasting
+-   Safety stock calculation with service level factors (90/95/99%)
+-   Days of supply calculation from demand
+-   Stock age threshold: 180 days
+-   Slow-moving liquidation when turnover is below 10%
+
+### AddressPolicy
+
+**Location:** `src/Domain/Policies/AddressPolicy.cs`
+
+**Purpose:** Defines business rules for customer address validation
+
+**Key Rules:**
+
+-   Street length: 3-200 characters
+-   City length: 2-100 characters
+-   Country codes: 3 characters (ISO)
+-   Postal codes: 4-12 characters with letters, digits, spaces, and dashes
+-   Addresses with a company name are treated as business addresses
+
+### ProductCatalogPolicy
+
+**Location:** `src/Domain/Policies/ProductCatalogPolicy.cs`
+
+**Purpose:** Defines business rules for product catalog management
+
+**Key Rules:**
+
+-   Product name length: 3-200 characters
+-   Description length: maximum 5,000 characters
+-   Category changes blocked for products with active orders
+-   Maximum product weight: 500 kg
+-   Maximum of 10 tags per product (each up to 50 characters)
+
+### SupplierPolicy
+
+**Location:** `src/Domain/Policies/SupplierPolicy.cs`
+
+**Purpose:** Defines business rules for supplier management
+
+**Key Rules:**
+
+-   Suppliers require a valid company name and contact email
+-   Purchase orders only for verified, active vendors
+-   Auto-replenishment requires 90%+ on-time delivery over 5+ orders
+-   Payment terms follow the NET n format (1-365 days)
+-   Suspension when complaint rate exceeds 20%
+
+### StorePolicy
+
+**Location:** `src/Domain/Policies/StorePolicy.cs`
+
+**Purpose:** Defines business rules for store configuration and operation
+
+**Key Rules:**
+
+-   Store name length: 2-100 characters
+-   Stores are inactive during suspension periods
+-   Orders accepted only when active and within business hours
+-   Business hours support stores that close after midnight
+
+### ShippingRatePolicy
+
+**Location:** `src/Domain/Policies/ShippingRatePolicy.cs`
+
+**Purpose:** Defines business rules for shipping rate calculation and carrier selection
+
+**Key Rules:**
+
+-   Weight-based rates combine base rate and per-kg rate
+-   Free shipping by country or order amount threshold
+-   Per-item rate calculation
+-   Surcharge application as a percentage
+-   Carrier codes: alphanumeric with dashes, up to 10 characters
+-   Handling fees capped at $100
+
+### InvoicePolicy
+
+**Location:** `src/Domain/Policies/InvoicePolicy.cs`
+
+**Purpose:** Defines business rules for invoice generation and payment terms
+
+**Key Rules:**
+
+-   Invoice number format: 5-50 characters
+-   Credit notes only for paid invoices within the valid period
+-   Invoice totals must not exceed the sum of their components
+-   Payment terms enforcement via due dates
+-   Prepayment required for new customers and high-value orders
+
 ### Additional Policies
 
 The following policies are also implemented in the system:
@@ -489,4 +704,4 @@ These business rules integrate with:
 
 ---
 
-_Last Updated: December 23, 2025_
+_Last Updated: August 7, 2026_

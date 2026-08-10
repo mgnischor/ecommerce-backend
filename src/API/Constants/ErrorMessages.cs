@@ -203,6 +203,17 @@ public static class ErrorMessages
     /// </summary>
     public static string SupplierNotFoundByCode(string code) => NotFoundByCode("Supplier", code);
 
+    /// <summary>
+    /// Message when supplier registration information is invalid
+    /// </summary>
+    public const string SupplierInfoInvalid = "Company name, contact email, and tax ID are invalid";
+
+    /// <summary>
+    /// Message when supplier payment terms are invalid
+    /// </summary>
+    public const string SupplierPaymentTermsInvalid =
+        "Payment terms must be in NET format (e.g., NET 30)";
+
     #endregion
 
     #region Store-specific Messages
@@ -231,6 +242,21 @@ public static class ErrorMessages
     /// Message when city name exceeds maximum length
     /// </summary>
     public const string CityNameTooLong = "City name must not exceed 100 characters";
+
+    /// <summary>
+    /// Message when store name is invalid
+    /// </summary>
+    public const string StoreNameInvalid = "Store name must be between 2 and 100 characters";
+
+    /// <summary>
+    /// Message when store address is invalid
+    /// </summary>
+    public const string StoreAddressInvalid = "Store address is invalid";
+
+    /// <summary>
+    /// Message when store state is invalid
+    /// </summary>
+    public const string StoreStateInvalid = "Store state must be between 2 and 20 characters";
 
     #endregion
 
@@ -267,9 +293,16 @@ public static class ErrorMessages
     public const string TrackingNumberAlreadyExists = "Tracking number already exists";
 
     /// <summary>
-    /// Message when carrier name is required
+    /// Message when carrier code is required or invalid
     /// </summary>
-    public const string CarrierNameRequired = "Valid carrier name is required (max 200 characters)";
+    public const string CarrierNameRequired =
+        "Valid carrier code is required (letters, numbers, or hyphens, max 10 characters)";
+
+    /// <summary>
+    /// Message when order is not in a status that allows shipment creation
+    /// </summary>
+    public const string OrderNotReadyForShipment =
+        "Order must be in Confirmed or Processing status to create a shipment";
 
     /// <summary>
     /// Message when shipping address is required
@@ -327,6 +360,11 @@ public static class ErrorMessages
     /// </summary>
     public const string ShippingZoneNameAlreadyExists = "Shipping zone name already exists";
 
+    /// <summary>
+    /// Message when tax rate is invalid
+    /// </summary>
+    public const string InvalidTaxRate = "Tax rate must be between 0 and 100 percent";
+
     #endregion
 
     #region Refund-specific Messages
@@ -350,6 +388,11 @@ public static class ErrorMessages
     /// Message when refund reason is required
     /// </summary>
     public const string RefundReasonRequired = "Refund reason is required";
+
+    /// <summary>
+    /// Message when refund reason is invalid
+    /// </summary>
+    public const string RefundReasonInvalid = "Refund reason must be between 5 and 500 characters";
 
     /// <summary>
     /// Message when rejection reason is required
@@ -404,6 +447,188 @@ public static class ErrorMessages
     /// Message when promotion code format is invalid
     /// </summary>
     public const string InvalidPromotionCodeFormat = "Invalid promotion code format";
+
+    #endregion
+
+    #region Gift Card-specific Messages
+
+    /// <summary>
+    /// Message for gift card data requirement
+    /// </summary>
+    public const string GiftCardDataRequired = "Gift card data is required";
+
+    /// <summary>
+    /// Message when gift card not found
+    /// </summary>
+    public const string GiftCardNotFound = "Gift card not found";
+
+    /// <summary>
+    /// Message when gift card number format is invalid
+    /// </summary>
+    public const string InvalidGiftCardNumber =
+        "Gift card number must be between 13 and 19 digits (digits and dashes only)";
+
+    /// <summary>
+    /// Message when gift card balance is outside acceptable limits
+    /// </summary>
+    public const string GiftCardBalanceOutOfRange =
+        "Gift card balance must be between 0.01 and 5000";
+
+    /// <summary>
+    /// Message when gift card is not active or has been revoked
+    /// </summary>
+    public const string GiftCardNotActive = "Gift card is not active or has been revoked";
+
+    /// <summary>
+    /// Message when gift card has expired
+    /// </summary>
+    public const string GiftCardExpired = "Gift card has expired";
+
+    /// <summary>
+    /// Message when gift card cannot be reloaded
+    /// </summary>
+    public const string GiftCardNotReloadable = "Gift card cannot be reloaded";
+
+    /// <summary>
+    /// Message when redeem amount exceeds the available balance
+    /// </summary>
+    public const string InsufficientGiftCardBalance =
+        "Gift card balance is insufficient for this redemption";
+
+    /// <summary>
+    /// Message when gift card number already exists
+    /// </summary>
+    public const string GiftCardNumberAlreadyExists = "Gift card number already exists";
+
+    #endregion
+
+    #region Rewards-specific Messages
+
+    /// <summary>
+    /// Message for loyalty reward data requirement
+    /// </summary>
+    public const string LoyaltyRewardDataRequired = "Loyalty reward data is required";
+
+    /// <summary>
+    /// Message when loyalty reward account not found
+    /// </summary>
+    public const string LoyaltyRewardNotFound = "Loyalty reward account not found";
+
+    /// <summary>
+    /// Message when point balance is negative
+    /// </summary>
+    public const string InvalidPointBalance = "Point balance must be a non-negative value";
+
+    /// <summary>
+    /// Message when customer has insufficient points for a reward
+    /// </summary>
+    public const string InsufficientPoints = "Insufficient points for this reward";
+
+    /// <summary>
+    /// Message when points have expired
+    /// </summary>
+    public const string PointsExpired = "Points have expired and can no longer be used";
+
+    /// <summary>
+    /// Message when a reward cost must be positive
+    /// </summary>
+    public const string InvalidRewardCost = "Reward cost must be greater than 0";
+
+    #endregion
+
+    #region Invoice-specific Messages
+
+    /// <summary>
+    /// Message for invoice data requirement
+    /// </summary>
+    public const string InvoiceDataRequired = "Invoice data is required";
+
+    /// <summary>
+    /// Message when invoice not found
+    /// </summary>
+    public const string InvoiceNotFound = "Invoice not found";
+
+    /// <summary>
+    /// Message when invoice number format is invalid
+    /// </summary>
+    public const string InvalidInvoiceNumber =
+        "Invoice number must be between 5 and 50 characters (letters, digits, dashes, or slashes)";
+
+    /// <summary>
+    /// Message when invoice number already exists
+    /// </summary>
+    public const string InvoiceNumberAlreadyExists = "Invoice number already exists";
+
+    /// <summary>
+    /// Message when invoice amounts are negative
+    /// </summary>
+    public const string InvalidInvoiceAmounts = "Invoice amounts cannot be negative";
+
+    /// <summary>
+    /// Message when invoice is past its due date
+    /// </summary>
+    public const string InvoiceOverdue = "Invoice is past its due date";
+
+    /// <summary>
+    /// Message when credit note cannot be issued
+    /// </summary>
+    public const string CreditNoteInvalid =
+        "Credit note can only be issued for paid invoices within the credit period, and cannot exceed the invoice total";
+
+    #endregion
+
+    #region Customer-specific Messages
+
+    /// <summary>
+    /// Message for customer data requirement
+    /// </summary>
+    public const string CustomerDataRequired = "Customer data is required";
+
+    /// <summary>
+    /// Message when customer not found
+    /// </summary>
+    public const string CustomerNotFound = "Customer not found";
+
+    /// <summary>
+    /// Message when customer user ID is required
+    /// </summary>
+    public const string CustomerUserIdRequired = "Valid user ID is required";
+
+    #endregion
+
+    #region Inventory Planning-specific Messages
+
+    /// <summary>
+    /// Message for inventory plan data requirement
+    /// </summary>
+    public const string InventoryPlanDataRequired = "Inventory plan data is required";
+
+    /// <summary>
+    /// Message when inventory plan not found
+    /// </summary>
+    public const string InventoryPlanNotFound = "Inventory plan not found";
+
+    /// <summary>
+    /// Message when current stock is negative
+    /// </summary>
+    public const string InvalidCurrentStock = "Current stock must be a non-negative value";
+
+    /// <summary>
+    /// Message when reorder point is negative
+    /// </summary>
+    public const string InvalidReorderPoint = "Reorder point must be a non-negative value";
+
+    /// <summary>
+    /// Message when average daily sales is negative
+    /// </summary>
+    public const string InvalidAverageDailySales =
+        "Average daily sales must be a non-negative value";
+
+    /// <summary>
+    /// Message when historical sales data is missing for forecasting
+    /// </summary>
+    public const string HistoricalSalesRequired =
+        "Historical sales data is required for forecasting";
 
     #endregion
 

@@ -4,7 +4,7 @@
         <AssemblyName>ECommerce.Tests</AssemblyName>
         <Authors>Miguel Nischor</Authors>
         <Company>Miguel Nischor</Company>
-        <Copyright>Copyright © 2025 Miguel Nischor</Copyright>
+        <Copyright>Copyright © 2025-2026 Miguel Nischor</Copyright>
         <Description>Unit tests for E-Commerce Backend API</Description>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>

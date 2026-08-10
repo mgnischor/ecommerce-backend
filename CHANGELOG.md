@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Upgraded to PostgreSQL 18**: Migrated database from PostgreSQL 16 to PostgreSQL 18
+    - Updated Docker images to `postgres:18-alpine` in `docker-compose.yml` and `docker-compose.dev.yml`
+    - Updated `scripts/build-docker.ps1` and `scripts/build-docker.cmd` to use PostgreSQL 18
+    - Updated documentation references to PostgreSQL 18:
+        - README.md badge, tech stack, prerequisites, and container descriptions
+        - CONTRIBUTING.md prerequisites section
+        - docs/OPENTELEMETRY_GUIDE.md Docker compose example
+        - GitHub issue templates (bug report and performance)
+    - Npgsql provider (`Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3) fully supports PostgreSQL 18
+
 ### Fixed
 
 ## [0.1.24] - 2026-06-14

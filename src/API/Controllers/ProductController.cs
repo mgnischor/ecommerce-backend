@@ -1,6 +1,7 @@
 using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Interfaces;
+using ECommerce.Domain.Policies;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -804,7 +805,7 @@ public sealed class ProductController : ControllerBase
     /// </para>
     /// <list type="bullet">
     /// <item><description>Search term is required (cannot be null, empty, or whitespace)</description></item>
-    /// <item><description>Minimum length: 1 character (no maximum enforced)</description></item>
+    /// <item><description>Minimum length: 2 characters (maximum length: 100 characters)</description></item>
     /// <item><description>Invalid search terms result in 400 Bad Request</description></item>
     /// </list>
     /// <para>
@@ -836,7 +837,7 @@ public sealed class ProductController : ControllerBase
     /// </remarks>
     /// <param name="searchTerm">
     /// The search term to match against product names. Performs case-insensitive partial matching.
-    /// Must be at least 1 character. Cannot be null, empty, or whitespace.
+    /// Must be between 2 and 100 characters. Cannot be null, empty, or whitespace.
     /// Example: "laptop" or "blue" or "samsung"
     /// </param>
     /// <param name="cancellationToken">
@@ -854,7 +855,7 @@ public sealed class ProductController : ControllerBase
     /// </response>
     /// <response code="400">
     /// Bad request. Invalid search term. The search term is required and cannot be null, empty,
-    /// or consist only of whitespace characters. Provide a valid search term with at least one character.
+    /// or consist only of whitespace characters. Provide a valid search term between 2 and 100 characters.
     /// </response>
     /// <response code="500">
     /// Internal server error. An unexpected error occurred while searching products.
@@ -871,6 +872,15 @@ public sealed class ProductController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
             return BadRequest("Search term is required");
+
+        if (!SearchPolicy.IsValidSearchTerm(searchTerm))
+        {
+            _logger.LogWarning(
+                "Attempt to search products with invalid search term: {SearchTerm}",
+                searchTerm
+            );
+            return BadRequest("Search term must be between 2 and 100 characters");
+        }
 
         var products = await _productRepository.SearchByNameAsync(searchTerm, cancellationToken);
         return Ok(products);
@@ -1021,6 +1031,60 @@ public sealed class ProductController : ControllerBase
         {
             _logger.LogWarning("Attempt to create product with null data");
             return BadRequest("Product data is required");
+        }
+
+        if (!ProductCatalogPolicy.IsValidProductName(newProduct.Name))
+        {
+            _logger.LogWarning(
+                "Attempt to create product with invalid name: {Name}",
+                newProduct.Name
+            );
+            return BadRequest("Product name must be between 3 and 200 characters");
+        }
+
+        if (!ProductCatalogPolicy.IsValidProductDescription(newProduct.Description))
+        {
+            _logger.LogWarning(
+                "Attempt to create product with invalid description for SKU: {Sku}",
+                newProduct.Sku
+            );
+            return BadRequest("Product description cannot exceed 5000 characters");
+        }
+
+        if (!ProductCatalogPolicy.IsValidBrand(newProduct.Brand))
+        {
+            _logger.LogWarning(
+                "Attempt to create product with invalid brand for SKU: {Sku}",
+                newProduct.Sku
+            );
+            return BadRequest("Product brand cannot exceed 100 characters");
+        }
+
+        if (!ProductCatalogPolicy.IsValidCategoryName(newProduct.Category.ToString()))
+        {
+            _logger.LogWarning(
+                "Attempt to create product with invalid category: {Category}",
+                newProduct.Category
+            );
+            return BadRequest("Product category is invalid");
+        }
+
+        if (!ProductCatalogPolicy.IsValidProductWeight(newProduct.Weight))
+        {
+            _logger.LogWarning(
+                "Attempt to create product with invalid weight for SKU: {Sku}",
+                newProduct.Sku
+            );
+            return BadRequest("Product weight must be greater than 0 and no more than 500 kg");
+        }
+
+        if (!ProductCatalogPolicy.IsValidProductTags(newProduct.Tags))
+        {
+            _logger.LogWarning(
+                "Attempt to create product with invalid tags for SKU: {Sku}",
+                newProduct.Sku
+            );
+            return BadRequest("Product tags are invalid");
         }
 
         if (await _productRepository.ExistsBySkuAsync(newProduct.Sku, cancellationToken))
@@ -1227,6 +1291,53 @@ public sealed class ProductController : ControllerBase
         {
             _logger.LogWarning("Attempt to update non-existent product: {ProductId}", id);
             return NotFound(new { Message = $"Product with ID '{id}' not found" });
+        }
+
+        if (!ProductCatalogPolicy.IsValidProductName(updatedProduct.Name))
+        {
+            _logger.LogWarning(
+                "Attempt to update product {ProductId} with invalid name: {Name}",
+                id,
+                updatedProduct.Name
+            );
+            return BadRequest("Product name must be between 3 and 200 characters");
+        }
+
+        if (!ProductCatalogPolicy.IsValidProductDescription(updatedProduct.Description))
+        {
+            _logger.LogWarning(
+                "Attempt to update product {ProductId} with invalid description",
+                id
+            );
+            return BadRequest("Product description cannot exceed 5000 characters");
+        }
+
+        if (!ProductCatalogPolicy.IsValidBrand(updatedProduct.Brand))
+        {
+            _logger.LogWarning("Attempt to update product {ProductId} with invalid brand", id);
+            return BadRequest("Product brand cannot exceed 100 characters");
+        }
+
+        if (!ProductCatalogPolicy.IsValidCategoryName(updatedProduct.Category.ToString()))
+        {
+            _logger.LogWarning(
+                "Attempt to update product {ProductId} with invalid category: {Category}",
+                id,
+                updatedProduct.Category
+            );
+            return BadRequest("Product category is invalid");
+        }
+
+        if (!ProductCatalogPolicy.IsValidProductWeight(updatedProduct.Weight))
+        {
+            _logger.LogWarning("Attempt to update product {ProductId} with invalid weight", id);
+            return BadRequest("Product weight must be greater than 0 and no more than 500 kg");
+        }
+
+        if (!ProductCatalogPolicy.IsValidProductTags(updatedProduct.Tags))
+        {
+            _logger.LogWarning("Attempt to update product {ProductId} with invalid tags", id);
+            return BadRequest("Product tags are invalid");
         }
 
         var skuExists = await _productRepository.ExistsBySkuAsync(

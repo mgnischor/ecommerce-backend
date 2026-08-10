@@ -78,7 +78,7 @@ Your support helps us:
 ### Prerequisites
 
 -   [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
--   [PostgreSQL 15+](https://www.postgresql.org/download/)
+-   [PostgreSQL 18+](https://www.postgresql.org/download/)
 -   [Git](https://git-scm.com/)
 -   [Docker](https://www.docker.com/) (optional)
 

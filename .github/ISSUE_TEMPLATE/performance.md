@@ -38,7 +38,7 @@ assignees: ""
 
 -   **OS**: [e.g., Windows Server 2022, Ubuntu 22.04]
 -   **.NET Version**: [e.g., .NET 9.0]
--   **Database**: [e.g., PostgreSQL 16]
+-   **Database**: [e.g., PostgreSQL 18]
 -   **Deployment**: [e.g., Docker, Kubernetes, IIS]
 -   **Hardware**: [e.g., CPU, RAM, Storage type]
 -   **Load**: [e.g., number of concurrent users, requests per second]

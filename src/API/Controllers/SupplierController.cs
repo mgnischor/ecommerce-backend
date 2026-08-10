@@ -2,6 +2,7 @@ using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Policies;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -269,6 +270,24 @@ public sealed class SupplierController : ControllerBase
         if (supplier == null)
             return BadRequest(ErrorMessages.SupplierDataRequired);
 
+        if (!SupplierPolicy.IsValidSupplier(supplier.CompanyName, supplier.Email, supplier.TaxId))
+        {
+            _logger.LogWarning(
+                "Attempt to create supplier with invalid registration info: {CompanyName}",
+                supplier.CompanyName
+            );
+            return BadRequest(new { Message = ErrorMessages.SupplierInfoInvalid });
+        }
+
+        if (!SupplierPolicy.IsValidPaymentTerms(supplier.PaymentTerms))
+        {
+            _logger.LogWarning(
+                "Attempt to create supplier with invalid payment terms: {CompanyName}",
+                supplier.CompanyName
+            );
+            return BadRequest(new { Message = ErrorMessages.SupplierPaymentTermsInvalid });
+        }
+
         supplier.Id = Guid.NewGuid();
         supplier.CreatedAt = DateTime.UtcNow;
         supplier.UpdatedAt = DateTime.UtcNow;
@@ -332,6 +351,24 @@ public sealed class SupplierController : ControllerBase
 
         if (id != supplier.Id)
             return BadRequest(ErrorMessages.IdMismatch);
+
+        if (!SupplierPolicy.IsValidSupplier(supplier.CompanyName, supplier.Email, supplier.TaxId))
+        {
+            _logger.LogWarning(
+                "Attempt to update supplier {SupplierId} with invalid registration info",
+                id
+            );
+            return BadRequest(new { Message = ErrorMessages.SupplierInfoInvalid });
+        }
+
+        if (!SupplierPolicy.IsValidPaymentTerms(supplier.PaymentTerms))
+        {
+            _logger.LogWarning(
+                "Attempt to update supplier {SupplierId} with invalid payment terms",
+                id
+            );
+            return BadRequest(new { Message = ErrorMessages.SupplierPaymentTermsInvalid });
+        }
 
         var existingSupplier = await _context.Suppliers.FindAsync(
             new object[] { id },

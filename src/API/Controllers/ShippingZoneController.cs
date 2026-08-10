@@ -3,6 +3,7 @@ using ECommerce.API.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Policies;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -340,6 +341,15 @@ public sealed class ShippingZoneController : ControllerBase
             return BadRequest(new { Message = ErrorMessages.PriorityMustBePositive });
         }
 
+        if (zone.TaxRate.HasValue && !TaxPolicy.IsValidTaxRate(zone.TaxRate.Value))
+        {
+            _logger.LogWarning(
+                "Invalid tax rate for shipping zone creation: {TaxRate}",
+                zone.TaxRate
+            );
+            return BadRequest(new { Message = ErrorMessages.InvalidTaxRate });
+        }
+
         try
         {
             // Check for duplicate name
@@ -436,6 +446,11 @@ public sealed class ShippingZoneController : ControllerBase
         if (zone.BaseRate < 0 || zone.RatePerKg < 0 || zone.RatePerItem < 0)
         {
             return BadRequest(new { Message = ErrorMessages.RatesCannotBeNegative });
+        }
+
+        if (zone.TaxRate.HasValue && !TaxPolicy.IsValidTaxRate(zone.TaxRate.Value))
+        {
+            return BadRequest(new { Message = ErrorMessages.InvalidTaxRate });
         }
 
         return null;
