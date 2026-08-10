@@ -213,31 +213,57 @@
             },
             "Microsoft.Extensions.Diagnostics.Abstractions": {
                 "type": "Transitive",
-                "resolved": "10.0.0",
-                "contentHash": "SfK89ytD61S7DgzorFljSkUeluC1ncn6dtZgwc0ot39f/BEYWBl5jpgvodxduoYAs1d9HG8faCDRZxE95UMo2A==",
+                "resolved": "10.0.10",
+                "contentHash": "9uWiKpeOVac355STyChWR/pliFX/5CeLqChW9kKsaxyDH4EUTZxMkT4Jwp/J/peLm0GBFmSX5c0WCse3yCnq1Q==",
                 "dependencies": {
-                    "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0",
-                    "Microsoft.Extensions.Options": "10.0.0"
+                    "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10",
+                    "Microsoft.Extensions.Options": "10.0.10"
+                }
+            },
+            "Microsoft.Extensions.Diagnostics.HealthChecks": {
+                "type": "Transitive",
+                "resolved": "10.0.10",
+                "contentHash": "R0O5oG+zAJeBSM8nNTa+Ycj2Zobyr/v6Ilo7Dha0sNB2Vq/XXoLdoecj9DAWGbN8YrPaW6u8+osTQ5Ypj7ZF0w==",
+                "dependencies": {
+                    "Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions": "10.0.10",
+                    "Microsoft.Extensions.Hosting.Abstractions": "10.0.10",
+                    "Microsoft.Extensions.Logging.Abstractions": "10.0.10",
+                    "Microsoft.Extensions.Options": "10.0.10"
+                }
+            },
+            "Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions": {
+                "type": "Transitive",
+                "resolved": "10.0.10",
+                "contentHash": "6euxgVR7NS83y0a2wLRAxfYXusLQJ2e1ah0MpQgYTYMs5lYrmdNP79C6T8uvRZdP87n5mcCcp6+w0EyWAidKZw=="
+            },
+            "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": {
+                "type": "Transitive",
+                "resolved": "10.0.10",
+                "contentHash": "jgYLn+CG1/EgZ3lsAuRUvb0RFhr1q23/z4U85arQ8XgABVZAuJIVecLaShMxsB/AS0ufY+Z4OCv1facaiEyc5g==",
+                "dependencies": {
+                    "Microsoft.EntityFrameworkCore.Relational": "10.0.10",
+                    "Microsoft.Extensions.Diagnostics.HealthChecks": "10.0.10",
+                    "Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions": "10.0.10"
                 }
             },
             "Microsoft.Extensions.FileProviders.Abstractions": {
                 "type": "Transitive",
-                "resolved": "10.0.0",
-                "contentHash": "/ppSdehKk3fuXjlqCDgSOtjRK/pSHU8eWgzSHfHdwVm5BP4Dgejehkw+PtxKG2j98qTDEHDst2Y99aNsmJldmw==",
+                "resolved": "10.0.10",
+                "contentHash": "c5zqFCY9DiIpMovLd7/d/CTiEtrMOuQ639dhv3PABtKQIKNQikSHwQt8+N679uii9q+B55lgK28Uv64FOwEu8w==",
                 "dependencies": {
-                    "Microsoft.Extensions.Primitives": "10.0.0"
+                    "Microsoft.Extensions.Primitives": "10.0.10"
                 }
             },
             "Microsoft.Extensions.Hosting.Abstractions": {
                 "type": "Transitive",
-                "resolved": "10.0.0",
-                "contentHash": "KrN6TGFwCwqOkLLk/idW/XtDQh+8In+CL9T4M1Dx+5ScsjTq4TlVbal8q532m82UYrMr6RiQJF2HvYCN0QwVsA==",
+                "resolved": "10.0.10",
+                "contentHash": "5LugpYGHk+mkn0a8IZgcyfBca8PCTAU9RQFoMrTdtOOidq88M2SI5f3px6ugnzgxC+eTkvYYJi8pzlUnG5xdAQ==",
                 "dependencies": {
-                    "Microsoft.Extensions.Configuration.Abstractions": "10.0.0",
-                    "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0",
-                    "Microsoft.Extensions.Diagnostics.Abstractions": "10.0.0",
-                    "Microsoft.Extensions.FileProviders.Abstractions": "10.0.0",
-                    "Microsoft.Extensions.Logging.Abstractions": "10.0.0"
+                    "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+                    "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10",
+                    "Microsoft.Extensions.Diagnostics.Abstractions": "10.0.10",
+                    "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+                    "Microsoft.Extensions.Logging.Abstractions": "10.0.10"
                 }
             },
             "Microsoft.Extensions.Logging": {
@@ -465,6 +491,14 @@
                     "OpenTelemetry": "1.17.0"
                 }
             },
+            "OpenTelemetry.Exporter.Prometheus.AspNetCore": {
+                "type": "Transitive",
+                "resolved": "1.17.0-beta.1",
+                "contentHash": "eecXu43HkY7LFJDutrQ6kpwvUOMDeqLMtU+UeN225ckXw33qN/StTcdW6mTHH1jDSYdFM29vvDXB3jnFwPHkXg==",
+                "dependencies": {
+                    "OpenTelemetry": "[1.17.0, 2.0.0)"
+                }
+            },
             "OpenTelemetry.Extensions.Hosting": {
                 "type": "Transitive",
                 "resolved": "1.17.0",
@@ -538,6 +572,7 @@
                     "Microsoft.EntityFrameworkCore.Abstractions": "[10.0.10, )",
                     "Microsoft.EntityFrameworkCore.Analyzers": "[10.0.10, )",
                     "Microsoft.EntityFrameworkCore.Relational": "[10.0.10, )",
+                    "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": "[10.0.10, )",
                     "Microsoft.OpenApi": "[2.11.0, )",
                     "Npgsql": "[10.0.3, )",
                     "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
@@ -545,6 +580,7 @@
                     "OpenTelemetry.Api": "[1.17.0, )",
                     "OpenTelemetry.Exporter.Console": "[1.17.0, )",
                     "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.17.0, )",
+                    "OpenTelemetry.Exporter.Prometheus.AspNetCore": "[1.17.0-beta.1, )",
                     "OpenTelemetry.Extensions.Hosting": "[1.17.0, )",
                     "OpenTelemetry.Instrumentation.AspNetCore": "[1.17.0, )",
                     "OpenTelemetry.Instrumentation.EntityFrameworkCore": "[1.17.0-beta.1, )",
