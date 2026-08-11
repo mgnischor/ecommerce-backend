@@ -125,11 +125,11 @@ public sealed class WafMiddleware
         "dirbuster",
         "gobuster",
         "joomscan",
-        "crawler",
-        "mozilla/4.0 (compatible; msie 6.0",
         "zgrab",
         "nuclei",
         "hydra",
+        "whatweb",
+        "fimap",
     };
 
     private readonly RequestDelegate _next;
