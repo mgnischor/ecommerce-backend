@@ -33,15 +33,16 @@ if ($null -ne $propertyGroup) {
     $propertyGroup.Version = $version
     $propertyGroup.AssemblyVersion = "$version.0"
     $propertyGroup.FileVersion = "$version.0"
-    
+
     if ($version.Contains("-")) {
         $propertyGroup.InformationalVersion = $version
     } else {
         $propertyGroup.InformationalVersion = "$version-dev"
     }
-    
+
     $csproj.Save((Resolve-Path $CsprojFile).Path)
     Write-Host "Version updated successfully!" -ForegroundColor Green
+    exit 0
 } else {
     Write-Host "ERROR: Could not find PropertyGroup in project file" -ForegroundColor Red
     exit 1
