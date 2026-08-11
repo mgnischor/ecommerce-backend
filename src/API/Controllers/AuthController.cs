@@ -84,6 +84,11 @@ public sealed class AuthController : ControllerBase
     private readonly ILoggingService _logger;
 
     /// <summary>
+    /// Service for recording security audit events
+    /// </summary>
+    private readonly ISecurityAuditService _auditService;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="AuthController"/> class
     /// </summary>
     /// <param name="userRepository">
@@ -114,7 +119,8 @@ public sealed class AuthController : ControllerBase
         IUserRepository userRepository,
         IJwtService jwtService,
         IPasswordService passwordService,
-        ILoggingService logger
+        ILoggingService logger,
+        ISecurityAuditService auditService
     )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
@@ -122,6 +128,7 @@ public sealed class AuthController : ControllerBase
         _passwordService =
             passwordService ?? throw new ArgumentNullException(nameof(passwordService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _auditService = auditService ?? throw new ArgumentNullException(nameof(auditService));
     }
 
     /// <summary>
@@ -283,6 +290,13 @@ public sealed class AuthController : ControllerBase
                 ipAddress,
                 Math.Ceiling(lockTimeRemaining)
             );
+            _auditService.Record(
+                "Authentication",
+                "Warning",
+                $"Login blocked - account locked (user {user.Id})",
+                ipAddress,
+                userAgent
+            );
             return Unauthorized(
                 new
                 {
@@ -317,6 +331,13 @@ public sealed class AuthController : ControllerBase
                         ipAddress,
                         user.FailedLoginAttempts
                     );
+                    _auditService.Record(
+                        "Authentication",
+                        "Warning",
+                        $"Account locked after {user.FailedLoginAttempts} failed login attempts (user {user.Id})",
+                        ipAddress,
+                        userAgent
+                    );
                 }
 
                 _userRepository.Update(user);
@@ -329,6 +350,14 @@ public sealed class AuthController : ControllerBase
             _logger.LogWarning(
                 "Login failed - Invalid credentials. EmailHash: {EmailHash}, IP: {IpAddress}, UserAgent: {UserAgent}",
                 emailHash,
+                ipAddress,
+                userAgent
+            );
+
+            _auditService.Record(
+                "Authentication",
+                "Warning",
+                "Login failed - invalid credentials",
                 ipAddress,
                 userAgent
             );
@@ -346,6 +375,13 @@ public sealed class AuthController : ControllerBase
                 user.IsActive,
                 user.IsBanned,
                 user.IsDeleted
+            );
+            _auditService.Record(
+                "Authentication",
+                "Warning",
+                $"Login blocked - account not active (user {user.Id})",
+                ipAddress,
+                userAgent
             );
             return Unauthorized(new { Message = "User account is not active" });
         }
