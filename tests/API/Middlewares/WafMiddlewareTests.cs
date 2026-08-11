@@ -203,6 +203,22 @@ public class WafMiddlewareTests
     }
 
     [Test]
+    public async Task InvokeAsync_WithEncodedSqlInjection_ReturnsForbidden()
+    {
+        // Arrange - decodes to: ' or '1'='1
+        var middleware = CreateMiddlewareWithNext();
+        _httpContext.Request.Path = "/api/v1/products";
+        _httpContext.Request.QueryString = new QueryString("?q=%27%20or%20%271%27%3D%271");
+
+        // Act
+        await middleware.InvokeAsync(_httpContext, _mockAuditService.Object);
+
+        // Assert
+        _httpContext.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+        _mockNext.Verify(n => n(_httpContext), Times.Never);
+    }
+
+    [Test]
     public async Task InvokeAsync_WithOversizedBody_ReturnsPayloadTooLarge()
     {
         // Arrange
