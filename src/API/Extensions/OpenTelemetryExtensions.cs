@@ -133,7 +133,9 @@ public static class OpenTelemetryExtensions
                     // Add HTTP Client metrics
                     .AddHttpClientInstrumentation()
                     // Add .NET Runtime metrics (GC, thread pool, etc.)
-                    .AddRuntimeInstrumentation();
+                    .AddRuntimeInstrumentation()
+                    // Expose metrics for Prometheus scraping at /metrics
+                    .AddPrometheusExporter();
 
                 // Add console exporter for development
                 if (enableConsoleExporter)
