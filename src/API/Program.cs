@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using System.Threading.RateLimiting;
 using ECommerce.API.Extensions;
@@ -15,7 +16,16 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using OpenTelemetry.Metrics;
 using Scalar.AspNetCore;
+
+// CLI mode: generate a strong JWT signing secret and exit.
+// Usage: dotnet run -- --generate-jwt-secret
+if (args.Any(a => a.Equals("--generate-jwt-secret", StringComparison.OrdinalIgnoreCase)))
+{
+    Console.WriteLine(JwtSecretGenerator.GenerateSecret());
+    return;
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +80,36 @@ builder.Services.AddScoped<ILoggingService, LoggingService>();
 // Register accounting query services
 builder.Services.AddScoped<IAccountingQueryService, AccountingQueryService>();
 
+// Configure HTTPS with optional self-signed certificate support (development / internal use).
+// When "Certificates:Enabled" is true, Kestrel listens on both HTTP and HTTPS ports using the
+// configured PFX (auto-generated self-signed when it does not exist yet).
+var certificatesSection = builder.Configuration.GetSection("Certificates");
+if (certificatesSection.GetValue<bool>("Enabled"))
+{
+    var certPath = certificatesSection["Path"] ?? "certs/ecommerce.pfx";
+    var certPassword = certificatesSection["Password"];
+    var certHost = certificatesSection["Host"] ?? "localhost";
+    var daysValid = certificatesSection.GetValue("DaysValid", 365);
+    var httpPort = certificatesSection.GetValue(
+        "HttpPort",
+        builder.Environment.IsDevelopment() ? 5049 : 80
+    );
+    var httpsPort = certificatesSection.GetValue("HttpsPort", 8443);
+
+    var certificate = CertificateGenerator.LoadOrCreate(
+        certPath,
+        certPassword,
+        certHost,
+        daysValid
+    );
+
+    builder.WebHost.ConfigureKestrel(kestrel =>
+    {
+        kestrel.Listen(IPAddress.Any, httpPort);
+        kestrel.Listen(IPAddress.Any, httpsPort, listen => listen.UseHttps(certificate));
+    });
+}
+
 // Register services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
@@ -80,6 +120,15 @@ builder.Services.AddScoped<
 >();
 builder.Services.AddScoped<IFinancialService, FinancialService>();
 builder.Services.AddScoped<IPaymentGatewayService, FictitiousPaymentGatewayService>();
+
+// Register security audit service
+builder.Services.AddScoped<ISecurityAuditService, SecurityAuditService>();
+
+// Register database backup and disaster recovery service (hosted + on-demand)
+builder.Services.AddSingleton<IDatabaseBackupService, DatabaseBackupService>();
+builder.Services.AddHostedService(sp =>
+    (DatabaseBackupService)sp.GetRequiredService<IDatabaseBackupService>()
+);
 
 // Configure JWT Authentication
 var jwtSecretKey =
@@ -95,6 +144,19 @@ var jwtAudience =
 if (Encoding.UTF8.GetByteCount(jwtSecretKey) < 32)
 {
     throw new InvalidOperationException("JWT SecretKey must be at least 256 bits (32 bytes) long.");
+}
+
+var jwtSecretValidation = JwtSecretGenerator.ValidateSecret(
+    jwtSecretKey,
+    builder.Environment.IsDevelopment()
+);
+if (!jwtSecretValidation.IsValid)
+{
+    throw new InvalidOperationException(jwtSecretValidation.Error);
+}
+else if (jwtSecretValidation.Warning is not null)
+{
+    Console.WriteLine($"[WARNING] {jwtSecretValidation.Warning}");
 }
 
 builder
@@ -193,6 +255,11 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+// Configure health checks (liveness / readiness)
+builder
+    .Services.AddHealthChecks()
+    .AddDbContextCheck<PostgresqlContext>("database", tags: ["ready"]);
+
 var app = builder.Build();
 
 // Trust X-Forwarded-For / X-Forwarded-Proto from the immediate upstream proxy.
@@ -211,7 +278,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-// Global middleware order: security headers first, then exception handling
+// Global middleware order:
+// 1. WAF (request filtering) - after forwarded headers so the real client IP is visible
+// 2. Security headers
+// 3. Exception handling
+app.UseMiddleware<ECommerce.API.Middlewares.WafMiddleware>();
 app.UseMiddleware<ECommerce.API.Middlewares.SecurityHeadersMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
@@ -282,4 +353,25 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Health checks:
+// - /health/live : liveness probe (process is up)
+// - /health/ready: readiness probe (database reachable)
+// - /health     : full health report
+app.MapHealthChecks(
+    "/health/live",
+    new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions { Predicate = _ => false }
+);
+app.MapHealthChecks(
+    "/health/ready",
+    new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+    {
+        Predicate = check => check.Tags.Contains("ready"),
+    }
+);
+app.MapHealthChecks("/health");
+
+// Prometheus metrics scraping endpoint
+app.MapPrometheusScrapingEndpoint("/metrics");
+
 app.Run();
