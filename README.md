@@ -50,7 +50,7 @@ The **E-Commerce Backend API** is a robust, scalable solution designed for moder
 ✅ **Enterprise Observability** - Full OpenTelemetry integration for distributed tracing and metrics
 ✅ **Production Ready** - Docker support, health checks, graceful shutdown, structured logging
 ✅ **Developer Experience** - Interactive API documentation with Scalar UI, automated database seeding
-✅ **Security First** - JWT authentication, role-based authorization, password hashing with BCrypt
+✅ **Security First** - JWT authentication, role-based authorization, password hashing with PBKDF2
 
 ---
 
@@ -61,7 +61,7 @@ The **E-Commerce Backend API** is a robust, scalable solution designed for moder
 - **Authentication & Authorization**
     - JWT-based authentication with configurable expiration
     - Role-based access control (Admin, Manager, Customer)
-    - Password hashing using BCrypt
+    - Password hashing using PBKDF2
     - Token refresh and validation
 
 - **Product Management**
@@ -76,7 +76,7 @@ The **E-Commerce Backend API** is a robust, scalable solution designed for moder
     - Automatic double-entry accounting for all inventory movements
     - Transaction types: Purchase, Sale, Return, Adjustment, Loss, Transfer
     - Full audit trail with traceability
-    - Chart of accounts seeded with 40+ predefined accounts
+    - Chart of accounts seeded with 37+ predefined accounts
     - Financial reports support (COGS, Trial Balance, Income Statement)
 
 - **Business Rules Engine**
@@ -222,17 +222,17 @@ The solution follows **Clean Architecture** principles with four distinct layers
 ### Authentication & Security
 
 - **JWT Bearer Authentication** - Stateless authentication
-- **BCrypt** - Password hashing
+- **PBKDF2** - Password hashing
 - **Role-Based Authorization** - Fine-grained access control
 
 ### API Documentation
 
 - **Microsoft.AspNetCore.OpenApi** - OpenAPI 3.0 specification
-- **Scalar.AspNetCore 2.12** - Modern, interactive API documentation UI
+- **Scalar.AspNetCore 2.16** - Modern, interactive API documentation UI
 
 ### Observability & Monitoring
 
-- **OpenTelemetry 1.15** - Distributed tracing and metrics
+- **OpenTelemetry 1.17** - Distributed tracing and metrics
 - **OpenTelemetry.Instrumentation.AspNetCore** - HTTP request tracing
 - **OpenTelemetry.Instrumentation.EntityFrameworkCore** - Database query tracing
 - **OpenTelemetry.Instrumentation.Http** - HTTP client tracing
@@ -391,8 +391,8 @@ cd scripts
 
 On first run, an admin user is automatically seeded:
 
-- **Email**: `admin@ecommerce.com.br`
-- **Password**: `admin`
+- **Email**: `admin@ecommerce.local`
+- **Password**: `ChangeMe!Dev#2026` (development only — change immediately in production!)
 
 > ⚠️ **Important**: Change these credentials immediately in production!
 
@@ -494,7 +494,7 @@ $env:Jwt__ExpirationMinutes = "60"
 {
     "OpenTelemetry": {
         "ServiceName": "ECommerce.Backend",
-        "ServiceVersion": "0.1.21",
+        "ServiceVersion": "0.1.25",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": ""
     }
@@ -505,7 +505,7 @@ $env:Jwt__ExpirationMinutes = "60"
 
 ```powershell
 $env:OpenTelemetry__ServiceName = "ECommerce.Backend"
-$env:OpenTelemetry__ServiceVersion = "0.1.21"
+$env:OpenTelemetry__ServiceVersion = "0.1.25"
 $env:OpenTelemetry__EnableConsoleExporter = "true"
 $env:OpenTelemetry__OtlpEndpoint = "http://localhost:4317"
 ```
@@ -561,11 +561,11 @@ dotnet ef migrations remove
 The application automatically seeds the database on first run:
 
 1. **Admin User**
-    - Email: `admin@ecommerce.com.br`
-    - Password: `admin`
+    - Email: `admin@ecommerce.local`
+    - Password: `ChangeMe!Dev#2026`
     - Role: Admin
 
-2. **Chart of Accounts** (40+ accounts)
+2. **Chart of Accounts** (37+ accounts)
     - Assets (Cash, Bank, Inventory, Receivables)
     - Liabilities (Payables, Loans, Taxes)
     - Equity (Capital, Retained Earnings)
@@ -601,8 +601,8 @@ POST /api/v1/login
 Content-Type: application/json
 
 {
-  "email": "admin@ecommerce.com.br",
-  "password": "admin"
+  "email": "admin@ecommerce.local",
+  "password": "ChangeMe!Dev#2026"
 }
 ```
 
@@ -614,7 +614,7 @@ Content-Type: application/json
     "expiresIn": 3600,
     "tokenType": "Bearer",
     "userId": "...",
-    "email": "admin@ecommerce.com.br",
+    "email": "admin@ecommerce.local",
     "accessLevel": "Admin"
 }
 ```
@@ -789,62 +789,62 @@ Content-Type: application/json
 
 ### Gift Card Endpoints
 
-| Method | Endpoint                            | Description                     | Auth                   |
-| ------ | ----------------------------------- | ------------------------------- | ---------------------- |
-| GET    | `/giftcards/{id}`                   | Get gift card by ID             | Yes                    |
-| GET    | `/giftcards/number/{cardNumber}`    | Get gift card by number         | Yes                    |
-| POST   | `/giftcards`                        | Create a gift card              | Admin/Manager/Developer |
-| PUT    | `/giftcards/{id}`                   | Update a gift card              | Admin/Manager/Developer |
-| POST   | `/giftcards/{id}/redeem`            | Redeem from gift card balance   | Admin/Manager/Developer |
-| POST   | `/giftcards/{id}/reload`            | Reload a gift card balance      | Admin/Manager/Developer |
-| DELETE | `/giftcards/{id}`                   | Delete a gift card              | Admin/Manager/Developer |
+| Method | Endpoint                         | Description                   | Auth                    |
+| ------ | -------------------------------- | ----------------------------- | ----------------------- |
+| GET    | `/giftcards/{id}`                | Get gift card by ID           | Yes                     |
+| GET    | `/giftcards/number/{cardNumber}` | Get gift card by number       | Yes                     |
+| POST   | `/giftcards`                     | Create a gift card            | Admin/Manager/Developer |
+| PUT    | `/giftcards/{id}`                | Update a gift card            | Admin/Manager/Developer |
+| POST   | `/giftcards/{id}/redeem`         | Redeem from gift card balance | Admin/Manager/Developer |
+| POST   | `/giftcards/{id}/reload`         | Reload a gift card balance    | Admin/Manager/Developer |
+| DELETE | `/giftcards/{id}`                | Delete a gift card            | Admin/Manager/Developer |
 
 ### Rewards Endpoints
 
-| Method | Endpoint                       | Description                        | Auth                   |
-| ------ | ------------------------------ | ---------------------------------- | ---------------------- |
-| GET    | `/rewards/{id}`                | Get loyalty account by ID          | Yes                    |
-| GET    | `/rewards/customer/{customerId}` | Get loyalty account for a customer | Yes                    |
-| GET    | `/rewards/{id}/value`          | Get reward value for point balance | Yes                    |
-| POST   | `/rewards`                     | Create a loyalty account           | Admin/Manager/Developer |
-| PUT    | `/rewards/{id}`                | Update a loyalty account           | Admin/Manager/Developer |
-| POST   | `/rewards/{id}/earn`           | Earn points on an account          | Admin/Manager/Developer |
-| POST   | `/rewards/{id}/redeem`         | Redeem points for a reward         | Admin/Manager/Developer |
-| DELETE | `/rewards/{id}`                | Delete a loyalty account           | Admin/Manager/Developer |
+| Method | Endpoint                         | Description                        | Auth                    |
+| ------ | -------------------------------- | ---------------------------------- | ----------------------- |
+| GET    | `/rewards/{id}`                  | Get loyalty account by ID          | Yes                     |
+| GET    | `/rewards/customer/{customerId}` | Get loyalty account for a customer | Yes                     |
+| GET    | `/rewards/{id}/value`            | Get reward value for point balance | Yes                     |
+| POST   | `/rewards`                       | Create a loyalty account           | Admin/Manager/Developer |
+| PUT    | `/rewards/{id}`                  | Update a loyalty account           | Admin/Manager/Developer |
+| POST   | `/rewards/{id}/earn`             | Earn points on an account          | Admin/Manager/Developer |
+| POST   | `/rewards/{id}/redeem`           | Redeem points for a reward         | Admin/Manager/Developer |
+| DELETE | `/rewards/{id}`                  | Delete a loyalty account           | Admin/Manager/Developer |
 
 ### Invoice Endpoints
 
-| Method | Endpoint                        | Description                     | Auth                   |
-| ------ | ------------------------------- | ------------------------------- | ---------------------- |
-| GET    | `/invoices/{id}`                | Get invoice by ID               | Yes                    |
-| GET    | `/invoices/number/{invoiceNumber}` | Get invoice by number           | Yes                    |
-| POST   | `/invoices`                     | Create an invoice               | Admin/Manager/Developer |
-| PUT    | `/invoices/{id}`                | Update an invoice               | Admin/Manager/Developer |
-| POST   | `/invoices/{id}/pay`            | Record an invoice payment       | Admin/Manager/Developer |
-| POST   | `/invoices/{id}/credit-note`    | Issue a credit note             | Admin/Manager/Developer |
-| DELETE | `/invoices/{id}`                | Delete an invoice               | Admin/Manager/Developer |
+| Method | Endpoint                           | Description               | Auth                    |
+| ------ | ---------------------------------- | ------------------------- | ----------------------- |
+| GET    | `/invoices/{id}`                   | Get invoice by ID         | Yes                     |
+| GET    | `/invoices/number/{invoiceNumber}` | Get invoice by number     | Yes                     |
+| POST   | `/invoices`                        | Create an invoice         | Admin/Manager/Developer |
+| PUT    | `/invoices/{id}`                   | Update an invoice         | Admin/Manager/Developer |
+| POST   | `/invoices/{id}/pay`               | Record an invoice payment | Admin/Manager/Developer |
+| POST   | `/invoices/{id}/credit-note`       | Issue a credit note       | Admin/Manager/Developer |
+| DELETE | `/invoices/{id}`                   | Delete an invoice         | Admin/Manager/Developer |
 
 ### Customer Endpoints
 
-| Method | Endpoint               | Description                            | Auth                   |
-| ------ | ---------------------- | -------------------------------------- | ---------------------- |
-| GET    | `/customers/{id}`      | Get customer by ID                     | Yes                    |
-| GET    | `/customers/user/{userId}` | Get customer by user ID                | Yes                    |
-| GET    | `/customers/{id}/segment` | Get customer segmentation analysis     | Yes                    |
-| POST   | `/customers`           | Create a customer                      | Admin/Manager/Developer |
-| PUT    | `/customers/{id}`      | Update a customer                      | Admin/Manager/Developer |
-| DELETE | `/customers/{id}`      | Delete a customer                      | Admin/Manager/Developer |
+| Method | Endpoint                   | Description                        | Auth                    |
+| ------ | -------------------------- | ---------------------------------- | ----------------------- |
+| GET    | `/customers/{id}`          | Get customer by ID                 | Yes                     |
+| GET    | `/customers/user/{userId}` | Get customer by user ID            | Yes                     |
+| GET    | `/customers/{id}/segment`  | Get customer segmentation analysis | Yes                     |
+| POST   | `/customers`               | Create a customer                  | Admin/Manager/Developer |
+| PUT    | `/customers/{id}`          | Update a customer                  | Admin/Manager/Developer |
+| DELETE | `/customers/{id}`          | Delete a customer                  | Admin/Manager/Developer |
 
 ### Inventory Planning Endpoints
 
-| Method | Endpoint                              | Description                           | Auth                   |
-| ------ | ------------------------------------- | ------------------------------------- | ---------------------- |
-| GET    | `/inventory-planning/{id}`            | Get inventory plan by ID              | Yes                    |
-| GET    | `/inventory-planning/product/{productId}` | Get inventory plan for a product   | Yes                    |
-| GET    | `/inventory-planning/{id}/analysis`   | Get forecasting and stock analysis    | Yes                    |
-| POST   | `/inventory-planning`                 | Create an inventory plan              | Admin/Manager/Developer |
-| PUT    | `/inventory-planning/{id}`            | Update an inventory plan              | Admin/Manager/Developer |
-| DELETE | `/inventory-planning/{id}`            | Delete an inventory plan              | Admin/Manager/Developer |
+| Method | Endpoint                                  | Description                        | Auth                    |
+| ------ | ----------------------------------------- | ---------------------------------- | ----------------------- |
+| GET    | `/inventory-planning/{id}`                | Get inventory plan by ID           | Yes                     |
+| GET    | `/inventory-planning/product/{productId}` | Get inventory plan for a product   | Yes                     |
+| GET    | `/inventory-planning/{id}/analysis`       | Get forecasting and stock analysis | Yes                     |
+| POST   | `/inventory-planning`                     | Create an inventory plan           | Admin/Manager/Developer |
+| PUT    | `/inventory-planning/{id}`                | Update an inventory plan           | Admin/Manager/Developer |
+| DELETE | `/inventory-planning/{id}`                | Delete an inventory plan           | Admin/Manager/Developer |
 
 ### Product Attribute Endpoints
 
@@ -1116,7 +1116,7 @@ Comprehensive documentation is available in the `docs/` directory:
 ### Authentication
 
 - **JWT Bearer Tokens** with configurable expiration
-- **BCrypt password hashing** with salt
+- **PBKDF2 password hashing** with salt
 - **Role-based authorization** (Admin, Manager, Customer)
 
 ### Best Practices
@@ -1127,8 +1127,8 @@ Comprehensive documentation is available in the `docs/` directory:
 ✅ **Input validation** - All DTOs use data annotations
 ✅ **SQL injection protection** - EF Core parameterized queries
 ✅ **CORS configuration** - Configure allowed origins in production
-✅ **Rate limiting** - Implement rate limiting middleware (planned)
-✅ **Security headers** - Add HSTS, CSP, X-Frame-Options (planned)
+✅ **Rate limiting** - Global per-IP limiter + dedicated auth policy for login
+✅ **Security headers** - HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy; CSP (planned)
 
 ### Production Checklist
 
