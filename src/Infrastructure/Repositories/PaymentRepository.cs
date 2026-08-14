@@ -73,11 +73,14 @@ public sealed class PaymentRepository : IPaymentRepository
         CancellationToken cancellationToken = default
     )
     {
-        // Note: PaymentEntity doesn't have UserId directly, need to join with Orders
-        // For now, returning empty list - should be implemented with proper join
+        _logger.LogInformation("Getting payments for user: {UserId}", userId);
+
+        // PaymentEntity has no UserId directly; link through Orders by customer/user.
+        var orderIds = _context.Orders.Where(o => o.CustomerId == userId).Select(o => o.Id);
+
         return await _context
             .Payments.AsNoTracking()
-            .Where(p => false) // Placeholder - needs proper implementation with order join
+            .Where(p => orderIds.Contains(p.OrderId))
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync(cancellationToken);
     }
