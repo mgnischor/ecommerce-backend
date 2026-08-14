@@ -349,8 +349,8 @@
             },
             "Microsoft.OpenApi": {
                 "type": "Transitive",
-                "resolved": "2.0.0",
-                "contentHash": "GGYLfzV/G/ct80OZ45JxnWP7NvMX1BCugn/lX7TH5o0lcVaviavsLMTxmFV2AybXWjbi3h6FF1vgZiTK6PXndw=="
+                "resolved": "2.7.5",
+                "contentHash": "0FA67RSnRM4tcBKqiqVu/HPdZ9+QOKbmeRjxRUGTCjPU4C0bmUhd97Dso7Yild5P7nOV6GxJ2xrK0Kv/O9xp0w=="
             },
             "Microsoft.Testing.Extensions.Telemetry": {
                 "type": "Transitive",
@@ -538,6 +538,7 @@
                     "Microsoft.EntityFrameworkCore.Abstractions": "[10.0.10, )",
                     "Microsoft.EntityFrameworkCore.Analyzers": "[10.0.10, )",
                     "Microsoft.EntityFrameworkCore.Relational": "[10.0.10, )",
+                    "Microsoft.OpenApi": "[2.7.5, )",
                     "Npgsql": "[10.0.3, )",
                     "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
                     "OpenTelemetry": "[1.17.0, )",
