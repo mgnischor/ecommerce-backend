@@ -3,6 +3,18 @@
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot\..
 
+# Resolve the backend project directory so this script works from either
+# repository of the stack (ecommerce-backend or ecommerce-frontend).
+if (-not (Test-Path "ECommerce.Backend.csproj")) {
+    $backendSibling = Join-Path (Get-Location).Path "ecommerce-backend"
+    if (Test-Path (Join-Path $backendSibling "ECommerce.Backend.csproj")) {
+        Set-Location $backendSibling
+    } else {
+        Write-Host "ERROR: ECommerce.Backend.csproj not found in this repository or in ..\ecommerce-backend" -ForegroundColor Red
+        exit 1
+    }
+}
+
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host " Migration SQL Script Generator" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan

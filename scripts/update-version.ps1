@@ -8,6 +8,15 @@ param(
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot\..
 
+# Resolve the backend project directory so this script works from either
+# repository of the stack (ecommerce-backend or ecommerce-frontend).
+if (-not (Test-Path $CsprojFile)) {
+    $backendSibling = Join-Path (Get-Location).Path "ecommerce-backend"
+    if (Test-Path (Join-Path $backendSibling $CsprojFile)) {
+        Set-Location $backendSibling
+    }
+}
+
 if (-not (Test-Path $VersionFile)) {
     Write-Host "ERROR: Version file not found: $VersionFile" -ForegroundColor Red
     exit 1

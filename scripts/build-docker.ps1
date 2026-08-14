@@ -1,185 +1,59 @@
 #!/usr/bin/env pwsh
 
+param(
+    [switch]$Dev,
+    [switch]$NoBuild
+)
+
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot\..
 
+$composeFile = if ($Dev) { "docker-compose.dev.yml" } else { "docker-compose.yml" }
+$stack = if ($Dev) { "desenvolvimento" } else { "produção" }
+
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host " Docker Build and Run Script" -ForegroundColor Cyan
+Write-Host " E-Commerce Docker Build ($stack)" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host ""
 
-Write-Host "[1/5] Cleaning up existing containers..." -ForegroundColor Yellow
-docker rm -f ecommerce-backend-dev 2>$null
-docker rm -f ecommerce-backend-prod 2>$null
-docker rm -f ecommerce-postgres 2>$null
-Write-Host ""
-
-Write-Host "[2/5] Creating Docker network..." -ForegroundColor Yellow
-$networkExists = docker network ls --filter name=ecommerce-network --format "{{.Name}}"
-if ($networkExists -eq "ecommerce-network") {
-    Write-Host "Network already exists" -ForegroundColor Green
-} else {
-    # Label the network so Docker Compose recognizes it as its own
-    # (avoids "incorrect label com.docker.compose.network" errors).
-    docker network create ecommerce-network --label com.docker.compose.network=ecommerce-network
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "Network created successfully" -ForegroundColor Green
-    } else {
-        Write-Host "ERROR: Failed to create network" -ForegroundColor Red
+if (-not $NoBuild) {
+    Write-Host "Building images..." -ForegroundColor Yellow
+    docker compose -f $composeFile build
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "ERROR: Docker build failed" -ForegroundColor Red
         exit 1
     }
-}
-Write-Host ""
-
-Write-Host "[3/5] Starting PostgreSQL container..." -ForegroundColor Yellow
-docker run -d `
-  --name ecommerce-postgres `
-  --network ecommerce-network `
-  -e POSTGRES_USER=ecommerce `
-  -e POSTGRES_PASSWORD=ecommerce `
-  -e POSTGRES_DB=ecommerce `
-  -p 5432:5432 `
-  postgres:18-alpine
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Failed to start PostgreSQL container" -ForegroundColor Red
-    exit 1
+    Write-Host ""
 }
 
-Write-Host "Waiting for PostgreSQL to be ready..." -ForegroundColor Cyan
-Start-Sleep -Seconds 5
-Write-Host "PostgreSQL is ready" -ForegroundColor Green
-Write-Host ""
-
-Write-Host "[4/5] Building Docker images..." -ForegroundColor Yellow
-Write-Host "Building development image..." -ForegroundColor Cyan
-docker build --target development --build-arg BUILD_DEVELOPMENT=1 -t ecommerce-backend:dev .
+Write-Host "Starting stack ($stack)..." -ForegroundColor Yellow
+docker compose -f $composeFile up -d
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Development build failed" -ForegroundColor Red
+    Write-Host "ERROR: Failed to start stack" -ForegroundColor Red
     exit 1
 }
 
 Write-Host ""
-Write-Host "Building production image..." -ForegroundColor Cyan
-docker build --target production --build-arg BUILD_DEVELOPMENT=0 -t ecommerce-backend:prod .
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Production build failed" -ForegroundColor Red
-    exit 1
-}
-Write-Host ""
-
-Write-Host "[5/6] Starting application containers..." -ForegroundColor Yellow
-Write-Host "Starting development container..." -ForegroundColor Cyan
-docker run -d `
-  --name ecommerce-backend-dev `
-  --network ecommerce-network `
-  -e ASPNETCORE_ENVIRONMENT=Development `
-  -e "ConnectionStrings__DefaultConnection=Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432" `
-  -e Jwt__SecretKey="dev-only-secret-key-not-for-production-use-please-rotate-32chars-min" `
-  -e Jwt__Issuer=ECommerceBackend `
-  -e Jwt__Audience=ECommerceClient `
-  -e OpenTelemetry__ServiceName=ECommerce.Backend.Dev `
-  -e OpenTelemetry__OtlpEndpoint=http://localhost:4317 `
-  -p 5049:5049 `
-  ecommerce-backend:dev
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Failed to start development container" -ForegroundColor Red
-    exit 1
-}
-
-Write-Host ""
-Write-Host "Starting production container..." -ForegroundColor Cyan
-docker run -d `
-  --name ecommerce-backend-prod `
-  --network ecommerce-network `
-  -e ASPNETCORE_ENVIRONMENT=Production `
-  -e "ConnectionStrings__DefaultConnection=Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432" `
-  -e Jwt__SecretKey="CHANGE-ME-prod-jwt-secret-2026-RotateNow-32chars+" `
-  -e Jwt__Issuer=ECommerceBackend `
-  -e Jwt__Audience=ECommerceClient `
-  -e OpenTelemetry__ServiceName=ECommerce.Backend `
-  -e OpenTelemetry__OtlpEndpoint=http://localhost:4317 `
-  -p 8080:80 `
-  ecommerce-backend:prod
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Failed to start production container" -ForegroundColor Red
-    exit 1
-}
-
-Write-Host ""
-Write-Host "[6/6] Applying database migrations..." -ForegroundColor Yellow
-Write-Host "Waiting for containers to be fully ready..." -ForegroundColor Cyan
-Start-Sleep -Seconds 3
-
-Write-Host "Creating temporary container for migrations..." -ForegroundColor Cyan
-docker run -d `
-  --name ecommerce-migration-temp `
-  --network ecommerce-network `
-  --entrypoint tail `
-  ecommerce-backend:dev `
-  -f /dev/null
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Failed to create temporary container" -ForegroundColor Red
-    exit 1
-}
-
-Write-Host "Applying migrations to PostgreSQL via temporary container..." -ForegroundColor Cyan
-docker exec ecommerce-migration-temp dotnet ef database update `
-  --project /src/ECommerce.Backend.csproj `
-  --context PostgresqlContext `
-  --connection "Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432"
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host ""
-    Write-Host "WARNING: Failed to apply database migrations" -ForegroundColor Yellow
-    Write-Host "Cleaning up temporary container..." -ForegroundColor Yellow
-    docker rm -f ecommerce-migration-temp 2>$null
-    Write-Host ""
-    Write-Host "The containers are running but database update failed." -ForegroundColor Yellow
-    Write-Host "You can try running migrations manually with:" -ForegroundColor White
-    Write-Host "  docker run -d --name ecommerce-migration-temp --network ecommerce-network --entrypoint tail ecommerce-backend:dev -f /dev/null" -ForegroundColor Gray
-    Write-Host "  docker exec ecommerce-migration-temp dotnet ef database update --project /src/ECommerce.Backend.csproj --context PostgresqlContext --connection 'Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432'" -ForegroundColor Gray
-    Write-Host "  docker rm -f ecommerce-migration-temp" -ForegroundColor Gray
-    Write-Host ""
-} else {
-    Write-Host "Database migrations applied successfully!" -ForegroundColor Green
-    Write-Host "Cleaning up temporary container..." -ForegroundColor Cyan
-    docker rm -f ecommerce-migration-temp 2>$null
-    Write-Host ""
-    Write-Host "Restarting backend containers to apply seeders..." -ForegroundColor Cyan
-    docker restart ecommerce-backend-dev ecommerce-backend-prod
-    Write-Host ""
-    Write-Host "Waiting for containers to restart..." -ForegroundColor Cyan
-    Start-Sleep -Seconds 5
-    Write-Host ""
-}
 Write-Host "====================================" -ForegroundColor Green
-Write-Host " Containers started successfully!" -ForegroundColor Green
+Write-Host " Stack ($stack) is running!" -ForegroundColor Green
 Write-Host "====================================" -ForegroundColor Green
-Write-Host ""
-Write-Host "Running containers:" -ForegroundColor Cyan
-docker ps --filter "name=ecommerce"
 Write-Host ""
 Write-Host "Endpoints:" -ForegroundColor Cyan
-Write-Host "  PostgreSQL:        " -NoNewline -ForegroundColor White
-Write-Host "localhost:5432" -ForegroundColor Yellow
-Write-Host "  Development API:   " -NoNewline -ForegroundColor White
-Write-Host "http://localhost:5049" -ForegroundColor Yellow
-Write-Host "  Production API:    " -NoNewline -ForegroundColor White
+Write-Host "  Frontend:         " -NoNewline -ForegroundColor White
 Write-Host "http://localhost:8080" -ForegroundColor Yellow
+Write-Host "  Backend API:      " -NoNewline -ForegroundColor White
+Write-Host "http://localhost:5049" -ForegroundColor Yellow
+Write-Host "  PostgreSQL:       " -NoNewline -ForegroundColor White
+Write-Host "localhost:5432" -ForegroundColor Yellow
+Write-Host "  Jaeger UI:        " -NoNewline -ForegroundColor White
+Write-Host "http://localhost:16686" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Useful commands:" -ForegroundColor Cyan
-Write-Host "  View dev logs:     " -NoNewline -ForegroundColor White
-Write-Host "docker logs -f ecommerce-backend-dev" -ForegroundColor Gray
-Write-Host "  View prod logs:    " -NoNewline -ForegroundColor White
-Write-Host "docker logs -f ecommerce-backend-prod" -ForegroundColor Gray
-Write-Host "  View DB logs:      " -NoNewline -ForegroundColor White
-Write-Host "docker logs -f ecommerce-postgres" -ForegroundColor Gray
-Write-Host "  Stop all:          " -NoNewline -ForegroundColor White
-Write-Host "docker stop ecommerce-backend-dev ecommerce-backend-prod ecommerce-postgres" -ForegroundColor Gray
-Write-Host "  Remove all:        " -NoNewline -ForegroundColor White
-Write-Host "docker rm -f ecommerce-backend-dev ecommerce-backend-prod ecommerce-postgres" -ForegroundColor Gray
+Write-Host "  View logs:      " -NoNewline -ForegroundColor White
+Write-Host "docker compose -f $composeFile logs -f" -ForegroundColor Gray
+Write-Host "  Stop stack:     " -NoNewline -ForegroundColor White
+Write-Host "docker compose -f $composeFile down" -ForegroundColor Gray
+Write-Host "  Stop + volumes: " -NoNewline -ForegroundColor White
+Write-Host "docker compose -f $composeFile down -v" -ForegroundColor Gray
 Write-Host ""
+Write-Host "Cleanup script: .\scripts\cleanup-docker.ps1" -ForegroundColor Cyan

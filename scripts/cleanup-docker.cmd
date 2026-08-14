@@ -1,19 +1,31 @@
 @echo off
+setlocal
+
+set COMPOSE_FILE=docker-compose.yml
+if /i "%1"=="dev" (
+    set COMPOSE_FILE=docker-compose.dev.yml
+    shift
+)
+
+set VOLUMES=
+if /i "%1"=="volumes" (
+    set VOLUMES=-v
+)
+
+cd /d "%~dp0\.."
 
 echo ====================================
-echo  Docker Cleanup Script
+echo  Docker Cleanup
 echo ====================================
 echo.
 
-echo Stopping containers...
-docker stop ecommerce-backend-dev ecommerce-backend-prod ecommerce-postgres 2>nul
-
-echo Removing containers...
-docker rm -f ecommerce-backend-dev ecommerce-backend-prod ecommerce-postgres 2>nul
-
-echo Removing network...
-docker network rm ecommerce-network 2>nul
+echo Stopping and removing stack...
+docker compose -f %COMPOSE_FILE% down %VOLUMES%
 
 echo.
+if defined VOLUMES (
+    echo Volumes removed.
+)
 echo Cleanup completed!
-echo.
+
+endlocal

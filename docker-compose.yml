@@ -1,5 +1,15 @@
+# Unified E-Commerce Docker Compose stack.
+# This file is intentionally IDENTICAL in the ecommerce-backend and
+# ecommerce-frontend repositories: both services are built from the two
+# sibling repositories via relative contexts, so it works from either repo.
+#
+#   Frontend: http://localhost:8080   (nginx reverse-proxies /api/* to the backend)
+#   Backend:  http://localhost:5049   (direct API access / debugging)
+#   Jaeger:   http://localhost:16686
+name: ecommerce
+
 services:
-    # PostgreSQL Database
+    # ── PostgreSQL Database ────────────────────────────────────────────────────
     postgres:
         image: postgres:18-alpine
         container_name: ecommerce-postgres
@@ -10,7 +20,7 @@ services:
         ports:
             - "5432:5432"
         volumes:
-            - postgres-data:/var/lib/postgresql/data
+            - postgres-data:/var/lib/postgresql
         networks:
             - ecommerce-network
         healthcheck:
@@ -18,8 +28,9 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+        restart: unless-stopped
 
-    # Jaeger - Distributed Tracing
+    # ── Jaeger - Distributed Tracing ───────────────────────────────────────────
     jaeger:
         image: jaegertracing/all-in-one:latest
         container_name: ecommerce-jaeger
@@ -28,17 +39,18 @@ services:
             - LOG_LEVEL=debug
         ports:
             - "16686:16686" # Jaeger UI
-            - "4317:4317" # OTLP gRPC receiver
-            - "4318:4318" # OTLP HTTP receiver
+            - "4317:4317"   # OTLP gRPC
+            - "4318:4318"   # OTLP HTTP
             - "14250:14250" # Jaeger gRPC
             - "14268:14268" # Jaeger HTTP
         networks:
             - ecommerce-network
+        restart: unless-stopped
 
-    # E-Commerce Backend API
+    # ── Backend (.NET API) ─────────────────────────────────────────────────────
     ecommerce-backend:
         build:
-            context: .
+            context: ../ecommerce-backend
             dockerfile: Dockerfile
             target: production
             args:
@@ -53,6 +65,12 @@ services:
             - Jwt__SecretKey=${JWT_SECRET_KEY:-CHANGE-ME-prod-jwt-secret-2026-RotateNow-32chars+}
             - Jwt__Issuer=ECommerceBackend
             - Jwt__Audience=ECommerceClient
+            - Cors__AllowedOrigins=http://localhost:8080,https://localhost:8080,http://localhost:5049
+            # Automatic migrations + admin seeding (override ADMIN_EMAIL/ADMIN_PASSWORD in production!)
+            - Database__AutoMigrate=true
+            - Admin__SeedEnabled=true
+            - Admin__Email=${ADMIN_EMAIL:-admin@ecommerce.local}
+            - Admin__Password=${ADMIN_PASSWORD:-ChangeMe!Dev#2026}
             - OpenTelemetry__ServiceName=ECommerce.Backend
             - OpenTelemetry__ServiceVersion=0.1.25
             - OpenTelemetry__EnableConsoleExporter=false
@@ -70,8 +88,8 @@ services:
             - Backup__IntervalHours=24
             - Backup__RetentionDays=7
         ports:
-            - "8080:80"
-            - "8443:8443"
+            - "5049:80"   # API direta/debug; o nginx do frontend usa a rota interna
+            - "8443:8443" # HTTPS (self-signed)
         volumes:
             - ecommerce-backups:/app/backups
             - ecommerce-certs:/app/certs
@@ -79,6 +97,24 @@ services:
             postgres:
                 condition: service_healthy
             jaeger:
+                condition: service_started
+        networks:
+            - ecommerce-network
+        restart: unless-stopped
+
+    # ── Frontend (Angular + nginx) ─────────────────────────────────────────────
+    ecommerce-frontend:
+        build:
+            context: ../ecommerce-frontend
+            dockerfile: Dockerfile
+        container_name: ecommerce-frontend
+        environment:
+            - BACKEND_HOST=ecommerce-backend
+            - BACKEND_PORT=80
+        ports:
+            - "8080:80"
+        depends_on:
+            ecommerce-backend:
                 condition: service_started
         networks:
             - ecommerce-network

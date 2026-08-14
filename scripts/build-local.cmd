@@ -1,7 +1,18 @@
 @echo off
 setlocal enabledelayedexpansion
 
-cd ..
+cd /d "%~dp0\.."
+
+REM Resolve the backend project directory so this script works from either
+REM repository of the stack (ecommerce-backend or ecommerce-frontend).
+if not exist "%CD%\ECommerce.Backend.csproj" (
+    if exist "%CD%\..\ecommerce-backend\ECommerce.Backend.csproj" (
+        cd /d "%CD%\..\ecommerce-backend"
+    ) else (
+        echo ERROR: ECommerce.Backend.csproj not found in this repository or in ..\ecommerce-backend
+        exit /b 1
+    )
+)
 
 echo ====================================
 echo  Ecommerce Backend Build Script

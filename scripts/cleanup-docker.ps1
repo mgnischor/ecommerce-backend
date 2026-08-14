@@ -1,19 +1,27 @@
 #!/usr/bin/env pwsh
 
+param(
+    [switch]$Dev,
+    [switch]$Volumes
+)
+
+$ErrorActionPreference = "Stop"
+Set-Location $PSScriptRoot\..
+
+$composeFile = if ($Dev) { "docker-compose.dev.yml" } else { "docker-compose.yml" }
+$stack = if ($Dev) { "desenvolvimento" } else { "produção" }
+$volumesArg = if ($Volumes) { "-v" } else { "" }
+
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host " Docker Cleanup Script" -ForegroundColor Cyan
+Write-Host " Docker Cleanup ($stack)" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host ""
 
-Write-Host "Stopping containers..." -ForegroundColor Yellow
-docker stop ecommerce-backend-dev ecommerce-backend-prod ecommerce-postgres 2>$null
-
-Write-Host "Removing containers..." -ForegroundColor Yellow
-docker rm -f ecommerce-backend-dev ecommerce-backend-prod ecommerce-postgres 2>$null
-
-Write-Host "Removing network..." -ForegroundColor Yellow
-docker network rm ecommerce-network 2>$null
+Write-Host "Stopping and removing stack ($stack)..." -ForegroundColor Yellow
+docker compose -f $composeFile down $volumesArg
 
 Write-Host ""
+if ($Volumes) {
+    Write-Host "Volumes removed." -ForegroundColor Green
+}
 Write-Host "Cleanup completed!" -ForegroundColor Green
-Write-Host ""

@@ -1,5 +1,15 @@
+# Unified E-Commerce Docker Compose stack (DEVELOPMENT).
+# This file is intentionally IDENTICAL in the ecommerce-backend and
+# ecommerce-frontend repositories (services are built from the two sibling
+# repositories via relative contexts).
+#
+#   Frontend: http://localhost:8080   (nginx reverse-proxies /api/* to the backend)
+#   Backend:  http://localhost:5049   (direct API access / debugging)
+#   Jaeger:   http://localhost:16686
+name: ecommerce-dev
+
 services:
-    # PostgreSQL Database
+    # ── PostgreSQL Database ────────────────────────────────────────────────────
     postgres:
         image: postgres:18-alpine
         container_name: ecommerce-postgres-dev
@@ -10,7 +20,7 @@ services:
         ports:
             - "5432:5432"
         volumes:
-            - postgres-dev-data:/var/lib/postgresql/data
+            - postgres-dev-data:/var/lib/postgresql
         networks:
             - ecommerce-network-dev
         healthcheck:
@@ -18,8 +28,9 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+        restart: unless-stopped
 
-    # Jaeger - Distributed Tracing
+    # ── Jaeger - Distributed Tracing ───────────────────────────────────────────
     jaeger:
         image: jaegertracing/all-in-one:latest
         container_name: ecommerce-jaeger-dev
@@ -28,17 +39,18 @@ services:
             - LOG_LEVEL=debug
         ports:
             - "16686:16686" # Jaeger UI
-            - "4317:4317" # OTLP gRPC receiver
-            - "4318:4318" # OTLP HTTP receiver
+            - "4317:4317"   # OTLP gRPC
+            - "4318:4318"   # OTLP HTTP
             - "14250:14250" # Jaeger gRPC
             - "14268:14268" # Jaeger HTTP
         networks:
             - ecommerce-network-dev
+        restart: unless-stopped
 
-    # E-Commerce Backend API - Development Mode
+    # ── Backend (.NET API) - Development image (SDK + EF tools) ────────────────
     ecommerce-backend-dev:
         build:
-            context: .
+            context: ../ecommerce-backend
             dockerfile: Dockerfile
             target: development
             args:
@@ -47,33 +59,23 @@ services:
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
             - ASPNETCORE_URLS=http://+:5049
+            - ASPNETCORE_HTTP_PORTS=5049
             - ConnectionStrings__DefaultConnection=Host=postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432
             # JWT signing key (override JWT_SECRET_KEY env var if desired)
             - Jwt__SecretKey=${JWT_SECRET_KEY:-dev-only-secret-key-not-for-production-use-please-rotate-32chars-min}
             - Jwt__Issuer=ECommerceBackend
             - Jwt__Audience=ECommerceClient
+            - Cors__AllowedOrigins=http://localhost:8080,http://localhost:4200,http://localhost:5049
+            - Database__AutoMigrate=true
+            - Admin__SeedEnabled=true
+            - Admin__Email=${ADMIN_EMAIL:-admin@ecommerce.local}
+            - Admin__Password=${ADMIN_PASSWORD:-ChangeMe!Dev#2026}
             - OpenTelemetry__ServiceName=ECommerce.Backend.Dev
             - OpenTelemetry__ServiceVersion=0.1.25
             - OpenTelemetry__EnableConsoleExporter=true
             - OpenTelemetry__OtlpEndpoint=http://jaeger:4317
-            # HTTPS with self-signed certificate (auto-generated on first start)
-            - Certificates__Enabled=true
-            - Certificates__Path=/app/certs/ecommerce-dev.pfx
-            - Certificates__Password=dev-password
-            - Certificates__Host=localhost
-            - Certificates__HttpPort=5049
-            - Certificates__HttpsPort=8443
-            # Database backups
-            - Backup__Enabled=true
-            - Backup__Directory=/app/backups
-            - Backup__IntervalHours=24
-            - Backup__RetentionDays=7
         ports:
             - "5049:5049"
-            - "8443:8443"
-        volumes:
-            - ecommerce-backups-dev:/app/backups
-            - ecommerce-certs-dev:/app/certs
         depends_on:
             postgres:
                 condition: service_healthy
@@ -83,13 +85,27 @@ services:
             - ecommerce-network-dev
         restart: unless-stopped
 
+    # ── Frontend (Angular + nginx) ─────────────────────────────────────────────
+    ecommerce-frontend-dev:
+        build:
+            context: ../ecommerce-frontend
+            dockerfile: Dockerfile
+        container_name: ecommerce-frontend-dev
+        environment:
+            - BACKEND_HOST=ecommerce-backend-dev
+            - BACKEND_PORT=5049
+        ports:
+            - "8080:80"
+        depends_on:
+            ecommerce-backend-dev:
+                condition: service_started
+        networks:
+            - ecommerce-network-dev
+        restart: unless-stopped
+
 volumes:
     postgres-dev-data:
         name: ecommerce-postgres-dev-data
-    ecommerce-backups-dev:
-        name: ecommerce-backups-dev
-    ecommerce-certs-dev:
-        name: ecommerce-certs-dev
 
 networks:
     ecommerce-network-dev:
