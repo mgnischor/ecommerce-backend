@@ -43,7 +43,7 @@ Write-Host ""
 # Generate complete migration script (all migrations, idempotent)
 Write-Host "Generating complete idempotent migration script..." -ForegroundColor Cyan
 $completeScript = "$sqlDir\00_complete_migration.sql"
-dotnet ef migrations script --idempotent --output $completeScript --project ecommerce-backend.csproj --context PostgresqlContext
+dotnet ef migrations script --idempotent --output $completeScript --project ECommerce.Backend.csproj --context PostgresqlContext
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "✓ Created: $completeScript" -ForegroundColor Green
@@ -55,7 +55,7 @@ Write-Host ""
 
 # Get list of migrations
 Write-Host "Retrieving migration list..." -ForegroundColor Cyan
-$migrationsOutput = dotnet ef migrations list --project ecommerce-backend.csproj --context PostgresqlContext --no-connect 2>&1
+$migrationsOutput = dotnet ef migrations list --project ECommerce.Backend.csproj --context PostgresqlContext --no-connect 2>&1
 $migrations = @()
 
 foreach ($line in $migrationsOutput) {
@@ -87,26 +87,26 @@ $previousMigration = $null
 
 foreach ($migration in $migrations) {
     Write-Host "[$counter/$($migrations.Count)] Processing: $migration" -ForegroundColor Yellow
-    
-    # Extract clean name for filename
-    $cleanName = $migration -replace '^\d{14}_', ''
-    $outputFile = "$sqlDir\$counter" + "_$cleanName.sql"
-    
+
+    # Keep the full migration name (timestamp + name) in the filename,
+    # matching the .cmd script naming convention.
+    $outputFile = "$sqlDir\$counter" + "_$migration.sql"
+
     # Generate SQL script from previous migration to current
     if ($previousMigration) {
         # Generate incremental script (only changes for this migration)
-        dotnet ef migrations script $previousMigration $migration --output $outputFile --project ecommerce-backend.csproj --context PostgresqlContext
+        dotnet ef migrations script $previousMigration $migration --output $outputFile --project ECommerce.Backend.csproj --context PostgresqlContext
     } else {
         # First migration - generate from beginning
-        dotnet ef migrations script 0 $migration --output $outputFile --project ecommerce-backend.csproj --context PostgresqlContext
+        dotnet ef migrations script 0 $migration --output $outputFile --project ECommerce.Backend.csproj --context PostgresqlContext
     }
-    
+
     if ($LASTEXITCODE -eq 0) {
         Write-Host "  ✓ Created: $outputFile" -ForegroundColor Green
     } else {
         Write-Host "  ✗ WARNING: Failed to generate script for $migration" -ForegroundColor Yellow
     }
-    
+
     $previousMigration = $migration
     $counter++
     Write-Host ""
