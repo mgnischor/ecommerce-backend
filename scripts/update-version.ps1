@@ -42,6 +42,7 @@ if ($null -ne $propertyGroup) {
 
     $csproj.Save((Resolve-Path $CsprojFile).Path)
     Write-Host "Version updated successfully!" -ForegroundColor Green
+    exit 0
 } else {
     Write-Host "ERROR: Could not find PropertyGroup in project file" -ForegroundColor Red
     exit 1

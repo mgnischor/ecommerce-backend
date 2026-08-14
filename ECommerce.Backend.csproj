@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
     <PropertyGroup>
         <AssemblyName>ECommerce.Backend</AssemblyName>
         <AssemblyVersion>0.1.25.0</AssemblyVersion>
@@ -27,23 +26,19 @@
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <DebugType>portable</DebugType>
         <DebugSymbols>true</DebugSymbols>
-
         <!-- Reduce memory usage during compilation -->
         <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
         <ServerGarbageCollection>true</ServerGarbageCollection>
-
         <!-- Optimize build performance -->
         <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
         <GenerateDependencyFile>true</GenerateDependencyFile>
     </PropertyGroup>
-
     <!-- Build Configuration for Debug -->
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
         <Optimize>false</Optimize>
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
-
     <!-- Build Configuration for Release -->
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <Optimize>true</Optimize>
@@ -51,9 +46,9 @@
         <WarningLevel>4</WarningLevel>
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
+        <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.10" />
@@ -74,6 +69,8 @@
         <PackageReference Include="OpenTelemetry.Api" Version="1.17.0" />
         <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.17.0" />
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
+        <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore"
+            Version="1.17.0-beta.1" />
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0" />
         <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
         <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.17.0-beta.1" />
@@ -81,12 +78,10 @@
         <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.17.0" />
         <PackageReference Include="Scalar.AspNetCore" Version="2.16.18" />
     </ItemGroup>
-
     <ItemGroup>
         <!-- Exclude test files from main project compilation -->
         <Compile Remove="tests\**" />
         <EmbeddedResource Remove="tests\**" />
         <None Remove="tests\**" />
     </ItemGroup>
-
 </Project>

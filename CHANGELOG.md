@@ -23,6 +23,102 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.1.24] - 2026-06-14
+
+### Added
+
+- **Payment Processing System**: Configurable payment gateway abstraction
+    - `IPaymentGatewayService` interface and `PaymentGatewayResult` class for gateway-agnostic payment operations
+    - `FictitiousPaymentGatewayService` for simulating payment processing and refunds in development
+    - **PaymentController** (`/api/v1/payments`): New RESTful endpoints for processing, refunding, and querying payments
+        - `POST /api/v1/payments/process` - Process a payment
+        - `POST /api/v1/payments/{id}/refund` - Refund a payment
+        - `GET /api/v1/payments/{id}` - Get payment by ID
+        - `GET /api/v1/payments/order/{orderId}` - Get payment by order ID
+    - `ProcessPaymentRequestDto`, `RefundPaymentRequestDto`, and `PaymentResponseDto` for payment payloads
+
+- **Order Creation DTOs**: `CreateOrderRequestDto` and `CreateOrderItemDto` for structured order creation payloads
+
+- **Global Soft-Delete Query Filter**: Automatic exclusion of entities with `IsDeleted` set across all queries
+
+- **Case-Insensitive Product Search**: Search now ignores case and automatically excludes deleted products
+
+- **SecurityHeadersMiddleware**: Adds standard security headers to every response
+    - `X-Content-Type-Options: nosniff`
+    - `X-Frame-Options: DENY`
+    - `X-XSS-Protection: 0`
+    - `Referrer-Policy: strict-origin-when-cross-origin`
+    - `Strict-Transport-Security` (HSTS) on HTTPS connections
+    - Removes `Server` and `X-Powered-By` headers to prevent fingerprinting
+
+- **Rate Limiting**: Configurable rate limiting to protect API endpoints
+    - Global policy: 100 requests/minute per client IP (sliding window)
+    - Auth policy: 5 requests/minute per IP (fixed window) to protect the login endpoint against brute-force
+    - Returns `429 Too Many Requests` when limits are exceeded
+
+- **CORS Configuration**: Explicit allowed-origin allow-list
+    - Required in non-development environments (startup fails if not configured)
+    - Rejects `"*"` when credentials are allowed
+
+- **Timing-Attack Mitigation**: `GetDummyHash` on `IPasswordService` for constant-time hash comparison against non-existent users
+
+- **Database Transaction Management**: Wrapped `AccountingService` and `FinancialService` operations in database transactions for improved consistency
+
+- **Enhanced Database Seeder**: Admin email and password validation before seeding
+
+### Changed
+
+- **Secrets Management**: Cleared sensitive values from `appsettings.json`; added JWT, CORS, Admin, and Database settings structure to `appsettings.Development.json`
+    - Added `.gitignore` rules to exclude environment files and sensitive configuration
+- **Order Creation Refactor**: `CreateOrder` now uses `CreateOrderRequestDto` with improved validation
+- **JWT Token Generation**: Refactored to use `SecurityTokenDescriptor` for improved clarity and maintainability
+- **ExceptionHandlingMiddleware**: Enhanced with detailed error responses and improved logging
+- **LoginRequestDto**: Password validation now requires a minimum of 8 characters
+- **Security Headers**: Removed manual header settings from `AuthController`, relying on the centralized `SecurityHeadersMiddleware`
+
+### Fixed
+
+- CSharpier formatting issues across the codebase
+
+## [0.1.23] - 2026-05-16
+
+### Added
+
+### Changed
+
+- **Package Updates**:
+    - EntityFrameworkCore packages to 10.0.8
+    - OpenTelemetry packages to 1.15.3
+    - Scalar.AspNetCore to 2.13.21
+    - Microsoft.NET.Test.Sdk to 18.4.0
+    - NUnit3TestAdapter to 6.2.0
+    - FluentAssertions to 8.9.0
+    - Various dependency version updates for stability and performance
+- **CORS Policy**: Updated to allow additional origins from configuration
+- Empty migration (no database changes)
+
+### Fixed
+
+- `UserEntity` initialization using null-forgiving operator for `City` and `Country`
+- `AuthControllerTests` now sets up `HttpContext` with `RemoteIpAddress` for rate limiting tests
+
+## [0.1.22] - 2026-03-12
+
+### Added
+
+### Changed
+
+- **Documentation Updates**:
+    - README updated with new features and improved clarity
+    - Security Review document updated for accuracy and clarity
+    - Jaeger guide updated for improved clarity and version bump
+    - OpenTelemetry guide updated for improved clarity and version bump
+- **CORS Origins**: Refactored CORS origins configuration for improved readability
+- Empty migration (no database changes)
+- Build version increment only
+
+### Fixed
+
 ## [0.1.21] - 2026-02-22
 
 ### Changed
@@ -722,6 +818,9 @@ CREATE TABLE users (
 
 ## Version History
 
+- **0.1.24** - Payment Processing, Security Enhancements & Soft-Delete Filter
+- **0.1.23** - Package Updates & Fixes
+- **0.1.22** - Documentation Updates
 - **0.1.21** - Build version increment
 - **0.1.20** - Build version increment
 - **0.1.19** - Build version increment
@@ -744,7 +843,10 @@ CREATE TABLE users (
 - **0.0.2** - User Management & Authentication
 - **0.0.1** - Initial Setup
 
-[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.21...HEAD
+[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.24...HEAD
+[0.1.24]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.23...v0.1.24
+[0.1.23]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.22...v0.1.23
+[0.1.22]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.21...v0.1.22
 [0.1.21]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.20...v0.1.21
 [0.1.20]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.19...v0.1.20
 [0.1.19]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.18...v0.1.19

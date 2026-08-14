@@ -18,6 +18,7 @@ public class AuthControllerTests : BaseTestFixture
     private Mock<IJwtService> _mockJwtService;
     private Mock<IPasswordService> _mockPasswordService;
     private Mock<ILoggingService> _mockLogger;
+    private Mock<ISecurityAuditService> _mockAuditService;
     private AuthController _controller;
 
     [SetUp]
@@ -28,12 +29,14 @@ public class AuthControllerTests : BaseTestFixture
         _mockJwtService = new Mock<IJwtService>();
         _mockPasswordService = new Mock<IPasswordService>();
         _mockLogger = new Mock<ILoggingService>();
+        _mockAuditService = new Mock<ISecurityAuditService>();
 
         _controller = new AuthController(
             _mockUserRepository.Object,
             _mockJwtService.Object,
             _mockPasswordService.Object,
-            _mockLogger.Object
+            _mockLogger.Object,
+            _mockAuditService.Object
         );
 
         var httpContext = new DefaultHttpContext();

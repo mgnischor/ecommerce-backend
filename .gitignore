@@ -173,3 +173,7 @@ appsettings.Staging.json
 
 # .NET user secrets (stored outside the project, but guard against accidental copies)
 secrets.json
+
+# Database backups and TLS certificates - never commit these
+backups/
+certs/

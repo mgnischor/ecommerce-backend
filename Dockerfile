@@ -8,7 +8,7 @@ RUN dotnet publish "ECommerce.Backend.csproj" -c Release -o /app/publish /p:UseA
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
 ARG BUILD_DEVELOPMENT=1
 RUN apk upgrade --no-cache && \
-    apk add --no-cache icu-libs
+    apk add --no-cache icu-libs postgresql-client
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 WORKDIR /app
 RUN if [ "$BUILD_DEVELOPMENT" = "1" ]; then \
@@ -27,6 +27,7 @@ RUN if [ "$BUILD_DEVELOPMENT" = "1" ]; then \
     chmod +x /app/entrypoint.sh
 RUN addgroup -g 1000 appgroup && \
     adduser -u 1000 -G appgroup -s /bin/sh -D appuser && \
+    mkdir -p /app/backups /app/certs && \
     chown -R appuser:appgroup /app
 COPY --from=build --chown=appuser:appgroup /app/publish .
 USER appuser
@@ -65,4 +66,4 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Production stage
 FROM final AS production
-EXPOSE 80
+EXPOSE 80 8443

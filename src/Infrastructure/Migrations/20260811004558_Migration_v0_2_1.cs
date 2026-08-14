@@ -1,11 +1,11 @@
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace ECommerce.src.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Migration_v0_1_24 : Migration
+    public partial class Migration_v0_2_1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder) { }

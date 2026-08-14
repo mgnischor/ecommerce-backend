@@ -55,8 +55,24 @@ services:
             - OpenTelemetry__ServiceVersion=0.1.25
             - OpenTelemetry__EnableConsoleExporter=false
             - OpenTelemetry__OtlpEndpoint=http://jaeger:4317
+            # HTTPS with self-signed certificate (auto-generated on first start)
+            - Certificates__Enabled=true
+            - Certificates__Path=/app/certs/ecommerce.pfx
+            - Certificates__Password=change-me-in-production
+            - Certificates__Host=localhost
+            - Certificates__HttpPort=80
+            - Certificates__HttpsPort=8443
+            # Database backups
+            - Backup__Enabled=true
+            - Backup__Directory=/app/backups
+            - Backup__IntervalHours=24
+            - Backup__RetentionDays=7
         ports:
             - "8080:80"
+            - "8443:8443"
+        volumes:
+            - ecommerce-backups:/app/backups
+            - ecommerce-certs:/app/certs
         depends_on:
             postgres:
                 condition: service_healthy
@@ -69,6 +85,10 @@ services:
 volumes:
     postgres-data:
         name: ecommerce-postgres-data
+    ecommerce-backups:
+        name: ecommerce-backups
+    ecommerce-certs:
+        name: ecommerce-certs
 
 networks:
     ecommerce-network:
