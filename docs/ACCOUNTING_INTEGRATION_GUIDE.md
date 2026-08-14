@@ -15,13 +15,13 @@ dotnet ef database update
 
 The chart of accounts is automatically initialized by the `DatabaseSeeder.SeedChartOfAccountsAsync()` method, which is called during application startup in `Program.cs`.
 
-The seeding includes 40+ predefined accounts organized by:
+The seeding includes 37+ predefined accounts organized by:
 
--   **Assets**: Cash, Bank, Investments, Inventory, Receivables, Fixed Assets
--   **Liabilities**: Accounts Payable, Salaries Payable, Taxes Payable, Loans
--   **Equity**: Capital, Retained Earnings, Profit/Loss
--   **Revenue**: Sales, Services, Returns, Other Income
--   **Expenses**: COGS, Freight, Personnel, Marketing, Administrative
+- **Assets**: Cash, Bank, Investments, Inventory, Receivables, Fixed Assets
+- **Liabilities**: Accounts Payable, Salaries Payable, Taxes Payable, Loans
+- **Equity**: Capital, Retained Earnings, Profit/Loss
+- **Revenue**: Sales, Services, Returns, Other Income
+- **Expenses**: COGS, Freight, Personnel, Marketing, Administrative
 
 ### 3. Register Services in DI Container
 
@@ -402,9 +402,9 @@ _logger.LogInformation(
 
 All entities already have:
 
--   `CreatedAt` - Creation timestamp
--   `CreatedBy` - Responsible user
--   `UpdatedAt` - Last update timestamp
+- `CreatedAt` - Creation timestamp
+- `CreatedBy` - Responsible user
+- `UpdatedAt` - Last update timestamp
 
 ### 4. Accounting Period Close
 
@@ -436,5 +436,5 @@ public async Task CloseAccountingPeriod(DateTime periodEndDate)
 
 For accounting questions:
 
--   See: `docs/ACCOUNTING_SYSTEM.md`
--   Standards: NBC TG 16 (Inventories), NBC TG 26 (Financial Statements)
+- See: `docs/ACCOUNTING_SYSTEM.md`
+- Standards: NBC TG 16 (Inventories), NBC TG 26 (Financial Statements)
