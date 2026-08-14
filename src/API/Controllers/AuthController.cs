@@ -140,8 +140,8 @@ public sealed class AuthController : ControllerBase
     /// Content-Type: application/json
     ///
     /// {
-    ///    "email": "admin@ecommerce.com.br",
-    ///    "password": "admin"
+    ///    "email": "admin@ecommerce.local",
+    ///    "password": "ChangeMe!Dev#2026"
     /// }
     /// </code>
     /// <para>
