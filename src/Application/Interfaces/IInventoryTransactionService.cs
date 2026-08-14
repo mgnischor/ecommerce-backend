@@ -68,4 +68,15 @@ public interface IInventoryTransactionService
         DateTime endDate,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// Retrieves a single inventory transaction by its unique identifier
+    /// </summary>
+    /// <param name="id">Transaction identifier</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The inventory transaction, or null if it does not exist</returns>
+    Task<InventoryTransactionEntity?> GetTransactionByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    );
 }
