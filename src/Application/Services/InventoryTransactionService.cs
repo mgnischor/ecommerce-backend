@@ -173,8 +173,8 @@ public class InventoryTransactionService : AppInterfaces.IInventoryTransactionSe
                             );
                             break;
 
-                            // Other transaction types (returns, adjustments, losses) may also
-                            // generate financial transactions if needed
+                        // Other transaction types (returns, adjustments, losses) may also
+                        // generate financial transactions if needed
                     }
                 }
                 catch (Exception financialEx)
@@ -226,6 +226,15 @@ public class InventoryTransactionService : AppInterfaces.IInventoryTransactionSe
     )
     {
         return await _transactionRepository.GetByPeriodAsync(startDate, endDate, cancellationToken);
+    }
+
+    public async Task<InventoryTransactionEntity?> GetTransactionByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
+    {
+        _logger.LogInformation("Getting inventory transaction: {TransactionId}", id);
+        return await _transactionRepository.GetByIdAsync(id, cancellationToken);
     }
 
     private static string GenerateTransactionNumber(InventoryTransactionType type)
