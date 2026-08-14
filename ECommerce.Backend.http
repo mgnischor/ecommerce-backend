@@ -15,8 +15,8 @@ POST {{ECommerce_HostAddress}}/api/v1/login
 Content-Type: application/json
 
 {
-  "email": "admin@ecommerce.com.br",
-  "password": "admin"
+  "email": "admin@ecommerce.local",
+  "password": "ChangeMe!Dev#2026"
 }
 
 ###
