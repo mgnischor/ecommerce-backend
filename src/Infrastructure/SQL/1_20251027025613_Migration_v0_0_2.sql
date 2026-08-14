@@ -36,7 +36,7 @@ CREATE UNIQUE INDEX ix_users_email ON public.users (email);
 CREATE UNIQUE INDEX ix_users_username ON public.users (username);
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20251027025613_Migration_v0_0_2', '9.0.10');
+VALUES ('20251027025613_Migration_v0_0_2', '10.0.10');
 
 COMMIT;
 

@@ -60,41 +60,56 @@ DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027025613_Migration_v0_0_2') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027025613_Migration_v0_0_2', '9.0.10');
+    VALUES ('20251027025613_Migration_v0_0_2', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027032829_Migration_v0_0_3') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027032829_Migration_v0_0_3', '9.0.10');
+    VALUES ('20251027032829_Migration_v0_0_3', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027033034_Migration_v0_0_4') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027033034_Migration_v0_0_4', '9.0.10');
+    VALUES ('20251027033034_Migration_v0_0_4', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027033118_Migration_v0_0_5') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027033118_Migration_v0_0_5', '9.0.10');
+    VALUES ('20251027033118_Migration_v0_0_5', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027034435_Migration_v0_0_6') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027034435_Migration_v0_0_6', '9.0.10');
+    VALUES ('20251027034435_Migration_v0_0_6', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
@@ -182,17 +197,23 @@ DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027121552_Migration_v0_0_7') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027121552_Migration_v0_0_7', '9.0.10');
+    VALUES ('20251027121552_Migration_v0_0_7', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027124850_Migration_v0_0_8') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027124850_Migration_v0_0_8', '9.0.10');
+    VALUES ('20251027124850_Migration_v0_0_8', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
@@ -430,9 +451,12 @@ DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027154509_Migration_v0_0_9') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027154509_Migration_v0_0_9', '9.0.10');
+    VALUES ('20251027154509_Migration_v0_0_9', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
@@ -712,33 +736,45 @@ DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027174620_Migration_v0_0_10') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027174620_Migration_v0_0_10', '9.0.10');
+    VALUES ('20251027174620_Migration_v0_0_10', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027182346_Migration_v0_0_11') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027182346_Migration_v0_0_11', '9.0.10');
+    VALUES ('20251027182346_Migration_v0_0_11', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251027194648_Migration_v0_0_12') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251027194648_Migration_v0_0_12', '9.0.10');
+    VALUES ('20251027194648_Migration_v0_0_12', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251028011615_Migration_v0_0_13') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251028011615_Migration_v0_0_13', '9.0.10');
+    VALUES ('20251028011615_Migration_v0_0_13', '10.0.10');
     END IF;
 END $EF$;
+COMMIT;
+
+START TRANSACTION;
 
 DO $EF$
 BEGIN
@@ -1489,7 +1525,880 @@ DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251103015250_Migration_v0_1_14') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20251103015250_Migration_v0_1_14', '9.0.10');
+    VALUES ('20251103015250_Migration_v0_1_14', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE TABLE financial_transactions (
+        id uuid NOT NULL,
+        transaction_number character varying(50) NOT NULL,
+        transaction_type character varying(50) NOT NULL,
+        amount numeric(18,2) NOT NULL,
+        currency character varying(3) NOT NULL DEFAULT 'USD',
+        transaction_date timestamp with time zone NOT NULL,
+        description character varying(500) NOT NULL,
+        order_id uuid,
+        payment_id uuid,
+        inventory_transaction_id uuid,
+        journal_entry_id uuid,
+        product_id uuid,
+        counterparty character varying(200),
+        reference_number character varying(100),
+        is_reconciled boolean NOT NULL DEFAULT FALSE,
+        reconciled_at timestamp with time zone,
+        reconciled_by uuid,
+        payment_method character varying(50),
+        payment_provider character varying(100),
+        status character varying(50) NOT NULL DEFAULT 'Pending',
+        notes character varying(1000),
+        tax_amount numeric(18,2) NOT NULL DEFAULT 0.0,
+        fee_amount numeric(18,2) NOT NULL DEFAULT 0.0,
+        net_amount numeric(18,2) NOT NULL,
+        created_by uuid NOT NULL,
+        created_at timestamp with time zone NOT NULL,
+        updated_at timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_financial_transactions" PRIMARY KEY (id),
+        CONSTRAINT "FK_financial_transactions_InventoryTransactions_inventory_tran~" FOREIGN KEY (inventory_transaction_id) REFERENCES "InventoryTransactions" ("Id") ON DELETE SET NULL,
+        CONSTRAINT "FK_financial_transactions_JournalEntries_journal_entry_id" FOREIGN KEY (journal_entry_id) REFERENCES "JournalEntries" ("Id") ON DELETE SET NULL,
+        CONSTRAINT "FK_financial_transactions_Payments_payment_id" FOREIGN KEY (payment_id) REFERENCES "Payments" ("Id") ON DELETE SET NULL
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE INDEX ix_financial_transactions_counterparty ON financial_transactions (counterparty);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE INDEX ix_financial_transactions_date_type ON financial_transactions (transaction_date, transaction_type);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE INDEX ix_financial_transactions_inventory_transaction_id ON financial_transactions (inventory_transaction_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE INDEX ix_financial_transactions_is_reconciled ON financial_transactions (is_reconciled);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE INDEX "IX_financial_transactions_journal_entry_id" ON financial_transactions (journal_entry_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE INDEX ix_financial_transactions_order_id ON financial_transactions (order_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE INDEX ix_financial_transactions_payment_id ON financial_transactions (payment_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE INDEX ix_financial_transactions_transaction_date ON financial_transactions (transaction_date);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE UNIQUE INDEX ix_financial_transactions_transaction_number ON financial_transactions (transaction_number);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    CREATE INDEX ix_financial_transactions_transaction_type ON financial_transactions (transaction_type);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108215537_Migration_v0_1_15') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20251108215537_Migration_v0_1_15', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251108220728_Migration_v0_1_16') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20251108220728_Migration_v0_1_16', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE financial_transactions DROP CONSTRAINT "FK_financial_transactions_InventoryTransactions_inventory_tran~";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE financial_transactions DROP CONSTRAINT "FK_financial_transactions_JournalEntries_journal_entry_id";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE financial_transactions DROP CONSTRAINT "FK_financial_transactions_Payments_payment_id";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE "InventoryTransactions" DROP CONSTRAINT "FK_InventoryTransactions_products_ProductId";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.vendors DROP CONSTRAINT "PK_vendors";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.users DROP CONSTRAINT "PK_users";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.suppliers DROP CONSTRAINT "PK_suppliers";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.stores DROP CONSTRAINT "PK_stores";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.shipments DROP CONSTRAINT "PK_shipments";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.refunds DROP CONSTRAINT "PK_refunds";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.promotions DROP CONSTRAINT "PK_promotions";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.products DROP CONSTRAINT "PK_products";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.notifications DROP CONSTRAINT "PK_notifications";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.shipping_zones DROP CONSTRAINT "PK_shipping_zones";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.product_variants DROP CONSTRAINT "PK_product_variants";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.product_attributes DROP CONSTRAINT "PK_product_attributes";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE financial_transactions DROP CONSTRAINT "PK_financial_transactions";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.vendors RENAME TO "Vendors";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.users RENAME TO "Users";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.suppliers RENAME TO "Suppliers";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.stores RENAME TO "Stores";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.shipments RENAME TO "Shipments";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.refunds RENAME TO "Refunds";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.promotions RENAME TO "Promotions";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.products RENAME TO "Products";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.notifications RENAME TO "Notifications";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.shipping_zones RENAME TO "ShippingZones";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.product_variants RENAME TO "ProductVariants";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public.product_attributes RENAME TO "ProductAttributes";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE financial_transactions RENAME TO "FinancialTransactions";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER INDEX "IX_financial_transactions_journal_entry_id" RENAME TO "IX_FinancialTransactions_journal_entry_id";
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."Vendors" ADD CONSTRAINT "PK_Vendors" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."Users" ADD CONSTRAINT "PK_Users" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."Suppliers" ADD CONSTRAINT "PK_Suppliers" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."Stores" ADD CONSTRAINT "PK_Stores" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."Shipments" ADD CONSTRAINT "PK_Shipments" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."Refunds" ADD CONSTRAINT "PK_Refunds" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."Promotions" ADD CONSTRAINT "PK_Promotions" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."Products" ADD CONSTRAINT "PK_Products" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."Notifications" ADD CONSTRAINT "PK_Notifications" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."ShippingZones" ADD CONSTRAINT "PK_ShippingZones" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."ProductVariants" ADD CONSTRAINT "PK_ProductVariants" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE public."ProductAttributes" ADD CONSTRAINT "PK_ProductAttributes" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE "FinancialTransactions" ADD CONSTRAINT "PK_FinancialTransactions" PRIMARY KEY (id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE "FinancialTransactions" ADD CONSTRAINT "FK_FinancialTransactions_InventoryTransactions_inventory_trans~" FOREIGN KEY (inventory_transaction_id) REFERENCES "InventoryTransactions" ("Id") ON DELETE SET NULL;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE "FinancialTransactions" ADD CONSTRAINT "FK_FinancialTransactions_JournalEntries_journal_entry_id" FOREIGN KEY (journal_entry_id) REFERENCES "JournalEntries" ("Id") ON DELETE SET NULL;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE "FinancialTransactions" ADD CONSTRAINT "FK_FinancialTransactions_Payments_payment_id" FOREIGN KEY (payment_id) REFERENCES "Payments" ("Id") ON DELETE SET NULL;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    ALTER TABLE "InventoryTransactions" ADD CONSTRAINT "FK_InventoryTransactions_Products_ProductId" FOREIGN KEY ("ProductId") REFERENCES public."Products" (id) ON DELETE RESTRICT;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251119001947_Migration_v0_1_17') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20251119001947_Migration_v0_1_17', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    ALTER TABLE public."Users" ADD "FailedLoginAttempts" integer NOT NULL DEFAULT 0;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    ALTER TABLE public."Users" ADD "LastFailedLoginAt" timestamp with time zone;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    ALTER TABLE public."Users" ADD "LastLoginIpAddress" text;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    ALTER TABLE public."Users" ADD "LastSuccessfulLoginAt" timestamp with time zone;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    ALTER TABLE public."Users" ADD "LockedUntil" timestamp with time zone;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    CREATE TABLE "AccountingRules" (
+        "Id" uuid NOT NULL,
+        "TransactionType" integer NOT NULL,
+        "RuleCode" character varying(50) NOT NULL,
+        "Description" character varying(500) NOT NULL,
+        "DebitAccountCode" character varying(20) NOT NULL,
+        "CreditAccountCode" character varying(20) NOT NULL,
+        "Condition" character varying(200),
+        "IsActive" boolean NOT NULL DEFAULT TRUE,
+        "CreatedAt" timestamp with time zone NOT NULL,
+        "UpdatedAt" timestamp with time zone NOT NULL,
+        CONSTRAINT "PK_AccountingRules" PRIMARY KEY ("Id")
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    INSERT INTO "AccountingRules" ("Id", "Condition", "CreatedAt", "CreditAccountCode", "DebitAccountCode", "Description", "IsActive", "RuleCode", "TransactionType", "UpdatedAt")
+    VALUES ('a0000000-0000-0000-0000-000000000001', NULL, TIMESTAMPTZ '2025-01-01T00:00:00Z', '2.1.01.001', '1.1.03.001', 'Purchase of inventory from suppliers', TRUE, 'PURCHASE', 1, TIMESTAMPTZ '2025-01-01T00:00:00Z');
+    INSERT INTO "AccountingRules" ("Id", "Condition", "CreatedAt", "CreditAccountCode", "DebitAccountCode", "Description", "IsActive", "RuleCode", "TransactionType", "UpdatedAt")
+    VALUES ('a0000000-0000-0000-0000-000000000002', NULL, TIMESTAMPTZ '2025-01-01T00:00:00Z', '1.1.03.001', '3.1.01.001', 'Sale of inventory to customers (COGS recognition)', TRUE, 'SALE', 2, TIMESTAMPTZ '2025-01-01T00:00:00Z');
+    INSERT INTO "AccountingRules" ("Id", "Condition", "CreatedAt", "CreditAccountCode", "DebitAccountCode", "Description", "IsActive", "RuleCode", "TransactionType", "UpdatedAt")
+    VALUES ('a0000000-0000-0000-0000-000000000003', NULL, TIMESTAMPTZ '2025-01-01T00:00:00Z', '3.1.01.001', '1.1.03.001', 'Customer returns inventory (COGS reversal)', TRUE, 'SALE_RETURN', 3, TIMESTAMPTZ '2025-01-01T00:00:00Z');
+    INSERT INTO "AccountingRules" ("Id", "Condition", "CreatedAt", "CreditAccountCode", "DebitAccountCode", "Description", "IsActive", "RuleCode", "TransactionType", "UpdatedAt")
+    VALUES ('a0000000-0000-0000-0000-000000000004', NULL, TIMESTAMPTZ '2025-01-01T00:00:00Z', '1.1.03.001', '2.1.01.001', 'Return of inventory to suppliers', TRUE, 'PURCHASE_RETURN', 4, TIMESTAMPTZ '2025-01-01T00:00:00Z');
+    INSERT INTO "AccountingRules" ("Id", "Condition", "CreatedAt", "CreditAccountCode", "DebitAccountCode", "Description", "IsActive", "RuleCode", "TransactionType", "UpdatedAt")
+    VALUES ('a0000000-0000-0000-0000-000000000005', 'Quantity > 0', TIMESTAMPTZ '2025-01-01T00:00:00Z', '4.2.01.001', '1.1.03.001', 'Positive inventory adjustment (overage)', TRUE, 'ADJUSTMENT_POSITIVE', 5, TIMESTAMPTZ '2025-01-01T00:00:00Z');
+    INSERT INTO "AccountingRules" ("Id", "Condition", "CreatedAt", "CreditAccountCode", "DebitAccountCode", "Description", "IsActive", "RuleCode", "TransactionType", "UpdatedAt")
+    VALUES ('a0000000-0000-0000-0000-000000000006', 'Quantity < 0', TIMESTAMPTZ '2025-01-01T00:00:00Z', '1.1.03.001', '3.2.01.002', 'Negative inventory adjustment (shortage)', TRUE, 'ADJUSTMENT_NEGATIVE', 5, TIMESTAMPTZ '2025-01-01T00:00:00Z');
+    INSERT INTO "AccountingRules" ("Id", "Condition", "CreatedAt", "CreditAccountCode", "DebitAccountCode", "Description", "IsActive", "RuleCode", "TransactionType", "UpdatedAt")
+    VALUES ('a0000000-0000-0000-0000-000000000007', NULL, TIMESTAMPTZ '2025-01-01T00:00:00Z', '1.1.03.001', '3.2.01.001', 'Inventory loss, shrinkage, or write-off', TRUE, 'LOSS', 7, TIMESTAMPTZ '2025-01-01T00:00:00Z');
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+
+                    INSERT INTO "ChartOfAccounts" ("Id", "AccountCode", "AccountName", "AccountType", "Balance", "CreatedAt", "Description", "IsActive", "IsAnalytic", "ParentAccountId", "UpdatedAt")
+                    VALUES
+                        ('10000000-0000-0000-0000-000000000001', '1.1.01.001', 'Cash and Cash Equivalents', 1, 0, '2025-01-01 00:00:00+00', 'Bank accounts and petty cash', true, true, NULL, '2025-01-01 00:00:00+00'),
+                        ('10000000-0000-0000-0000-000000000002', '1.1.03.001', 'Inventory', 1, 0, '2025-01-01 00:00:00+00', 'Merchandise inventory for resale', true, true, NULL, '2025-01-01 00:00:00+00'),
+                        ('20000000-0000-0000-0000-000000000001', '2.1.01.001', 'Accounts Payable - Suppliers', 2, 0, '2025-01-01 00:00:00+00', 'Amounts owed to suppliers for inventory purchases', true, true, NULL, '2025-01-01 00:00:00+00'),
+                        ('30000000-0000-0000-0000-000000000001', '3.1.01.001', 'Cost of Goods Sold', 5, 0, '2025-01-01 00:00:00+00', 'Direct costs of goods sold to customers', true, true, NULL, '2025-01-01 00:00:00+00'),
+                        ('30000000-0000-0000-0000-000000000002', '3.2.01.001', 'Inventory Loss', 5, 0, '2025-01-01 00:00:00+00', 'Inventory shrinkage, loss, and write-offs', true, true, NULL, '2025-01-01 00:00:00+00'),
+                        ('30000000-0000-0000-0000-000000000003', '3.2.01.002', 'Other Operating Expenses', 5, 0, '2025-01-01 00:00:00+00', 'Miscellaneous operating expenses including negative inventory adjustments', true, true, NULL, '2025-01-01 00:00:00+00'),
+                        ('40000000-0000-0000-0000-000000000001', '4.2.01.001', 'Other Operating Income', 4, 0, '2025-01-01 00:00:00+00', 'Miscellaneous income including positive inventory adjustments', true, true, NULL, '2025-01-01 00:00:00+00')
+                    ON CONFLICT ("AccountCode") DO NOTHING;
+
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    CREATE INDEX "IX_AccountingRules_IsActive" ON "AccountingRules" ("IsActive");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    CREATE UNIQUE INDEX "IX_AccountingRules_RuleCode" ON "AccountingRules" ("RuleCode");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    CREATE INDEX "IX_AccountingRules_TransactionType" ON "AccountingRules" ("TransactionType");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    CREATE INDEX "IX_AccountingRules_TransactionType_IsActive" ON "AccountingRules" ("TransactionType", "IsActive");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216135854_Migration_v0_1_18') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20251216135854_Migration_v0_1_18', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216140010_Migration_v0_1_19') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20251216140010_Migration_v0_1_19', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20251216140158_Migration_v0_1_20') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20251216140158_Migration_v0_1_20', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260222224509_Migration_v0_1_21') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20260222224509_Migration_v0_1_21', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260301170852_Migration_v0_1_22') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20260301170852_Migration_v0_1_22', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260410141623_Migration_v0_1_23') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20260410141623_Migration_v0_1_23', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260614223559_Migration_v0_1_24') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20260614223559_Migration_v0_1_24', '10.0.10');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE TABLE public."Customers" (
+        id uuid NOT NULL,
+        user_id uuid NOT NULL,
+        total_spending numeric(18,2) NOT NULL DEFAULT 0.0,
+        total_orders integer NOT NULL DEFAULT 0,
+        last_order_date timestamp with time zone,
+        last_login_at timestamp with time zone,
+        historical_average_order_days integer,
+        is_active boolean NOT NULL DEFAULT TRUE,
+        is_deleted boolean NOT NULL DEFAULT FALSE,
+        created_at timestamp with time zone NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        updated_at timestamp with time zone NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        CONSTRAINT "PK_Customers" PRIMARY KEY (id)
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE TABLE public."GiftCards" (
+        id uuid NOT NULL,
+        created_by uuid NOT NULL DEFAULT 'ce06e1a8-f688-44b6-b616-4badf09d9153',
+        updated_by uuid,
+        card_number character varying(19) NOT NULL,
+        balance numeric(18,2) NOT NULL DEFAULT 0.0,
+        is_active boolean NOT NULL DEFAULT TRUE,
+        is_revoked boolean NOT NULL DEFAULT FALSE,
+        allows_reload boolean NOT NULL DEFAULT TRUE,
+        issued_at timestamp with time zone NOT NULL,
+        expires_at timestamp with time zone,
+        is_deleted boolean NOT NULL DEFAULT FALSE,
+        created_at timestamp with time zone NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        updated_at timestamp with time zone NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        CONSTRAINT "PK_GiftCards" PRIMARY KEY (id)
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE TABLE public."InventoryPlans" (
+        id uuid NOT NULL,
+        product_id uuid NOT NULL,
+        current_stock integer NOT NULL DEFAULT 0,
+        reorder_point integer NOT NULL DEFAULT 0,
+        average_daily_sales integer NOT NULL DEFAULT 0,
+        lead_time_days integer,
+        service_level_percent integer,
+        received_at timestamp with time zone NOT NULL,
+        cost_of_goods_sold numeric(18,2) NOT NULL DEFAULT 0.0,
+        average_inventory_value numeric(18,2) NOT NULL DEFAULT 0.0,
+        sales_in_last_90_days integer NOT NULL DEFAULT 0,
+        is_deleted boolean NOT NULL DEFAULT FALSE,
+        created_at timestamp with time zone NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        updated_at timestamp with time zone NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        CONSTRAINT "PK_InventoryPlans" PRIMARY KEY (id)
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE TABLE public."Invoices" (
+        id uuid NOT NULL,
+        created_by uuid NOT NULL DEFAULT 'ce06e1a8-f688-44b6-b616-4badf09d9153',
+        updated_by uuid,
+        invoice_number character varying(50) NOT NULL,
+        order_id uuid NOT NULL,
+        customer_id uuid NOT NULL,
+        subtotal numeric(18,2) NOT NULL DEFAULT 0.0,
+        tax_amount numeric(18,2) NOT NULL DEFAULT 0.0,
+        shipping_cost numeric(18,2) NOT NULL DEFAULT 0.0,
+        total numeric(18,2) NOT NULL DEFAULT 0.0,
+        paid_amount numeric(18,2) NOT NULL DEFAULT 0.0,
+        due_date timestamp with time zone NOT NULL,
+        issued_at timestamp with time zone NOT NULL,
+        is_paid boolean NOT NULL DEFAULT FALSE,
+        is_deleted boolean NOT NULL DEFAULT FALSE,
+        created_at timestamp with time zone NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        updated_at timestamp with time zone NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        CONSTRAINT "PK_Invoices" PRIMARY KEY (id)
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE TABLE public."LoyaltyRewards" (
+        id uuid NOT NULL,
+        customer_id uuid NOT NULL,
+        point_balance integer NOT NULL,
+        total_points_earned integer NOT NULL,
+        total_points_redeemed integer NOT NULL,
+        last_earned_at timestamp with time zone,
+        tier character varying(20) NOT NULL DEFAULT 'Bronze',
+        is_deleted boolean NOT NULL DEFAULT FALSE,
+        created_at timestamp with time zone NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        updated_at timestamp with time zone NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+        CONSTRAINT "PK_LoyaltyRewards" PRIMARY KEY (id)
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE INDEX ix_customers_is_active ON public."Customers" (is_active);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE UNIQUE INDEX ix_customers_user_id ON public."Customers" (user_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE UNIQUE INDEX ix_gift_cards_card_number ON public."GiftCards" (card_number);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE INDEX ix_gift_cards_is_active ON public."GiftCards" (is_active);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE INDEX ix_inventory_plans_is_deleted ON public."InventoryPlans" (is_deleted);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE INDEX ix_inventory_plans_product_id ON public."InventoryPlans" (product_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE INDEX ix_invoices_customer_id ON public."Invoices" (customer_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE UNIQUE INDEX ix_invoices_invoice_number ON public."Invoices" (invoice_number);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE INDEX ix_invoices_is_paid ON public."Invoices" (is_paid);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE INDEX ix_invoices_order_id ON public."Invoices" (order_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    CREATE UNIQUE INDEX ix_loyalty_rewards_customer_id ON public."LoyaltyRewards" (customer_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260807173003_Migration_v0_1_25') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20260807173003_Migration_v0_1_25', '10.0.10');
     END IF;
 END $EF$;
 COMMIT;

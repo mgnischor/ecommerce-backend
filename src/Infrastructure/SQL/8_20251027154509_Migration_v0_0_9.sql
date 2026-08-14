@@ -1,7 +1,4 @@
 ﻿START TRANSACTION;
-INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20251027124850_Migration_v0_0_8', '9.0.10');
-
 CREATE TABLE "ChartOfAccounts" (
     "Id" uuid NOT NULL,
     "AccountCode" character varying(20) NOT NULL,
@@ -115,7 +112,7 @@ CREATE INDEX "IX_JournalEntries_OrderId" ON "JournalEntries" ("OrderId");
 CREATE INDEX "IX_JournalEntries_ProductId" ON "JournalEntries" ("ProductId");
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20251027154509_Migration_v0_0_9', '9.0.10');
+VALUES ('20251027154509_Migration_v0_0_9', '10.0.10');
 
 COMMIT;
 

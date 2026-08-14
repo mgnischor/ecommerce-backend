@@ -1,7 +1,4 @@
 ﻿START TRANSACTION;
-INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20251028011615_Migration_v0_0_13', '9.0.10');
-
 CREATE TABLE public.notifications (
     id uuid NOT NULL,
     created_by uuid NOT NULL DEFAULT 'ce06e1a8-f688-44b6-b616-4badf09d9153',
@@ -418,7 +415,7 @@ CREATE INDEX ix_vendors_store_name ON public.vendors (store_name);
 CREATE UNIQUE INDEX ix_vendors_user_id ON public.vendors (user_id);
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20251103015250_Migration_v0_1_14', '9.0.10');
+VALUES ('20251103015250_Migration_v0_1_14', '10.0.10');
 
 COMMIT;
 
