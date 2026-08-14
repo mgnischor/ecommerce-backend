@@ -492,8 +492,8 @@ public sealed class InventoryTransactionController : ControllerBase
     /// <item><description>Tracing journal entries back to source transactions</description></item>
     /// </list>
     /// <para>
-    /// <strong>Important Note:</strong> This endpoint is currently a placeholder and requires service implementation.
-    /// Once implemented, it will retrieve transaction details from the database using the transaction ID.
+    /// <strong>Important Note:</strong> Returns the transaction details persisted when the
+    /// transaction was recorded, including accounting references (journal entry ID).
     /// </para>
     /// </remarks>
     /// <param name="id">
@@ -509,7 +509,7 @@ public sealed class InventoryTransactionController : ControllerBase
     /// A <see cref="Task{TResult}"/> that represents the asynchronous operation.
     /// The task result contains an <see cref="ActionResult{T}"/> with an <see cref="InventoryTransactionResponseDto"/>
     /// object containing complete transaction details including accounting references.
-    /// Currently returns 404 NotFound as the service implementation is pending.
+    /// Returns 404 NotFound when the transaction does not exist.
     /// </returns>
     /// <response code="200">
     /// Successfully retrieved the inventory transaction.
@@ -522,7 +522,7 @@ public sealed class InventoryTransactionController : ControllerBase
     /// </response>
     /// <response code="404">
     /// Transaction not found with the specified ID. The GUID may be invalid or the transaction
-    /// may not exist in the system. This status is also returned when the service implementation is pending.
+    /// may not exist in the system.
     /// </response>
     /// <response code="500">
     /// Internal server error. An unexpected error occurred while retrieving the transaction.
@@ -532,23 +532,47 @@ public sealed class InventoryTransactionController : ControllerBase
     [ProducesResponseType(typeof(InventoryTransactionResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public Task<ActionResult<InventoryTransactionResponseDto>> GetTransactionById(
+    public async Task<ActionResult<InventoryTransactionResponseDto>> GetTransactionById(
         Guid id,
         CancellationToken cancellationToken = default
     )
     {
         _logger.LogDebug("Retrieving inventory transaction: TransactionId={TransactionId}", id);
 
-        // This method requires implementation in the service interface
-        // For now, return NotFound as placeholder
-        _logger.LogWarning(
-            "GetTransactionById not yet implemented in service: TransactionId={TransactionId}",
-            id
-        );
+        var transaction = await _transactionService.GetTransactionByIdAsync(id, cancellationToken);
 
-        return Task.FromResult<ActionResult<InventoryTransactionResponseDto>>(
-            NotFound(new { Message = "Transaction retrieval not yet implemented" })
-        );
+        if (transaction == null)
+        {
+            _logger.LogWarning(
+                "Inventory transaction not found: TransactionId={TransactionId}",
+                id
+            );
+            return NotFound(new { Message = $"Inventory transaction not found: {id}" });
+        }
+
+        var response = new InventoryTransactionResponseDto
+        {
+            Id = transaction.Id,
+            TransactionNumber = transaction.TransactionNumber,
+            TransactionDate = transaction.TransactionDate,
+            TransactionType = transaction.TransactionType.ToString(),
+            ProductId = transaction.ProductId,
+            ProductSku = transaction.ProductSku,
+            ProductName = transaction.ProductName,
+            FromLocation = transaction.FromLocation,
+            ToLocation = transaction.ToLocation,
+            Quantity = transaction.Quantity,
+            UnitCost = transaction.UnitCost,
+            TotalCost = transaction.TotalCost,
+            JournalEntryId = transaction.JournalEntryId,
+            OrderId = transaction.OrderId,
+            DocumentNumber = transaction.DocumentNumber,
+            Notes = transaction.Notes,
+            CreatedBy = transaction.CreatedBy,
+            CreatedAt = transaction.CreatedAt,
+        };
+
+        return Ok(response);
     }
 
     /// <summary>
