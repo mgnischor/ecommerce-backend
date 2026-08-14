@@ -2,7 +2,7 @@
 
 param(
     [string]$VersionFile = "version.txt",
-    [string]$CsprojFile = "ecommerce-backend.csproj"
+    [string]$CsprojFile = "ECommerce.Backend.csproj"
 )
 
 $ErrorActionPreference = "Stop"
@@ -33,13 +33,13 @@ if ($null -ne $propertyGroup) {
     $propertyGroup.Version = $version
     $propertyGroup.AssemblyVersion = "$version.0"
     $propertyGroup.FileVersion = "$version.0"
-    
+
     if ($version.Contains("-")) {
         $propertyGroup.InformationalVersion = $version
     } else {
         $propertyGroup.InformationalVersion = "$version-dev"
     }
-    
+
     $csproj.Save((Resolve-Path $CsprojFile).Path)
     Write-Host "Version updated successfully!" -ForegroundColor Green
 } else {
