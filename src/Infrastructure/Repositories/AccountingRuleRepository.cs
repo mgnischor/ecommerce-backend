@@ -1,3 +1,4 @@
+using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces;
@@ -17,15 +18,18 @@ namespace ECommerce.Infrastructure.Repositories;
 public class AccountingRuleRepository : IAccountingRuleRepository
 {
     private readonly Persistence.PostgresqlContext _context;
+    private readonly ILoggingService _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AccountingRuleRepository"/> class.
     /// </summary>
     /// <param name="context">The database context for data access operations.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> is null.</exception>
-    public AccountingRuleRepository(Persistence.PostgresqlContext context)
+    /// <param name="logger">The logging service for diagnostic and audit information.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> or <paramref name="logger"/> is null.</exception>
+    public AccountingRuleRepository(Persistence.PostgresqlContext context, ILoggingService logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <inheritdoc />
@@ -34,6 +38,7 @@ public class AccountingRuleRepository : IAccountingRuleRepository
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Getting accounting rule: {RuleId}", id);
         return await _context.AccountingRules.FirstOrDefaultAsync(
             r => r.Id == id,
             cancellationToken
@@ -46,6 +51,7 @@ public class AccountingRuleRepository : IAccountingRuleRepository
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Getting accounting rule by code: {RuleCode}", ruleCode);
         return await _context.AccountingRules.FirstOrDefaultAsync(
             r => r.RuleCode == ruleCode && r.IsActive,
             cancellationToken
@@ -58,6 +64,10 @@ public class AccountingRuleRepository : IAccountingRuleRepository
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation(
+            "Getting accounting rules by transaction type: {TransactionType}",
+            transactionType
+        );
         return await _context
             .AccountingRules.Where(r => r.TransactionType == transactionType && r.IsActive)
             .OrderBy(r => r.Condition == null ? 0 : 1) // Rules without conditions first
@@ -69,6 +79,7 @@ public class AccountingRuleRepository : IAccountingRuleRepository
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Getting active accounting rules");
         return await _context
             .AccountingRules.Where(r => r.IsActive)
             .OrderBy(r => r.TransactionType)
@@ -81,6 +92,7 @@ public class AccountingRuleRepository : IAccountingRuleRepository
         CancellationToken cancellationToken = default
     )
     {
+        _logger.LogInformation("Getting all accounting rules");
         return await _context
             .AccountingRules.OrderBy(r => r.TransactionType)
             .ThenBy(r => r.RuleCode)
