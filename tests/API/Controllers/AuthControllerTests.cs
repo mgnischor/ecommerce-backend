@@ -47,8 +47,8 @@ public class AuthControllerTests : BaseTestFixture
         // Arrange
         var loginRequest = new LoginRequestDto
         {
-            Email = "admin@ecommerce.com.br",
-            Password = "admin",
+            Email = "admin@ecommerce.local",
+            Password = "ChangeMe!Dev#2026",
         };
 
         var user = new UserEntity
