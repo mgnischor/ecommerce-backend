@@ -14,7 +14,9 @@ docker rm -f ecommerce-postgres 2>nul
 echo.
 
 echo [2/5] Creating Docker network...
-docker network create ecommerce-network 2>nul
+REM Label the network so Docker Compose recognizes it as its own
+REM (avoids "incorrect label com.docker.compose.network" errors).
+docker network create ecommerce-network --label com.docker.compose.network=ecommerce-network 2>nul
 if %ERRORLEVEL% EQU 0 (
     echo Network created successfully
 ) else (
@@ -61,6 +63,9 @@ docker run -d ^
   --network ecommerce-network ^
   -e ASPNETCORE_ENVIRONMENT=Development ^
   -e ConnectionStrings__DefaultConnection="Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432" ^
+  -e Jwt__SecretKey="dev-only-secret-key-not-for-production-use-please-rotate-32chars-min" ^
+  -e Jwt__Issuer=ECommerceBackend ^
+  -e Jwt__Audience=ECommerceClient ^
   -e OpenTelemetry__ServiceName=ECommerce.Backend.Dev ^
   -e OpenTelemetry__OtlpEndpoint=http://localhost:4317 ^
   -p 5049:5049 ^
@@ -73,6 +78,9 @@ docker run -d ^
   --network ecommerce-network ^
   -e ASPNETCORE_ENVIRONMENT=Production ^
   -e ConnectionStrings__DefaultConnection="Host=ecommerce-postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432" ^
+  -e Jwt__SecretKey="CHANGE-ME-prod-jwt-secret-2026-RotateNow-32chars+" ^
+  -e Jwt__Issuer=ECommerceBackend ^
+  -e Jwt__Audience=ECommerceClient ^
   -e OpenTelemetry__ServiceName=ECommerce.Backend ^
   -e OpenTelemetry__OtlpEndpoint=http://localhost:4317 ^
   -p 8080:80 ^
