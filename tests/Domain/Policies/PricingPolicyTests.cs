@@ -1,6 +1,6 @@
-using ECommerce.Domain.Policies;
+using Comex.Domain.Policies;
 
-namespace ECommerce.Tests.Domain.Policies;
+namespace Comex.Tests.Domain.Policies;
 
 /// <summary>
 /// Tests for PricingPolicy
