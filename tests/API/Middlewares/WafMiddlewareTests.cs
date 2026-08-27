@@ -1,10 +1,10 @@
 using System.IO;
 using System.Net;
-using ECommerce.API.Middlewares;
+using Comex.API.Middlewares;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
-namespace ECommerce.Tests.API.Middlewares;
+namespace Comex.Tests.API.Middlewares;
 
 /// <summary>
 /// Tests for WafMiddleware
