@@ -1,12 +1,12 @@
-using ECommerce.API.Constants;
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Interfaces;
-using ECommerce.Infrastructure.Persistence;
+using Comex.API.Constants;
+using Comex.Application.Interfaces;
+using Comex.Domain.Entities;
+using Comex.Domain.Interfaces;
+using Comex.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// User management endpoints
