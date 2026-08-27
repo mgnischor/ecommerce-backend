@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ECommerce.API.DTOs;
+namespace Comex.API.DTOs;
 
 /// <summary>
 /// Request payload for creating a new order. Only the fields below are accepted
