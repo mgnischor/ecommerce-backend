@@ -1,4 +1,4 @@
-namespace ECommerce.API.Middlewares;
+namespace Comex.API.Middlewares;
 
 /// <summary>
 /// Adds standard security-related HTTP response headers to every response.
