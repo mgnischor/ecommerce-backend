@@ -3,7 +3,7 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace ECommerce.API.Filters;
+namespace Comex.API.Filters;
 
 /// <summary>
 /// Action filter that implements token bucket rate limiting to prevent API abuse and protect against denial-of-service attacks.
