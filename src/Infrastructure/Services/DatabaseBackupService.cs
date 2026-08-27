@@ -1,11 +1,11 @@
 using System.Diagnostics;
-using ECommerce.Application.Interfaces;
+using Comex.Application.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace ECommerce.Infrastructure.Services;
+namespace Comex.Infrastructure.Services;
 
 /// <summary>
 /// PostgreSQL database backup and disaster recovery service using <c>pg_dump</c> / <c>pg_restore</c>.
