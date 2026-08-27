@@ -1,4 +1,4 @@
-namespace ECommerce.Application.Interfaces;
+namespace Comex.Application.Interfaces;
 
 /// <summary>
 /// A single security audit event captured by <see cref="ISecurityAuditService"/>.
