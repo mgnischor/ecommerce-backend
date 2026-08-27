@@ -1,4 +1,4 @@
-# Security Review - E-Commerce Backend
+# Security Review - Comex Backend
 
 ## Date: February 22, 2026
 
