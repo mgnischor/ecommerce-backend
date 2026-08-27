@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Exceptions;
+namespace Comex.Domain.Exceptions;
 
 /// <summary>
 /// Base exception for all domain-related errors
