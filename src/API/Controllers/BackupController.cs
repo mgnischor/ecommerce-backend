@@ -1,9 +1,9 @@
-using ECommerce.API.DTOs;
-using ECommerce.Application.Interfaces;
+using Comex.API.DTOs;
+using Comex.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// Database backup and disaster recovery endpoints (admin only).
