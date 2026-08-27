@@ -1,10 +1,10 @@
-using ECommerce.API.DTOs;
-using ECommerce.API.Middlewares;
-using ECommerce.Application.Interfaces;
+using Comex.API.DTOs;
+using Comex.API.Middlewares;
+using Comex.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// Security monitoring endpoints (admin only).
