@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Entities;
+namespace Comex.Domain.Entities;
 
 /// <summary>
 /// Represents a journal entry in the double-entry bookkeeping system.
