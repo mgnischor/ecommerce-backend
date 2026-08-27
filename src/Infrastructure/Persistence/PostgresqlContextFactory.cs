@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace ECommerce.Infrastructure.Persistence;
+namespace Comex.Infrastructure.Persistence;
 
 /// <summary>
 /// Design-time factory for creating PostgresqlContext instances.
@@ -31,7 +31,7 @@ public class PostgresqlContextFactory : IDesignTimeDbContextFactory<PostgresqlCo
         // Get connection string from configuration
         var connectionString =
             configuration.GetConnectionString("DefaultConnection")
-            ?? "Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432";
+            ?? "Host=localhost;Database=comex;Username=comex;Password=comex;Port=5432";
 
         // Build DbContextOptions
         var optionsBuilder = new DbContextOptionsBuilder<PostgresqlContext>();
