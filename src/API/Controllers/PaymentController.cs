@@ -1,16 +1,16 @@
 using System.Security.Claims;
-using ECommerce.API.Constants;
-using ECommerce.API.DTOs;
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Enums;
-using ECommerce.Domain.Interfaces;
-using ECommerce.Infrastructure.Persistence;
+using Comex.API.Constants;
+using Comex.API.DTOs;
+using Comex.Application.Interfaces;
+using Comex.Domain.Entities;
+using Comex.Domain.Enums;
+using Comex.Domain.Interfaces;
+using Comex.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// Payment processing endpoints backed by a fictitious payment gateway.
