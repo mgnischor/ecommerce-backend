@@ -1,8 +1,8 @@
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ECommerce.Infrastructure.Configurations;
+namespace Comex.Infrastructure.Configurations;
 
 /// <summary>
 /// Configuration for the ShipmentEntity.
@@ -56,7 +56,7 @@ internal sealed class ShipmentEntityConfiguration : IEntityTypeConfiguration<Shi
             .HasColumnName("status")
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(ECommerce.Domain.Enums.ShipmentStatus.Preparing);
+            .HasDefaultValue(Comex.Domain.Enums.ShipmentStatus.Preparing);
 
         builder
             .Property(s => s.ShippingCost)
