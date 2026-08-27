@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Enums;
+namespace Comex.Domain.Enums;
 
 /// <summary>
 /// Defines various user access levels within the e-commerce system.
