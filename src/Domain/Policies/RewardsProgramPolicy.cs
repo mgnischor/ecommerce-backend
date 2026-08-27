@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Policies;
+namespace Comex.Domain.Policies;
 
 /// <summary>
 /// Defines business rules for the customer rewards and loyalty program
