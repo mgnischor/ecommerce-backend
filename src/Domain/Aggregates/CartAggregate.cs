@@ -1,6 +1,6 @@
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 
-namespace ECommerce.Domain.Aggregates;
+namespace Comex.Domain.Aggregates;
 
 /// <summary>
 /// Shopping cart aggregate root - encapsulates cart business logic
