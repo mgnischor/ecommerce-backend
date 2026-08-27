@@ -1,10 +1,10 @@
 using System.Diagnostics;
-using ECommerce.Infrastructure.Persistence;
+using Comex.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// Application diagnostics and health information endpoints (admin only).
