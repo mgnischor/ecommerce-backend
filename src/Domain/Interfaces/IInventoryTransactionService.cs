@@ -1,7 +1,7 @@
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Enums;
+using Comex.Domain.Entities;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Domain.Interfaces;
+namespace Comex.Domain.Interfaces;
 
 /// <summary>
 /// Interface for inventory transaction management
