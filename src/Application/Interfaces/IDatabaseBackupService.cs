@@ -1,4 +1,4 @@
-namespace ECommerce.Application.Interfaces;
+namespace Comex.Application.Interfaces;
 
 /// <summary>
 /// Defines operations for PostgreSQL database backup and disaster recovery.
