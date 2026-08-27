@@ -1,4 +1,4 @@
-namespace ECommerce.API.DTOs;
+namespace Comex.API.DTOs;
 
 /// <summary>
 /// A security audit event as returned by the security API.
