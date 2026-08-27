@@ -1,6 +1,6 @@
 # OpenTelemetry Integration Guide
 
-This document describes the OpenTelemetry implementation in the E-Commerce Backend API, including configuration, usage examples, and best practices.
+This document describes the OpenTelemetry implementation in the Comex Backend API, including configuration, usage examples, and best practices.
 
 ## Overview
 
@@ -17,7 +17,7 @@ OpenTelemetry provides comprehensive observability for the application through:
 ```json
 {
     "OpenTelemetry": {
-        "ServiceName": "ECommerce.Backend",
+        "ServiceName": "Comex.Backend",
         "ServiceVersion": "0.1.25",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": ""
@@ -30,7 +30,7 @@ OpenTelemetry provides comprehensive observability for the application through:
 ```json
 {
     "OpenTelemetry": {
-        "ServiceName": "ECommerce.Backend.Dev",
+        "ServiceName": "Comex.Backend.Dev",
         "ServiceVersion": "0.1.25",
         "EnableConsoleExporter": true,
         "OtlpEndpoint": "http://localhost:4317"
@@ -80,7 +80,7 @@ The following components are automatically instrumented:
 ### Using ActivityHelper
 
 ```csharp
-using ECommerce.API.Extensions;
+using Comex.API.Extensions;
 
 public class OrderService
 {
@@ -123,7 +123,7 @@ public class OrderService
 
 ```csharp
 using System.Diagnostics;
-using ECommerce.API.Extensions;
+using Comex.API.Extensions;
 
 public class PaymentService
 {
@@ -149,7 +149,7 @@ public class PaymentService
 ## Adding Tags in Controllers
 
 ```csharp
-using ECommerce.API.Extensions;
+using Comex.API.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -300,7 +300,7 @@ Example docker-compose.yml with Jaeger:
 version: "3.8"
 
 services:
-    ecommerce-backend:
+    comex-backend:
         build: .
         environment:
             - OpenTelemetry__OtlpEndpoint=http://jaeger:4317
@@ -320,9 +320,9 @@ services:
     postgres:
         image: postgres:18
         environment:
-            - POSTGRES_USER=ecommerce
-            - POSTGRES_PASSWORD=ecommerce
-            - POSTGRES_DB=ecommerce
+            - POSTGRES_USER=comex
+            - POSTGRES_PASSWORD=comex
+            - POSTGRES_DB=comex
         ports:
             - "5432:5432"
 ```
