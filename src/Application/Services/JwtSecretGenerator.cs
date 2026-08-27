@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ECommerce.Application.Services;
+namespace Comex.Application.Services;
 
 /// <summary>
 /// Generates and validates cryptographically strong JWT signing secrets.
