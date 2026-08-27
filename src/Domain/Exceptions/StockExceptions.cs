@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Exceptions;
+namespace Comex.Domain.Exceptions;
 
 /// <summary>
 /// Exception thrown when product stock is insufficient
