@@ -1,9 +1,9 @@
-using ECommerce.API.DTOs;
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Interfaces;
+using Comex.API.DTOs;
+using Comex.Application.Interfaces;
+using Comex.Domain.Entities;
+using Comex.Domain.Interfaces;
 
-namespace ECommerce.API.Services;
+namespace Comex.API.Services;
 
 /// <summary>
 /// Provides read-only accounting query operations with DTO mapping helpers.
