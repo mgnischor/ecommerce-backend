@@ -1,6 +1,6 @@
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Domain.Policies;
+namespace Comex.Domain.Policies;
 
 /// <summary>
 /// Defines business rules for email and communication delivery
