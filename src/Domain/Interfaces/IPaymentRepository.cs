@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Interfaces;
+namespace Comex.Domain.Interfaces;
 
 /// <summary>
 /// Repository interface for PaymentEntity operations
