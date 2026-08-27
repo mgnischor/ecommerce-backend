@@ -1,6 +1,6 @@
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Domain.Entities;
+namespace Comex.Domain.Entities;
 
 /// <summary>
 /// Represents an individual accounting entry (Debit or Credit) in the double-entry bookkeeping system.
