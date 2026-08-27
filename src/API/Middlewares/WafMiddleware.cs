@@ -1,10 +1,10 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using ECommerce.Application.Interfaces;
+using Comex.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.API.Middlewares;
+namespace Comex.API.Middlewares;
 
 /// <summary>
 /// Web Application Firewall middleware providing OWASP-style request filtering.
