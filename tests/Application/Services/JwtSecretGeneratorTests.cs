@@ -1,7 +1,7 @@
 using System.Text;
-using ECommerce.Application.Services;
+using Comex.Application.Services;
 
-namespace ECommerce.Tests.Application.Services;
+namespace Comex.Tests.Application.Services;
 
 /// <summary>
 /// Tests for JwtSecretGenerator
