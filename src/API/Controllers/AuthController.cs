@@ -1,12 +1,12 @@
 using System.Security.Cryptography;
 using System.Text;
-using ECommerce.API.DTOs;
-using ECommerce.API.Filters;
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Interfaces;
+using Comex.API.DTOs;
+using Comex.API.Filters;
+using Comex.Application.Interfaces;
+using Comex.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// Authentication endpoints for user login and token management
@@ -147,7 +147,7 @@ public sealed class AuthController : ControllerBase
     /// Content-Type: application/json
     ///
     /// {
-    ///    "email": "admin@ecommerce.local",
+    ///    "email": "admin@comex.local",
     ///    "password": "ChangeMe!Dev#2026"
     /// }
     /// </code>
