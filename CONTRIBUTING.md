@@ -1,16 +1,16 @@
 # Contributing Guide
 
-Welcome to the **E-Commerce Backend API** project! This document describes how you can contribute to the development of this open-source project. All contributions are welcome, whether in code, documentation, bug reports, feature suggestions, or financial support.
+Welcome to the **Comex Backend API** project! This document describes how you can contribute to the development of this open-source project. All contributions are welcome, whether in code, documentation, bug reports, feature suggestions, or financial support.
 
 ## 📋 Code of Conduct
 
 This project adopts a code of conduct to ensure a collaborative and respectful environment. By participating, you agree to:
 
--   Be respectful to all participants
--   Accept constructive feedback
--   Focus on collaborative solutions
--   Maintain privacy and data security
--   Respect the project's GPLv3 license
+- Be respectful to all participants
+- Accept constructive feedback
+- Focus on collaborative solutions
+- Maintain privacy and data security
+- Respect the project's GPLv3 license
 
 ## 🤝 How to Contribute
 
@@ -18,8 +18,8 @@ This project adopts a code of conduct to ensure a collaborative and respectful e
 
 Found an issue? Help us improve!
 
-1. **Check if already reported**: Search in [Issues](https://github.com/mgnischor/ecommerce-backend/issues) if the issue has already been reported
-2. **Create a new issue**: If not found, [open a new issue](https://github.com/mgnischor/ecommerce-backend/issues/new)
+1. **Check if already reported**: Search in [Issues](https://github.com/mgnischor/Comex.Backend/issues) if the issue has already been reported
+2. **Create a new issue**: If not found, [open a new issue](https://github.com/mgnischor/Comex.Backend/issues/new)
 3. **Provide complete details**:
     - Clear description of the problem
     - Steps to reproduce
@@ -31,8 +31,8 @@ Found an issue? Help us improve!
 
 Have an idea to improve the project?
 
-1. **Check if already suggested**: Search in [Issues](https://github.com/mgnischor/ecommerce-backend/issues) with the `enhancement` tag
-2. **Open a discussion**: [Create a new issue](https://github.com/mgnischor/ecommerce-backend/issues/new) with the `enhancement` tag
+1. **Check if already suggested**: Search in [Issues](https://github.com/mgnischor/Comex.Backend/issues) with the `enhancement` tag
+2. **Open a discussion**: [Create a new issue](https://github.com/mgnischor/Comex.Backend/issues/new) with the `enhancement` tag
 3. **Describe in detail**:
     - The problem the feature solves
     - How it would work
@@ -55,40 +55,40 @@ Want to contribute directly with code?
 
 Documentation is crucial for open-source projects!
 
--   **README.md**: Improve descriptions, installation instructions, examples
--   **Code**: Add XML comments to public methods
--   **Wiki**: Help expand repository documentation
--   **Translation**: Translate documentation to other languages
+- **README.md**: Improve descriptions, installation instructions, examples
+- **Code**: Add XML comments to public methods
+- **Wiki**: Help expand repository documentation
+- **Translation**: Translate documentation to other languages
 
 ### Financial Support
 
 This project is maintained by volunteers and any financial support is welcome:
 
--   **GitHub Sponsors**: [Support via GitHub](https://github.com/sponsors/mgnischor)
+- **GitHub Sponsors**: [Support via GitHub](https://github.com/sponsors/mgnischor)
 
 Your support helps us:
 
--   Maintain development servers
--   Acquire tools and resources
--   Dedicate more time to the project
--   Improve infrastructure
+- Maintain development servers
+- Acquire tools and resources
+- Dedicate more time to the project
+- Improve infrastructure
 
 ## 🛠 Development Setup
 
 ### Prerequisites
 
--   [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
--   [PostgreSQL 18+](https://www.postgresql.org/download/)
--   [Git](https://git-scm.com/)
--   [Docker](https://www.docker.com/) (optional)
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [PostgreSQL 18+](https://www.postgresql.org/download/)
+- [Git](https://git-scm.com/)
+- [Docker](https://www.docker.com/) (optional)
 
 ### Installation Steps
 
 1. **Clone the repository**:
 
     ```bash
-    git clone https://github.com/mgnischor/ecommerce-backend.git
-    cd ecommerce-backend
+    git clone https://github.com/mgnischor/Comex.Backend.git
+    cd Comex.Backend
     ```
 
 2. **Install dependencies**:
@@ -98,12 +98,10 @@ Your support helps us:
     ```
 
 3. **Configure the database**:
-
-    - Create a PostgreSQL database named `ecommerce`
+    - Create a PostgreSQL database named `comex`
     - Configure the connection string in `appsettings.Development.json`
 
 4. **Configure JWT**:
-
     - Add your JWT keys in `appsettings.Development.json`
 
 5. **Run migrations**:
@@ -119,9 +117,9 @@ Your support helps us:
 
 ### Useful Scripts
 
--   `scripts/build-local.ps1`: Complete build with migrations
--   `scripts/build-docker.cmd`: Docker build
--   `scripts/update-version.ps1`: Version update
+- `scripts/build-local.ps1`: Complete build with migrations
+- `scripts/build-docker.cmd`: Docker build
+- `scripts/update-version.ps1`: Version update
 
 ## 🔄 Pull Request Process
 
@@ -149,25 +147,25 @@ Your support helps us:
 
 ### C# Style
 
--   Use C# 12 features when appropriate
--   Follow [Naming Conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
--   Use `var` when the type is obvious
--   Prefer LINQ for collection operations
--   Use async/await for I/O operations
+- Use C# 12 features when appropriate
+- Follow [Naming Conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
+- Use `var` when the type is obvious
+- Prefer LINQ for collection operations
+- Use async/await for I/O operations
 
 ### Project Structure
 
--   **Domain**: Entities, Value Objects, Domain Interfaces
--   **Application**: Commands, Queries, Services, DTOs
--   **Infrastructure**: Persistence, Repositories, Configurations
--   **API**: Controllers, Middlewares, Configuration
+- **Domain**: Entities, Value Objects, Domain Interfaces
+- **Application**: Commands, Queries, Services, DTOs
+- **Infrastructure**: Persistence, Repositories, Configurations
+- **API**: Controllers, Middlewares, Configuration
 
 ### Testing
 
--   Write unit tests for business logic
--   Use integration tests for APIs
--   Maintain test coverage above 80%
--   Name tests descriptively: `Should_Return_Product_When_Valid_Id`
+- Write unit tests for business logic
+- Use integration tests for APIs
+- Maintain test coverage above 80%
+- Name tests descriptively: `Should_Return_Product_When_Valid_Id`
 
 **Running Tests:**
 
@@ -202,8 +200,8 @@ By contributing, you agree that your contributions will be licensed under the **
 
 Thank you for contributing! Your help makes this project better for the entire community. Every contribution, no matter how small, is valuable.
 
-For questions, open an [issue](https://github.com/mgnischor/ecommerce-backend/issues) or contact [miguel@datatower.tech](mailto:miguel@datatower.tech).
+For questions, open an [issue](https://github.com/mgnischor/Comex.Backend/issues) or contact [miguel@datatower.tech](mailto:miguel@datatower.tech).
 
 ---
 
-**Repository**: [https://github.com/mgnischor/ecommerce-backend](https://github.com/mgnischor/ecommerce-backend)
+**Repository**: [https://github.com/mgnischor/Comex.Backend](https://github.com/mgnischor/Comex.Backend)
