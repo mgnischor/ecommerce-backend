@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace ECommerce.src.Infrastructure.Migrations
+namespace Comex.src.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class Migration_v0_1_18 : Migration
