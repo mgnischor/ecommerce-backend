@@ -1,6 +1,6 @@
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 
-namespace ECommerce.Domain.Interfaces;
+namespace Comex.Domain.Interfaces;
 
 /// <summary>
 /// Repository interface for financial transaction data access operations
