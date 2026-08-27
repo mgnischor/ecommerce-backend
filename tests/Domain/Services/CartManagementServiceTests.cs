@@ -1,4 +1,4 @@
-namespace ECommerce.Tests.Domain.Services;
+namespace Comex.Tests.Domain.Services;
 
 /// <summary>
 /// Tests for CartManagementService domain service
