@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Entities;
+namespace Comex.Domain.Entities;
 
 /// <summary>
 /// Represents a shopping cart for a customer in the e-commerce system.
