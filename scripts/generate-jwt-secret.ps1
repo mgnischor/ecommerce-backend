@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 $projectDir = Split-Path -Parent $PSScriptRoot
 Push-Location $projectDir
 try {
-    $secret = dotnet run --project ECommerce.Backend.csproj -- --generate-jwt-secret
+    $secret = dotnet run --project Comex.Backend.csproj -- --generate-jwt-secret
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to generate JWT secret (exit code $LASTEXITCODE)."
     }
