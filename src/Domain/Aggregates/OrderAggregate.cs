@@ -1,7 +1,7 @@
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Enums;
+using Comex.Domain.Entities;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Domain.Aggregates;
+namespace Comex.Domain.Aggregates;
 
 /// <summary>
 /// Order aggregate root - encapsulates order business logic and maintains consistency
