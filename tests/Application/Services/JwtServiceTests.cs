@@ -1,7 +1,7 @@
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 
-namespace ECommerce.Tests.Application.Services;
+namespace Comex.Tests.Application.Services;
 
 /// <summary>
 /// Tests for JwtService
