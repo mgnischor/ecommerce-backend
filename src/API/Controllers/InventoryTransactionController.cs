@@ -1,14 +1,14 @@
 using System.Security.Claims;
-using ECommerce.API.DTOs;
-using ECommerce.Application.Services;
-using ECommerce.Domain.Enums;
-using ECommerce.Domain.Interfaces;
-using ECommerce.Domain.Policies;
+using Comex.API.DTOs;
+using Comex.Application.Services;
+using Comex.Domain.Enums;
+using Comex.Domain.Interfaces;
+using Comex.Domain.Policies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AppInterfaces = ECommerce.Application.Interfaces;
+using AppInterfaces = Comex.Application.Interfaces;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// Inventory transaction management endpoints
