@@ -1,8 +1,8 @@
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Events;
-using ECommerce.Domain.Policies;
+using Comex.Domain.Entities;
+using Comex.Domain.Events;
+using Comex.Domain.Policies;
 
-namespace ECommerce.Domain.Aggregates;
+namespace Comex.Domain.Aggregates;
 
 /// <summary>
 /// Product aggregate root - encapsulates product business logic with inventory
