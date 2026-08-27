@@ -1,8 +1,8 @@
-using ECommerce.Domain.Interfaces;
-using ECommerce.Infrastructure.Persistence;
+using Comex.Domain.Interfaces;
+using Comex.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Infrastructure.Repositories;
+namespace Comex.Infrastructure.Repositories;
 
 /// <summary>
 /// Generic repository implementation for data access operations
