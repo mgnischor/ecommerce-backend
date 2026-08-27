@@ -1,8 +1,8 @@
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ECommerce.Infrastructure.Configurations;
+namespace Comex.Infrastructure.Configurations;
 
 /// <summary>
 /// Configuration for the RefundEntity.
@@ -42,7 +42,7 @@ internal sealed class RefundEntityConfiguration : IEntityTypeConfiguration<Refun
             .HasColumnName("status")
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(ECommerce.Domain.Enums.RefundStatus.Requested);
+            .HasDefaultValue(Comex.Domain.Enums.RefundStatus.Requested);
 
         builder
             .Property(r => r.RefundAmount)
