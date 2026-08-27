@@ -1,6 +1,6 @@
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Tests.Domain.Services;
+namespace Comex.Tests.Domain.Services;
 
 /// <summary>
 /// Tests for FraudDetectionService domain service
