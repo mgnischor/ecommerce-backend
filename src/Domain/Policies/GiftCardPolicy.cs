@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Policies;
+namespace Comex.Domain.Policies;
 
 /// <summary>
 /// Defines business rules for gift card validation and redemption
