@@ -1,7 +1,7 @@
-using ECommerce.Domain.Enums;
-using ECommerce.Domain.Policies;
+using Comex.Domain.Enums;
+using Comex.Domain.Policies;
 
-namespace ECommerce.Tests.Domain.Policies;
+namespace Comex.Tests.Domain.Policies;
 
 /// <summary>
 /// Tests for OrderValidationPolicy
