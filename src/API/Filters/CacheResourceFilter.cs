@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace ECommerce.API.Filters;
+namespace Comex.API.Filters;
 
 /// <summary>
 /// Resource filter that implements in-memory response caching for GET requests to improve API performance.
