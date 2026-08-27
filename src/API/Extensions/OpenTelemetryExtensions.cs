@@ -3,7 +3,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace ECommerce.API.Extensions;
+namespace Comex.API.Extensions;
 
 /// <summary>
 /// Extension methods for configuring OpenTelemetry observability in the application.
@@ -15,7 +15,7 @@ public static class OpenTelemetryExtensions
     /// Application activity source for custom tracing spans.
     /// Use this to create custom spans throughout the application.
     /// </summary>
-    public static readonly ActivitySource ActivitySource = new("ECommerce.Backend", "1.0.0");
+    public static readonly ActivitySource ActivitySource = new("Comex.Backend", "1.0.0");
 
     /// <summary>
     /// Configures OpenTelemetry with tracing and metrics for the application.
@@ -26,7 +26,7 @@ public static class OpenTelemetryExtensions
         this WebApplicationBuilder builder
     )
     {
-        var serviceName = builder.Configuration["OpenTelemetry:ServiceName"] ?? "ECommerce.Backend";
+        var serviceName = builder.Configuration["OpenTelemetry:ServiceName"] ?? "Comex.Backend";
         var serviceVersion = builder.Configuration["OpenTelemetry:ServiceVersion"] ?? "1.0.0";
         var otlpEndpoint = builder.Configuration["OpenTelemetry:OtlpEndpoint"];
         var enableConsoleExporter = builder.Configuration.GetValue<bool>(
@@ -108,7 +108,7 @@ public static class OpenTelemetryExtensions
                     })
                     // Add custom application activity sources
                     .AddSource(ActivitySource.Name)
-                    .AddSource("ECommerce.Application.Accounting");
+                    .AddSource("Comex.Application.Accounting");
 
                 // Add console exporter for development
                 if (enableConsoleExporter)
