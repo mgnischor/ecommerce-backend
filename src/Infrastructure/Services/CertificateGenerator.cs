@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
-namespace ECommerce.Infrastructure.Services;
+namespace Comex.Infrastructure.Services;
 
 /// <summary>
 /// Generates self-signed TLS certificates for local development and non-production HTTPS.
