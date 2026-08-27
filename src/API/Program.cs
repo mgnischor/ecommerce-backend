@@ -1,16 +1,16 @@
 using System.Net;
 using System.Text;
 using System.Threading.RateLimiting;
-using ECommerce.API.Extensions;
-using ECommerce.API.Middlewares;
-using ECommerce.API.Services;
-using ECommerce.Application.Interfaces;
-using ECommerce.Application.Services;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Interfaces;
-using ECommerce.Infrastructure.Persistence;
-using ECommerce.Infrastructure.Repositories;
-using ECommerce.Infrastructure.Services;
+using Comex.API.Extensions;
+using Comex.API.Middlewares;
+using Comex.API.Services;
+using Comex.Application.Interfaces;
+using Comex.Application.Services;
+using Comex.Domain.Entities;
+using Comex.Domain.Interfaces;
+using Comex.Infrastructure.Persistence;
+using Comex.Infrastructure.Repositories;
+using Comex.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
@@ -86,7 +86,7 @@ builder.Services.AddScoped<IAccountingQueryService, AccountingQueryService>();
 var certificatesSection = builder.Configuration.GetSection("Certificates");
 if (certificatesSection.GetValue<bool>("Enabled"))
 {
-    var certPath = certificatesSection["Path"] ?? "certs/ecommerce.pfx";
+    var certPath = certificatesSection["Path"] ?? "certs/comex.pfx";
     var certPassword = certificatesSection["Password"];
     var certHost = certificatesSection["Host"] ?? "localhost";
     var daysValid = certificatesSection.GetValue("DaysValid", 365);
@@ -115,7 +115,7 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAccountingService, AccountingService>();
 builder.Services.AddScoped<
-    ECommerce.Application.Interfaces.IInventoryTransactionService,
+    Comex.Application.Interfaces.IInventoryTransactionService,
     InventoryTransactionService
 >();
 builder.Services.AddScoped<IFinancialService, FinancialService>();
@@ -216,7 +216,7 @@ builder.Services.AddCors(options =>
 });
 
 // Register filters that need DI
-builder.Services.AddScoped<ECommerce.API.Filters.ApiExceptionFilter>();
+builder.Services.AddScoped<Comex.API.Filters.ApiExceptionFilter>();
 builder.Services.AddMemoryCache();
 
 // Configure rate limiting
@@ -282,8 +282,8 @@ if (!app.Environment.IsDevelopment())
 // 1. WAF (request filtering) - after forwarded headers so the real client IP is visible
 // 2. Security headers
 // 3. Exception handling
-app.UseMiddleware<ECommerce.API.Middlewares.WafMiddleware>();
-app.UseMiddleware<ECommerce.API.Middlewares.SecurityHeadersMiddleware>();
+app.UseMiddleware<Comex.API.Middlewares.WafMiddleware>();
+app.UseMiddleware<Comex.API.Middlewares.SecurityHeadersMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Apply migrations and seed database (gated by configuration)
@@ -339,7 +339,7 @@ if (app.Environment.IsDevelopment())
             options.HideSearch = false;
             options.ShowSidebar = true;
             options.Theme = ScalarTheme.DeepSpace;
-            options.Title = "E-Commerce API";
+            options.Title = "Comex API";
             options.WithDirectDocumentDownload();
             options.WithJsonDocumentDownload();
             options.WithOpenApiRoutePattern("/openapi/{documentName}.json");
