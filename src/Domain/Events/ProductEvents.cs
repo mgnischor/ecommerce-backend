@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Events;
+namespace Comex.Domain.Events;
 
 /// <summary>
 /// Event raised when a new product is created
