@@ -2,7 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.API.Middlewares;
+namespace Comex.API.Middlewares;
 
 /// <summary>
 /// Middleware for handling exceptions globally and logging them
