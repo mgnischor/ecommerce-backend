@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace ECommerce.API.Filters;
+namespace Comex.API.Filters;
 
 /// <summary>
 /// Action filter that validates model state before controller action execution
