@@ -1,6 +1,6 @@
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Domain.Entities;
+namespace Comex.Domain.Entities;
 
 /// <summary>
 /// Represents an accounting rule that maps transaction types to chart of accounts.
