@@ -1,4 +1,4 @@
-namespace ECommerce.Tests.Application.Services;
+namespace Comex.Tests.Application.Services;
 
 /// <summary>
 /// Tests for LoggingService
