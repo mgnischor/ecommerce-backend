@@ -1,7 +1,7 @@
-using ECommerce.Application.Interfaces;
-using ECommerce.Application.Services;
+using Comex.Application.Interfaces;
+using Comex.Application.Services;
 
-namespace ECommerce.Tests.Application.Services;
+namespace Comex.Tests.Application.Services;
 
 /// <summary>
 /// Tests for SecurityAuditService
