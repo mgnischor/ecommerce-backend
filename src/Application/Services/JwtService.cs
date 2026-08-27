@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using System.Text;
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Entities;
+using Comex.Application.Interfaces;
+using Comex.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace ECommerce.Application.Services;
+namespace Comex.Application.Services;
 
 /// <summary>
 /// Service for generating and managing JWT tokens
