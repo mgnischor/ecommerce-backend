@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Enums;
+namespace Comex.Domain.Enums;
 
 /// <summary>
 /// Accounting account types (Chart of Accounts - Brazilian GAAP NBC TG)
