@@ -1,6 +1,6 @@
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 
-namespace ECommerce.Application.Interfaces;
+namespace Comex.Application.Interfaces;
 
 /// <summary>
 /// Interface for JWT token generation and validation
