@@ -1,8 +1,8 @@
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Enums;
+using Comex.Domain.Entities;
+using Comex.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Infrastructure.Persistence;
+namespace Comex.Infrastructure.Persistence;
 
 /// <summary>
 /// Database seeding for Chart of Accounts and Accounting Rules
