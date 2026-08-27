@@ -1,4 +1,4 @@
-namespace ECommerce.API.DTOs;
+namespace Comex.API.DTOs;
 
 /// <summary>
 /// Data Transfer Object (DTO) for chart of accounts response
