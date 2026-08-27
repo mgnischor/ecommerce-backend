@@ -25,17 +25,17 @@ jobs:
                   cache-dependency-path: "**/packages.lock.json"
 
             - name: Restore dependencies
-              run: dotnet restore ECommerce.sln
+              run: dotnet restore Comex.sln
 
             - name: Verify formatting
               if: matrix.configuration == 'Debug'
-              run: dotnet format --verify-no-changes --verbosity diagnostic ECommerce.sln
+              run: dotnet format --verify-no-changes --verbosity diagnostic Comex.sln
 
             - name: Build
-              run: dotnet build ECommerce.sln --configuration ${{ matrix.configuration }} --no-restore
+              run: dotnet build Comex.sln --configuration ${{ matrix.configuration }} --no-restore
 
             - name: Test
-              run: dotnet test ECommerce.sln --configuration ${{ matrix.configuration }} --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+              run: dotnet test Comex.sln --configuration ${{ matrix.configuration }} --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
 
             - name: Upload coverage reports
               uses: actions/upload-artifact@v4
@@ -45,7 +45,7 @@ jobs:
                   retention-days: 7
 
             - name: Publish
-              run: dotnet publish ECommerce.sln --configuration ${{ matrix.configuration }} --no-build --output ./publish/${{ matrix.configuration }}
+              run: dotnet publish Comex.sln --configuration ${{ matrix.configuration }} --no-build --output ./publish/${{ matrix.configuration }}
 
             - name: Upload build artifacts
               uses: actions/upload-artifact@v4
