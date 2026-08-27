@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Interfaces;
+namespace Comex.Domain.Interfaces;
 
 /// <summary>
 /// Generic repository interface for data access operations
