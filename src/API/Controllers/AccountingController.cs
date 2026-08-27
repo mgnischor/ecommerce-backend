@@ -1,11 +1,11 @@
-using ECommerce.API.DTOs;
-using ECommerce.API.Services;
-using ECommerce.Application.Interfaces;
-using ECommerce.Application.Services;
+using Comex.API.DTOs;
+using Comex.API.Services;
+using Comex.Application.Interfaces;
+using Comex.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// Accounting and financial management endpoints
