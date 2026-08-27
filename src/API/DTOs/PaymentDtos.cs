@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 
-namespace ECommerce.API.DTOs;
+namespace Comex.API.DTOs;
 
 /// <summary>
 /// Request payload to initiate a payment for an existing order.
