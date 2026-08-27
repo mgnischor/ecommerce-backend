@@ -1,8 +1,8 @@
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ECommerce.Infrastructure.Configurations;
+namespace Comex.Infrastructure.Configurations;
 
 /// <summary>
 /// Configuration for the VendorEntity.
@@ -142,7 +142,7 @@ internal sealed class VendorEntityConfiguration : IEntityTypeConfiguration<Vendo
             .HasColumnName("status")
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(ECommerce.Domain.Enums.VendorStatus.Pending);
+            .HasDefaultValue(Comex.Domain.Enums.VendorStatus.Pending);
 
         builder
             .Property(v => v.BankAccountNumber)
