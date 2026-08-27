@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.ValueObjects;
+namespace Comex.Domain.ValueObjects;
 
 /// <summary>
 /// Value object representing a product SKU (Stock Keeping Unit)
