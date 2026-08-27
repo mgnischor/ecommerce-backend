@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Enums;
+namespace Comex.Domain.Enums;
 
 /// <summary>
 /// Defines various product statuses within the e-commerce system.
