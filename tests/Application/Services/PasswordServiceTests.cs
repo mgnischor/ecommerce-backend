@@ -1,6 +1,6 @@
-using ECommerce.Tests.TestFixtures;
+using Comex.Tests.TestFixtures;
 
-namespace ECommerce.Tests.Application.Services;
+namespace Comex.Tests.Application.Services;
 
 /// <summary>
 /// Unit tests for PasswordService
