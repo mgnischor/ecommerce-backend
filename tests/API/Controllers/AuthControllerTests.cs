@@ -1,12 +1,12 @@
 using System.Net;
 using System.Threading;
-using ECommerce.API.Controllers;
-using ECommerce.API.DTOs;
-using ECommerce.Domain.Enums;
+using Comex.API.Controllers;
+using Comex.API.DTOs;
+using Comex.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.Tests.API.Controllers;
+namespace Comex.Tests.API.Controllers;
 
 /// <summary>
 /// Tests for AuthController
@@ -50,7 +50,7 @@ public class AuthControllerTests : BaseTestFixture
         // Arrange
         var loginRequest = new LoginRequestDto
         {
-            Email = "admin@ecommerce.local",
+            Email = "admin@comex.local",
             Password = "ChangeMe!Dev#2026",
         };
 
