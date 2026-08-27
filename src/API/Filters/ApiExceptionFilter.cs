@@ -1,9 +1,9 @@
 using System.Net;
-using ECommerce.Domain.Exceptions;
+using Comex.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace ECommerce.API.Filters;
+namespace Comex.API.Filters;
 
 /// <summary>
 /// Exception filter that handles domain exceptions and converts them to appropriate HTTP responses.
