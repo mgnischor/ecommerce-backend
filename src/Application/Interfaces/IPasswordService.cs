@@ -1,4 +1,4 @@
-namespace ECommerce.Application.Interfaces;
+namespace Comex.Application.Interfaces;
 
 /// <summary>
 /// Interface for password hashing and verification
