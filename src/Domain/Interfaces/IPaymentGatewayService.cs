@@ -1,6 +1,6 @@
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Domain.Interfaces;
+namespace Comex.Domain.Interfaces;
 
 /// <summary>
 /// Represents the result returned by the payment gateway after processing a payment or refund.
