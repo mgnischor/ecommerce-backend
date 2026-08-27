@@ -1,11 +1,11 @@
-namespace ECommerce.Application.Interfaces;
+namespace Comex.Application.Interfaces;
 
 /// <summary>
 /// Describes a single database backup file on disk.
 /// </summary>
 public sealed class BackupFileInfo
 {
-    /// <summary>File name of the backup, e.g. <c>20260614-120000_ecommerce.dump</c>.</summary>
+    /// <summary>File name of the backup, e.g. <c>20260614-120000_comex.dump</c>.</summary>
     public string FileName { get; init; } = string.Empty;
 
     /// <summary>Full path of the backup file.</summary>
