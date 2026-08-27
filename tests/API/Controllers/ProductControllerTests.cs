@@ -1,10 +1,10 @@
-using ECommerce.API.Controllers;
-using ECommerce.Domain.Enums;
-using ECommerce.Infrastructure.Persistence;
+using Comex.API.Controllers;
+using Comex.Domain.Enums;
+using Comex.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.Tests.API.Controllers;
+namespace Comex.Tests.API.Controllers;
 
 /// <summary>
 /// Tests for ProductController
