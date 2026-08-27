@@ -1,4 +1,4 @@
-namespace ECommerce.API.Constants;
+namespace Comex.API.Constants;
 
 /// <summary>
 /// Centralized error messages used across all API controllers
