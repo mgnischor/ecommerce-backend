@@ -17,7 +17,7 @@ if /i "%1"=="nobuild" (
 cd /d "%~dp0\.."
 
 echo ====================================
-echo  E-Commerce Docker Build (%STACK%)
+echo  Comex Docker Build (%STACK%)
 echo ====================================
 echo.
 
