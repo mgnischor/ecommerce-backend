@@ -1,8 +1,8 @@
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Enums;
-using ECommerce.Domain.Policies;
+using Comex.Domain.Entities;
+using Comex.Domain.Enums;
+using Comex.Domain.Policies;
 
-namespace ECommerce.Domain.Services;
+namespace Comex.Domain.Services;
 
 /// <summary>
 /// Domain service for managing order lifecycle and state transitions
