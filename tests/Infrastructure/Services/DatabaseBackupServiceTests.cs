@@ -1,9 +1,9 @@
 using System.IO;
-using ECommerce.Infrastructure.Services;
+using Comex.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace ECommerce.Tests.Infrastructure.Services;
+namespace Comex.Tests.Infrastructure.Services;
 
 /// <summary>
 /// Tests for DatabaseBackupService (file operations only; process invocation is not tested).
@@ -28,7 +28,7 @@ public class DatabaseBackupServiceTests
                 new Dictionary<string, string?>
                 {
                     ["ConnectionStrings:DefaultConnection"] =
-                        "Host=localhost;Port=5432;Database=ecommerce;Username=ecommerce;Password=ecommerce",
+                        "Host=localhost;Port=5432;Database=comex;Username=comex;Password=comex",
                     ["Backup:Directory"] = _tempDirectory,
                     ["Backup:RetentionDays"] = "7",
                 }
@@ -52,16 +52,16 @@ public class DatabaseBackupServiceTests
     public async Task ListBackupsAsync_ReturnsBackupFiles_NewestFirst()
     {
         // Arrange
-        File.WriteAllText(Path.Combine(_tempDirectory, "20260610-100000_ecommerce.dump"), "data");
+        File.WriteAllText(Path.Combine(_tempDirectory, "20260610-100000_comex.dump"), "data");
         await Task.Delay(10);
-        File.WriteAllText(Path.Combine(_tempDirectory, "20260614-100000_ecommerce.dump"), "data");
+        File.WriteAllText(Path.Combine(_tempDirectory, "20260614-100000_comex.dump"), "data");
 
         // Act
         var backups = await _service.ListBackupsAsync();
 
         // Assert
         backups.Should().HaveCount(2);
-        backups[0].FileName.Should().Be("20260614-100000_ecommerce.dump");
+        backups[0].FileName.Should().Be("20260614-100000_comex.dump");
         backups[0].SizeBytes.Should().Be(4);
     }
 
@@ -84,7 +84,7 @@ public class DatabaseBackupServiceTests
     public async Task DeleteBackupAsync_WithValidFile_DeletesIt()
     {
         // Arrange
-        var fileName = "20260614-100000_ecommerce.dump";
+        var fileName = "20260614-100000_comex.dump";
         File.WriteAllText(Path.Combine(_tempDirectory, fileName), "data");
 
         // Act
