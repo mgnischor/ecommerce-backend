@@ -445,7 +445,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Complete E-Commerce Domain Entities**: Comprehensive database schema for e-commerce operations
+- **Complete Comex Domain Entities**: Comprehensive database schema for e-commerce operations
     - **Orders Management**:
         - `OrderEntity` with order tracking, status management, and multi-address support
         - `OrderItemEntity` for line items with pricing, discounts, and tax calculations
@@ -627,8 +627,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Timestamp formatting: "yyyy-MM-dd HH:mm:ss"
     - Scope inclusion enabled for better traceability
     - Namespace-specific log level configuration:
-        - Production: ECommerce._ → Information, Microsoft._ → Warning
-        - Development: ECommerce._ → Debug, Microsoft._ → Information
+        - Production: Comex._ → Information, Microsoft._ → Warning
+        - Development: Comex._ → Debug, Microsoft._ → Information
 
 ### Changed
 
@@ -832,7 +832,7 @@ CREATE TABLE users (
 - **0.0.13** - Build version increment
 - **0.0.12** - Build version increment
 - **0.0.11** - Build version increment
-- **0.0.10** - Complete E-Commerce Domain Entities
+- **0.0.10** - Complete Comex Domain Entities
 - **0.0.9** - Integrated Accounting System
 - **0.0.8** - Comprehensive Logging System
 - **0.0.7** - Product Management System
@@ -843,28 +843,28 @@ CREATE TABLE users (
 - **0.0.2** - User Management & Authentication
 - **0.0.1** - Initial Setup
 
-[Unreleased]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.24...HEAD
-[0.1.24]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.23...v0.1.24
-[0.1.23]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.22...v0.1.23
-[0.1.22]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.21...v0.1.22
-[0.1.21]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.20...v0.1.21
-[0.1.20]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.19...v0.1.20
-[0.1.19]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.18...v0.1.19
-[0.1.18]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.17...v0.1.18
-[0.1.17]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.16...v0.1.17
-[0.1.16]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.15...v0.1.16
-[0.1.15]: https://github.com/mgnischor/ecommerce-backend/compare/v0.1.14...v0.1.15
-[0.1.14]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.13...v0.1.14
-[0.0.13]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.12...v0.0.13
-[0.0.12]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.11...v0.0.12
-[0.0.11]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.10...v0.0.11
-[0.0.10]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.9...v0.0.10
-[0.0.9]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.8...v0.0.9
-[0.0.8]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.7...v0.0.8
-[0.0.7]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.6...v0.0.7
-[0.0.6]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.5...v0.0.6
-[0.0.5]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.4...v0.0.5
-[0.0.4]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.3...v0.0.4
-[0.0.3]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.2...v0.0.3
-[0.0.2]: https://github.com/mgnischor/ecommerce-backend/compare/v0.0.1...v0.0.2
-[0.0.1]: https://github.com/mgnischor/ecommerce-backend/releases/tag/v0.0.1
+[Unreleased]: https://github.com/mgnischor/comex-backend/compare/v0.1.24...HEAD
+[0.1.24]: https://github.com/mgnischor/comex-backend/compare/v0.1.23...v0.1.24
+[0.1.23]: https://github.com/mgnischor/comex-backend/compare/v0.1.22...v0.1.23
+[0.1.22]: https://github.com/mgnischor/comex-backend/compare/v0.1.21...v0.1.22
+[0.1.21]: https://github.com/mgnischor/comex-backend/compare/v0.1.20...v0.1.21
+[0.1.20]: https://github.com/mgnischor/comex-backend/compare/v0.1.19...v0.1.20
+[0.1.19]: https://github.com/mgnischor/comex-backend/compare/v0.1.18...v0.1.19
+[0.1.18]: https://github.com/mgnischor/comex-backend/compare/v0.1.17...v0.1.18
+[0.1.17]: https://github.com/mgnischor/comex-backend/compare/v0.1.16...v0.1.17
+[0.1.16]: https://github.com/mgnischor/comex-backend/compare/v0.1.15...v0.1.16
+[0.1.15]: https://github.com/mgnischor/comex-backend/compare/v0.1.14...v0.1.15
+[0.1.14]: https://github.com/mgnischor/comex-backend/compare/v0.0.13...v0.1.14
+[0.0.13]: https://github.com/mgnischor/comex-backend/compare/v0.0.12...v0.0.13
+[0.0.12]: https://github.com/mgnischor/comex-backend/compare/v0.0.11...v0.0.12
+[0.0.11]: https://github.com/mgnischor/comex-backend/compare/v0.0.10...v0.0.11
+[0.0.10]: https://github.com/mgnischor/comex-backend/compare/v0.0.9...v0.0.10
+[0.0.9]: https://github.com/mgnischor/comex-backend/compare/v0.0.8...v0.0.9
+[0.0.8]: https://github.com/mgnischor/comex-backend/compare/v0.0.7...v0.0.8
+[0.0.7]: https://github.com/mgnischor/comex-backend/compare/v0.0.6...v0.0.7
+[0.0.6]: https://github.com/mgnischor/comex-backend/compare/v0.0.5...v0.0.6
+[0.0.5]: https://github.com/mgnischor/comex-backend/compare/v0.0.4...v0.0.5
+[0.0.4]: https://github.com/mgnischor/comex-backend/compare/v0.0.3...v0.0.4
+[0.0.3]: https://github.com/mgnischor/comex-backend/compare/v0.0.2...v0.0.3
+[0.0.2]: https://github.com/mgnischor/comex-backend/compare/v0.0.1...v0.0.2
+[0.0.1]: https://github.com/mgnischor/comex-backend/releases/tag/v0.0.1
