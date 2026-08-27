@@ -1,9 +1,9 @@
 using System.Security.Claims;
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace ECommerce.API.Filters;
+namespace Comex.API.Filters;
 
 /// <summary>
 /// Authorization filter that enforces role-based access control
