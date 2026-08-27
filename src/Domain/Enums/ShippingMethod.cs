@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Enums;
+namespace Comex.Domain.Enums;
 
 /// <summary>
 /// Represents the shipping method for an order
