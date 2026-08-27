@@ -1,13 +1,13 @@
 using System.Security.Claims;
-using ECommerce.API.Constants;
-using ECommerce.API.DTOs;
-using ECommerce.Application.Interfaces;
-using ECommerce.Application.Services;
-using ECommerce.Domain.Interfaces;
+using Comex.API.Constants;
+using Comex.API.DTOs;
+using Comex.Application.Interfaces;
+using Comex.Application.Services;
+using Comex.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// Financial transaction and cash flow management endpoints
