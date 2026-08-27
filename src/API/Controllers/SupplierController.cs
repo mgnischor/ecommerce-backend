@@ -1,14 +1,14 @@
-using ECommerce.API.Constants;
-using ECommerce.Application.Interfaces;
-using ECommerce.Application.Services;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Policies;
-using ECommerce.Infrastructure.Persistence;
+using Comex.API.Constants;
+using Comex.Application.Interfaces;
+using Comex.Application.Services;
+using Comex.Domain.Entities;
+using Comex.Domain.Policies;
+using Comex.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// Provides endpoints for managing supplier entities in the e-commerce system
