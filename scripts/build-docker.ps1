@@ -12,7 +12,7 @@ $composeFile = if ($Dev) { "docker-compose.dev.yml" } else { "docker-compose.yml
 $stack = if ($Dev) { "desenvolvimento" } else { "produção" }
 
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host " E-Commerce Docker Build ($stack)" -ForegroundColor Cyan
+Write-Host " Comex Docker Build ($stack)" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host ""
 
