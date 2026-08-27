@@ -4,18 +4,18 @@ setlocal enabledelayedexpansion
 cd /d "%~dp0\.."
 
 REM Resolve the backend project directory so this script works from either
-REM repository of the stack (ecommerce-backend or ecommerce-frontend).
-if not exist "%CD%\ECommerce.Backend.csproj" (
-    if exist "%CD%\..\ecommerce-backend\ECommerce.Backend.csproj" (
-        cd /d "%CD%\..\ecommerce-backend"
+REM repository of the stack (comex-backend or comex-frontend).
+if not exist "%CD%\Comex.Backend.csproj" (
+    if exist "%CD%\..\comex-backend\Comex.Backend.csproj" (
+        cd /d "%CD%\..\comex-backend"
     ) else (
-        echo ERROR: ECommerce.Backend.csproj not found in this repository or in ..\ecommerce-backend
+        echo ERROR: Comex.Backend.csproj not found in this repository or in ..\comex-backend
         exit /b 1
     )
 )
 
 echo ====================================
-echo  Ecommerce Backend Build Script
+echo  Comex Backend Build Script
 echo  (Uses LOCAL PostgreSQL)
 echo ====================================
 echo.
@@ -62,7 +62,7 @@ set MIGRATION_NAME=Migration_v%MAJOR%_%MINOR%_%BUILD%
 echo Migration name: %MIGRATION_NAME%
 
 dotnet ef migrations add %MIGRATION_NAME% ^
-    --project ECommerce.Backend.csproj ^
+    --project Comex.Backend.csproj ^
     --output-dir src\Infrastructure\Migrations ^
     --context PostgresqlContext
 
@@ -77,14 +77,14 @@ echo.
 
 echo [5/8] Building project...
 echo Building Release configuration...
-dotnet build ECommerce.Backend.csproj -c Release --no-incremental
+dotnet build Comex.Backend.csproj -c Release --no-incremental
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Release build failed
     exit /b 1
 )
 
 echo Building Debug configuration...
-dotnet build ECommerce.Backend.csproj -c Debug --no-incremental
+dotnet build Comex.Backend.csproj -c Debug --no-incremental
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Debug build failed
     exit /b 1
@@ -93,14 +93,14 @@ echo.
 
 echo [6/8] Publishing project...
 echo Publishing Release configuration...
-dotnet publish ECommerce.Backend.csproj -c Release --no-build
+dotnet publish Comex.Backend.csproj -c Release --no-build
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Release publish failed
     exit /b 1
 )
 
 echo Publishing Debug configuration...
-dotnet publish ECommerce.Backend.csproj -c Debug --no-build
+dotnet publish Comex.Backend.csproj -c Debug --no-build
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Debug publish failed
     exit /b 1
@@ -120,7 +120,7 @@ echo.
 echo [8/8] Applying database migrations...
 echo Updating database with latest migrations...
 dotnet ef database update ^
-    --project ECommerce.Backend.csproj ^
+    --project Comex.Backend.csproj ^
     --context PostgresqlContext
 
 if %ERRORLEVEL% NEQ 0 (
