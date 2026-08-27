@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Infrastructure.Persistence;
+namespace Comex.Infrastructure.Persistence;
 
 public class PostgresqlContext : DbContext
 {
