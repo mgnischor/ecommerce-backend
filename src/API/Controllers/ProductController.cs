@@ -1,12 +1,12 @@
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Interfaces;
-using ECommerce.Domain.Policies;
-using ECommerce.Infrastructure.Persistence;
+using Comex.Application.Interfaces;
+using Comex.Domain.Entities;
+using Comex.Domain.Interfaces;
+using Comex.Domain.Policies;
+using Comex.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.API.Controllers;
+namespace Comex.API.Controllers;
 
 /// <summary>
 /// Product catalog management endpoints
