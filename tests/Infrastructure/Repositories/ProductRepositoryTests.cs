@@ -1,6 +1,6 @@
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Tests.Infrastructure.Repositories;
+namespace Comex.Tests.Infrastructure.Repositories;
 
 /// <summary>
 /// Tests for ProductRepository
