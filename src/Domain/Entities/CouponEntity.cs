@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Entities;
+namespace Comex.Domain.Entities;
 
 /// <summary>
 /// Represents a promotional discount coupon that can be applied to orders.
