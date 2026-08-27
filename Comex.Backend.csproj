@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
-        <AssemblyName>ECommerce.Backend</AssemblyName>
+        <AssemblyName>Comex.Backend</AssemblyName>
         <AssemblyVersion>0.1.25.0</AssemblyVersion>
         <Authors>Miguel Nischor</Authors>
         <Company>Miguel Nischor</Company>
@@ -13,10 +13,10 @@
         <NeutralLanguage>en-US</NeutralLanguage>
         <Nullable>enable</Nullable>
         <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
-        <Product>E-Commerce Backend API</Product>
+        <Product>Comex Backend API</Product>
         <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/mgnischor/ecommerce-backend</RepositoryUrl>
-        <RootNamespace>ECommerce</RootNamespace>
+        <RepositoryUrl>https://github.com/mgnischor/Comex.Backend</RepositoryUrl>
+        <RootNamespace>Comex</RootNamespace>
         <TargetFramework>net10.0</TargetFramework>
         <Version>0.1.25</Version>
 
@@ -47,37 +47,39 @@
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
-        <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.10" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="10.0.10" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10">
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
+        <PackageReference Include="Microsoft.OpenApi" Version="3.10.2" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="10.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.10" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.10">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.11">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore"
-            Version="10.0.10" />
+        <PackageReference
+            Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore"
+            Version="10.0.11" />
         <PackageReference Include="Npgsql" Version="10.0.3" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
-        <PackageReference Include="OpenTelemetry" Version="1.17.0" />
-        <PackageReference Include="OpenTelemetry.Api" Version="1.17.0" />
-        <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.17.0" />
-        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
+        <PackageReference Include="OpenTelemetry" Version="1.18.0" />
+        <PackageReference Include="OpenTelemetry.Api" Version="1.18.0" />
+        <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.18.0" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore"
-            Version="1.17.0-beta.1" />
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.17.0-beta.1" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.17.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.17.0" />
-        <PackageReference Include="Scalar.AspNetCore" Version="2.16.18" />
+            Version="1.18.0-beta.1" />
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.18.0" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.18.0" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore"
+            Version="1.18.0-beta.1" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.18.0" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.18.0" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.17.1" />
     </ItemGroup>
     <ItemGroup>
         <!-- Exclude test files from main project compilation -->

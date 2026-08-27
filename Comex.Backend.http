@@ -1,7 +1,7 @@
-@ECommerce_HostAddress = http://localhost:5049
+@Comex_HostAddress = http://localhost:5049
 
 ### Health Check
-GET {{ECommerce_HostAddress}}/
+GET {{Comex_HostAddress}}/
 Accept: application/json
 
 ###
@@ -11,24 +11,24 @@ Accept: application/json
 # ============================================
 
 ### Login
-POST {{ECommerce_HostAddress}}/api/v1/login
+POST {{Comex_HostAddress}}/api/v1/login
 Content-Type: application/json
 
 {
-  "email": "admin@ecommerce.local",
+  "email": "admin@comex.local",
   "password": "ChangeMe!Dev#2026"
 }
 
 ###
 
 ### Get Authentication Endpoints
-GET {{ECommerce_HostAddress}}/api/v1/endpoints
+GET {{Comex_HostAddress}}/api/v1/endpoints
 Accept: application/json
 
 ###
 
 ### Options for Authentication
-OPTIONS {{ECommerce_HostAddress}}/api/v1
+OPTIONS {{Comex_HostAddress}}/api/v1
 Accept: application/json
 
 ###
@@ -38,35 +38,35 @@ Accept: application/json
 # ============================================
 
 ### Get All Chart of Accounts
-GET {{ECommerce_HostAddress}}/api/v1/accounting/chart-of-accounts
+GET {{Comex_HostAddress}}/api/v1/accounting/chart-of-accounts
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Account by ID
-GET {{ECommerce_HostAddress}}/api/v1/accounting/chart-of-accounts/{{accountId}}
+GET {{Comex_HostAddress}}/api/v1/accounting/chart-of-accounts/{{accountId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Journal Entries (Paginated)
-GET {{ECommerce_HostAddress}}/api/v1/accounting/journal-entries?pageNumber=1&pageSize=50
+GET {{Comex_HostAddress}}/api/v1/accounting/journal-entries?pageNumber=1&pageSize=50
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Journal Entry by ID
-GET {{ECommerce_HostAddress}}/api/v1/accounting/journal-entries/{{journalEntryId}}
+GET {{Comex_HostAddress}}/api/v1/accounting/journal-entries/{{journalEntryId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Journal Entries by Product
-GET {{ECommerce_HostAddress}}/api/v1/accounting/journal-entries/product/{{productId}}
+GET {{Comex_HostAddress}}/api/v1/accounting/journal-entries/product/{{productId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
@@ -77,7 +77,7 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Record Inventory Transaction
-POST {{ECommerce_HostAddress}}/api/v1/inventory-transactions
+POST {{Comex_HostAddress}}/api/v1/inventory-transactions
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -96,21 +96,21 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Get Inventory Transaction by ID
-GET {{ECommerce_HostAddress}}/api/v1/inventory-transactions/{{transactionId}}
+GET {{Comex_HostAddress}}/api/v1/inventory-transactions/{{transactionId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Product Transactions
-GET {{ECommerce_HostAddress}}/api/v1/inventory-transactions/product/{{productId}}
+GET {{Comex_HostAddress}}/api/v1/inventory-transactions/product/{{productId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Transactions by Period
-GET {{ECommerce_HostAddress}}/api/v1/inventory-transactions/period?startDate=2024-01-01&endDate=2024-01-31
+GET {{Comex_HostAddress}}/api/v1/inventory-transactions/period?startDate=2024-01-01&endDate=2024-01-31
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
@@ -121,21 +121,21 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get User Notifications
-GET {{ECommerce_HostAddress}}/api/v1/notifications/user/{{userId}}?unreadOnly=false
+GET {{Comex_HostAddress}}/api/v1/notifications/user/{{userId}}?unreadOnly=false
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Notification by ID
-GET {{ECommerce_HostAddress}}/api/v1/notifications/{{notificationId}}
+GET {{Comex_HostAddress}}/api/v1/notifications/{{notificationId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Create Notification (Admin/Manager)
-POST {{ECommerce_HostAddress}}/api/v1/notifications
+POST {{Comex_HostAddress}}/api/v1/notifications
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -151,25 +151,25 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Mark Notification as Read
-PATCH {{ECommerce_HostAddress}}/api/v1/notifications/{{notificationId}}/read
+PATCH {{Comex_HostAddress}}/api/v1/notifications/{{notificationId}}/read
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Mark All Notifications as Read
-PATCH {{ECommerce_HostAddress}}/api/v1/notifications/user/{{userId}}/read-all
+PATCH {{Comex_HostAddress}}/api/v1/notifications/user/{{userId}}/read-all
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Delete Notification
-DELETE {{ECommerce_HostAddress}}/api/v1/notifications/{{notificationId}}
+DELETE {{Comex_HostAddress}}/api/v1/notifications/{{notificationId}}
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Unread Notification Count
-GET {{ECommerce_HostAddress}}/api/v1/notifications/user/{{userId}}/unread-count
+GET {{Comex_HostAddress}}/api/v1/notifications/user/{{userId}}/unread-count
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
@@ -180,31 +180,31 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get All Product Attributes
-GET {{ECommerce_HostAddress}}/api/v1/product-attributes
+GET {{Comex_HostAddress}}/api/v1/product-attributes
 Accept: application/json
 
 ###
 
 ### Get Product Attribute by ID
-GET {{ECommerce_HostAddress}}/api/v1/product-attributes/{{attributeId}}
+GET {{Comex_HostAddress}}/api/v1/product-attributes/{{attributeId}}
 Accept: application/json
 
 ###
 
 ### Get Product Attribute by Code
-GET {{ECommerce_HostAddress}}/api/v1/product-attributes/code/{{attributeCode}}
+GET {{Comex_HostAddress}}/api/v1/product-attributes/code/{{attributeCode}}
 Accept: application/json
 
 ###
 
 ### Get Variant Attributes
-GET {{ECommerce_HostAddress}}/api/v1/product-attributes/variant
+GET {{Comex_HostAddress}}/api/v1/product-attributes/variant
 Accept: application/json
 
 ###
 
 ### Create Product Attribute (Admin/Manager)
-POST {{ECommerce_HostAddress}}/api/v1/product-attributes
+POST {{Comex_HostAddress}}/api/v1/product-attributes
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -223,7 +223,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update Product Attribute (Admin/Manager)
-PUT {{ECommerce_HostAddress}}/api/v1/product-attributes/{{attributeId}}
+PUT {{Comex_HostAddress}}/api/v1/product-attributes/{{attributeId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -243,7 +243,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Delete Product Attribute (Admin)
-DELETE {{ECommerce_HostAddress}}/api/v1/product-attributes/{{attributeId}}
+DELETE {{Comex_HostAddress}}/api/v1/product-attributes/{{attributeId}}
 Authorization: Bearer {{authToken}}
 
 ###
@@ -253,49 +253,49 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get All Products (Paginated)
-GET {{ECommerce_HostAddress}}/api/v1/products?pageNumber=1&pageSize=20
+GET {{Comex_HostAddress}}/api/v1/products?pageNumber=1&pageSize=20
 Accept: application/json
 
 ###
 
 ### Get Product by ID
-GET {{ECommerce_HostAddress}}/api/v1/products/{{productId}}
+GET {{Comex_HostAddress}}/api/v1/products/{{productId}}
 Accept: application/json
 
 ###
 
 ### Get Product by SKU
-GET {{ECommerce_HostAddress}}/api/v1/products/sku/{{productSku}}
+GET {{Comex_HostAddress}}/api/v1/products/sku/{{productSku}}
 Accept: application/json
 
 ###
 
 ### Get Products by Category
-GET {{ECommerce_HostAddress}}/api/v1/products/category/{{categoryId}}
+GET {{Comex_HostAddress}}/api/v1/products/category/{{categoryId}}
 Accept: application/json
 
 ###
 
 ### Get Featured Products
-GET {{ECommerce_HostAddress}}/api/v1/products/featured
+GET {{Comex_HostAddress}}/api/v1/products/featured
 Accept: application/json
 
 ###
 
 ### Get Products On Sale
-GET {{ECommerce_HostAddress}}/api/v1/products/on-sale
+GET {{Comex_HostAddress}}/api/v1/products/on-sale
 Accept: application/json
 
 ###
 
 ### Search Products
-GET {{ECommerce_HostAddress}}/api/v1/products/search?searchTerm=laptop
+GET {{Comex_HostAddress}}/api/v1/products/search?searchTerm=laptop
 Accept: application/json
 
 ###
 
 ### Create Product (Admin/Manager)
-POST {{ECommerce_HostAddress}}/api/v1/products
+POST {{Comex_HostAddress}}/api/v1/products
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -313,7 +313,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update Product (Admin/Manager)
-PUT {{ECommerce_HostAddress}}/api/v1/products/{{productId}}
+PUT {{Comex_HostAddress}}/api/v1/products/{{productId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -333,25 +333,25 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Delete Product (Admin)
-DELETE {{ECommerce_HostAddress}}/api/v1/products/{{productId}}
+DELETE {{Comex_HostAddress}}/api/v1/products/{{productId}}
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Soft Delete Product (Admin/Manager)
-PATCH {{ECommerce_HostAddress}}/api/v1/products/{{productId}}/soft-delete
+PATCH {{Comex_HostAddress}}/api/v1/products/{{productId}}/soft-delete
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Product Endpoints
-GET {{ECommerce_HostAddress}}/api/v1/products/endpoints
+GET {{Comex_HostAddress}}/api/v1/products/endpoints
 Accept: application/json
 
 ###
 
 ### Options for Products
-OPTIONS {{ECommerce_HostAddress}}/api/v1/products
+OPTIONS {{Comex_HostAddress}}/api/v1/products
 Accept: application/json
 
 ###
@@ -361,25 +361,25 @@ Accept: application/json
 # ============================================
 
 ### Get Variants by Product
-GET {{ECommerce_HostAddress}}/api/v1/product-variants/product/{{productId}}
+GET {{Comex_HostAddress}}/api/v1/product-variants/product/{{productId}}
 Accept: application/json
 
 ###
 
 ### Get Product Variant by ID
-GET {{ECommerce_HostAddress}}/api/v1/product-variants/{{variantId}}
+GET {{Comex_HostAddress}}/api/v1/product-variants/{{variantId}}
 Accept: application/json
 
 ###
 
 ### Get Product Variant by SKU
-GET {{ECommerce_HostAddress}}/api/v1/product-variants/sku/{{variantSku}}
+GET {{Comex_HostAddress}}/api/v1/product-variants/sku/{{variantSku}}
 Accept: application/json
 
 ###
 
 ### Create Product Variant (Admin/Manager)
-POST {{ECommerce_HostAddress}}/api/v1/product-variants
+POST {{Comex_HostAddress}}/api/v1/product-variants
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -395,7 +395,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update Product Variant (Admin/Manager)
-PUT {{ECommerce_HostAddress}}/api/v1/product-variants/{{variantId}}
+PUT {{Comex_HostAddress}}/api/v1/product-variants/{{variantId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -412,7 +412,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Delete Product Variant (Admin)
-DELETE {{ECommerce_HostAddress}}/api/v1/product-variants/{{variantId}}
+DELETE {{Comex_HostAddress}}/api/v1/product-variants/{{variantId}}
 Authorization: Bearer {{authToken}}
 
 ###
@@ -422,31 +422,31 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get Active Promotions
-GET {{ECommerce_HostAddress}}/api/v1/promotions
+GET {{Comex_HostAddress}}/api/v1/promotions
 Accept: application/json
 
 ###
 
 ### Get Featured Promotions
-GET {{ECommerce_HostAddress}}/api/v1/promotions/featured
+GET {{Comex_HostAddress}}/api/v1/promotions/featured
 Accept: application/json
 
 ###
 
 ### Get Promotion by ID
-GET {{ECommerce_HostAddress}}/api/v1/promotions/{{promotionId}}
+GET {{Comex_HostAddress}}/api/v1/promotions/{{promotionId}}
 Accept: application/json
 
 ###
 
 ### Get Promotion by Code
-GET {{ECommerce_HostAddress}}/api/v1/promotions/code/{{promotionCode}}
+GET {{Comex_HostAddress}}/api/v1/promotions/code/{{promotionCode}}
 Accept: application/json
 
 ###
 
 ### Create Promotion (Admin/Manager)
-POST {{ECommerce_HostAddress}}/api/v1/promotions
+POST {{Comex_HostAddress}}/api/v1/promotions
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -466,7 +466,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update Promotion (Admin/Manager)
-PUT {{ECommerce_HostAddress}}/api/v1/promotions/{{promotionId}}
+PUT {{Comex_HostAddress}}/api/v1/promotions/{{promotionId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -487,7 +487,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Delete Promotion (Admin)
-DELETE {{ECommerce_HostAddress}}/api/v1/promotions/{{promotionId}}
+DELETE {{Comex_HostAddress}}/api/v1/promotions/{{promotionId}}
 Authorization: Bearer {{authToken}}
 
 ###
@@ -497,35 +497,35 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get All Refunds (Admin/Manager - Paginated)
-GET {{ECommerce_HostAddress}}/api/v1/refunds?pageNumber=1&pageSize=10
+GET {{Comex_HostAddress}}/api/v1/refunds?pageNumber=1&pageSize=10
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Refund by ID
-GET {{ECommerce_HostAddress}}/api/v1/refunds/{{refundId}}
+GET {{Comex_HostAddress}}/api/v1/refunds/{{refundId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Refunds by Order
-GET {{ECommerce_HostAddress}}/api/v1/refunds/order/{{orderId}}
+GET {{Comex_HostAddress}}/api/v1/refunds/order/{{orderId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Refunds by Customer
-GET {{ECommerce_HostAddress}}/api/v1/refunds/customer/{{customerId}}
+GET {{Comex_HostAddress}}/api/v1/refunds/customer/{{customerId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Create Refund
-POST {{ECommerce_HostAddress}}/api/v1/refunds
+POST {{Comex_HostAddress}}/api/v1/refunds
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -540,7 +540,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update Refund (Admin/Manager)
-PUT {{ECommerce_HostAddress}}/api/v1/refunds/{{refundId}}
+PUT {{Comex_HostAddress}}/api/v1/refunds/{{refundId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -556,13 +556,13 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Approve Refund (Admin/Manager)
-PATCH {{ECommerce_HostAddress}}/api/v1/refunds/{{refundId}}/approve
+PATCH {{Comex_HostAddress}}/api/v1/refunds/{{refundId}}/approve
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Reject Refund (Admin/Manager)
-PATCH {{ECommerce_HostAddress}}/api/v1/refunds/{{refundId}}/reject
+PATCH {{Comex_HostAddress}}/api/v1/refunds/{{refundId}}/reject
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -571,7 +571,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Delete Refund (Admin)
-DELETE {{ECommerce_HostAddress}}/api/v1/refunds/{{refundId}}
+DELETE {{Comex_HostAddress}}/api/v1/refunds/{{refundId}}
 Authorization: Bearer {{authToken}}
 
 ###
@@ -581,34 +581,34 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get All Shipments (Admin/Manager - Paginated)
-GET {{ECommerce_HostAddress}}/api/v1/shipments?pageNumber=1&pageSize=10
+GET {{Comex_HostAddress}}/api/v1/shipments?pageNumber=1&pageSize=10
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Shipment by ID
-GET {{ECommerce_HostAddress}}/api/v1/shipments/{{shipmentId}}
+GET {{Comex_HostAddress}}/api/v1/shipments/{{shipmentId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Shipments by Order
-GET {{ECommerce_HostAddress}}/api/v1/shipments/order/{{orderId}}
+GET {{Comex_HostAddress}}/api/v1/shipments/order/{{orderId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Track Shipment by Tracking Number (Public)
-GET {{ECommerce_HostAddress}}/api/v1/shipments/tracking/{{trackingNumber}}
+GET {{Comex_HostAddress}}/api/v1/shipments/tracking/{{trackingNumber}}
 Accept: application/json
 
 ###
 
 ### Create Shipment (Admin/Manager)
-POST {{ECommerce_HostAddress}}/api/v1/shipments
+POST {{Comex_HostAddress}}/api/v1/shipments
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -624,7 +624,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update Shipment (Admin/Manager)
-PUT {{ECommerce_HostAddress}}/api/v1/shipments/{{shipmentId}}
+PUT {{Comex_HostAddress}}/api/v1/shipments/{{shipmentId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -642,7 +642,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Delete Shipment (Admin)
-DELETE {{ECommerce_HostAddress}}/api/v1/shipments/{{shipmentId}}
+DELETE {{Comex_HostAddress}}/api/v1/shipments/{{shipmentId}}
 Authorization: Bearer {{authToken}}
 
 ###
@@ -652,20 +652,20 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get All Shipping Zones (Public)
-GET {{ECommerce_HostAddress}}/api/v1/shipping-zones
+GET {{Comex_HostAddress}}/api/v1/shipping-zones
 Accept: application/json
 
 ###
 
 ### Get Shipping Zone by ID
-GET {{ECommerce_HostAddress}}/api/v1/shipping-zones/{{shippingZoneId}}
+GET {{Comex_HostAddress}}/api/v1/shipping-zones/{{shippingZoneId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Create Shipping Zone (Admin/Manager)
-POST {{ECommerce_HostAddress}}/api/v1/shipping-zones
+POST {{Comex_HostAddress}}/api/v1/shipping-zones
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -686,7 +686,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update Shipping Zone (Admin/Manager)
-PUT {{ECommerce_HostAddress}}/api/v1/shipping-zones/{{shippingZoneId}}
+PUT {{Comex_HostAddress}}/api/v1/shipping-zones/{{shippingZoneId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -708,7 +708,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Delete Shipping Zone (Admin)
-DELETE {{ECommerce_HostAddress}}/api/v1/shipping-zones/{{shippingZoneId}}
+DELETE {{Comex_HostAddress}}/api/v1/shipping-zones/{{shippingZoneId}}
 Authorization: Bearer {{authToken}}
 
 ###
@@ -718,31 +718,31 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get All Stores
-GET {{ECommerce_HostAddress}}/api/v1/stores
+GET {{Comex_HostAddress}}/api/v1/stores
 Accept: application/json
 
 ###
 
 ### Get Store by ID
-GET {{ECommerce_HostAddress}}/api/v1/stores/{{storeId}}
+GET {{Comex_HostAddress}}/api/v1/stores/{{storeId}}
 Accept: application/json
 
 ###
 
 ### Get Store by Code
-GET {{ECommerce_HostAddress}}/api/v1/stores/code/{{storeCode}}
+GET {{Comex_HostAddress}}/api/v1/stores/code/{{storeCode}}
 Accept: application/json
 
 ###
 
 ### Search Stores by City
-GET {{ECommerce_HostAddress}}/api/v1/stores/search/city/{{cityName}}
+GET {{Comex_HostAddress}}/api/v1/stores/search/city/{{cityName}}
 Accept: application/json
 
 ###
 
 ### Create Store (Admin)
-POST {{ECommerce_HostAddress}}/api/v1/stores
+POST {{Comex_HostAddress}}/api/v1/stores
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -763,7 +763,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update Store (Admin/Manager)
-PUT {{ECommerce_HostAddress}}/api/v1/stores/{{storeId}}
+PUT {{Comex_HostAddress}}/api/v1/stores/{{storeId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -785,7 +785,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Delete Store (Admin)
-DELETE {{ECommerce_HostAddress}}/api/v1/stores/{{storeId}}
+DELETE {{Comex_HostAddress}}/api/v1/stores/{{storeId}}
 Authorization: Bearer {{authToken}}
 
 ###
@@ -795,35 +795,35 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get All Suppliers (Admin/Manager)
-GET {{ECommerce_HostAddress}}/api/v1/suppliers
+GET {{Comex_HostAddress}}/api/v1/suppliers
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Supplier by ID (Admin/Manager)
-GET {{ECommerce_HostAddress}}/api/v1/suppliers/{{supplierId}}
+GET {{Comex_HostAddress}}/api/v1/suppliers/{{supplierId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get Supplier by Code (Admin/Manager)
-GET {{ECommerce_HostAddress}}/api/v1/suppliers/code/{{supplierCode}}
+GET {{Comex_HostAddress}}/api/v1/suppliers/code/{{supplierCode}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Search Suppliers (Admin/Manager)
-GET {{ECommerce_HostAddress}}/api/v1/suppliers/search?searchTerm=supplier
+GET {{Comex_HostAddress}}/api/v1/suppliers/search?searchTerm=supplier
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Create Supplier (Admin/Manager)
-POST {{ECommerce_HostAddress}}/api/v1/suppliers
+POST {{Comex_HostAddress}}/api/v1/suppliers
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -845,7 +845,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update Supplier (Admin/Manager)
-PUT {{ECommerce_HostAddress}}/api/v1/suppliers/{{supplierId}}
+PUT {{Comex_HostAddress}}/api/v1/suppliers/{{supplierId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -868,7 +868,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Delete Supplier (Admin)
-DELETE {{ECommerce_HostAddress}}/api/v1/suppliers/{{supplierId}}
+DELETE {{Comex_HostAddress}}/api/v1/suppliers/{{supplierId}}
 Authorization: Bearer {{authToken}}
 
 ###
@@ -878,21 +878,21 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get All Users (Paginated)
-GET {{ECommerce_HostAddress}}/api/v1/users?pageNumber=1&pageSize=20
+GET {{Comex_HostAddress}}/api/v1/users?pageNumber=1&pageSize=20
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get User by ID
-GET {{ECommerce_HostAddress}}/api/v1/users/{{userId}}
+GET {{Comex_HostAddress}}/api/v1/users/{{userId}}
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Create User
-POST {{ECommerce_HostAddress}}/api/v1/users
+POST {{Comex_HostAddress}}/api/v1/users
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -909,7 +909,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update User
-PUT {{ECommerce_HostAddress}}/api/v1/users/{{userId}}
+PUT {{Comex_HostAddress}}/api/v1/users/{{userId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -927,20 +927,20 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Delete User
-DELETE {{ECommerce_HostAddress}}/api/v1/users/{{userId}}
+DELETE {{Comex_HostAddress}}/api/v1/users/{{userId}}
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Get User Endpoints
-GET {{ECommerce_HostAddress}}/api/v1/users/endpoints
+GET {{Comex_HostAddress}}/api/v1/users/endpoints
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Options for Users
-OPTIONS {{ECommerce_HostAddress}}/api/v1/users
+OPTIONS {{Comex_HostAddress}}/api/v1/users
 Accept: application/json
 Authorization: Bearer {{authToken}}
 
@@ -951,31 +951,31 @@ Authorization: Bearer {{authToken}}
 # ============================================
 
 ### Get All Vendors (Paginated)
-GET {{ECommerce_HostAddress}}/api/v1/vendors?pageNumber=1&pageSize=10
+GET {{Comex_HostAddress}}/api/v1/vendors?pageNumber=1&pageSize=10
 Accept: application/json
 
 ###
 
 ### Get Vendor by ID
-GET {{ECommerce_HostAddress}}/api/v1/vendors/{{vendorId}}
+GET {{Comex_HostAddress}}/api/v1/vendors/{{vendorId}}
 Accept: application/json
 
 ###
 
 ### Get Featured Vendors
-GET {{ECommerce_HostAddress}}/api/v1/vendors/featured
+GET {{Comex_HostAddress}}/api/v1/vendors/featured
 Accept: application/json
 
 ###
 
 ### Search Vendors
-GET {{ECommerce_HostAddress}}/api/v1/vendors/search?searchTerm=vendor
+GET {{Comex_HostAddress}}/api/v1/vendors/search?searchTerm=vendor
 Accept: application/json
 
 ###
 
 ### Create Vendor
-POST {{ECommerce_HostAddress}}/api/v1/vendors
+POST {{Comex_HostAddress}}/api/v1/vendors
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -993,7 +993,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Update Vendor (Admin/Manager)
-PUT {{ECommerce_HostAddress}}/api/v1/vendors/{{vendorId}}
+PUT {{Comex_HostAddress}}/api/v1/vendors/{{vendorId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -1012,13 +1012,13 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### Verify Vendor (Admin)
-PATCH {{ECommerce_HostAddress}}/api/v1/vendors/{{vendorId}}/verify
+PATCH {{Comex_HostAddress}}/api/v1/vendors/{{vendorId}}/verify
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### Delete Vendor (Admin)
-DELETE {{ECommerce_HostAddress}}/api/v1/vendors/{{vendorId}}
+DELETE {{Comex_HostAddress}}/api/v1/vendors/{{vendorId}}
 Authorization: Bearer {{authToken}}
 
 ###
