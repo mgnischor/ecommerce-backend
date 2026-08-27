@@ -1,8 +1,8 @@
-using ECommerce.Domain.Entities;
-using ECommerce.Infrastructure.Persistence;
+using Comex.Domain.Entities;
+using Comex.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Tests.TestFixtures;
+namespace Comex.Tests.TestFixtures;
 
 /// <summary>
 /// Test-specific DbContext that configures entities for InMemory provider
