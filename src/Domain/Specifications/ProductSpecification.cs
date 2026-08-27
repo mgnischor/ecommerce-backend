@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Specifications;
+namespace Comex.Domain.Specifications;
 
 /// <summary>
 /// Specification for filtering products based on various criteria
