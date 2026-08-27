@@ -1,11 +1,11 @@
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Enums;
-using ECommerce.Domain.Interfaces;
-using ECommerce.Infrastructure.Persistence;
+using Comex.Application.Interfaces;
+using Comex.Domain.Entities;
+using Comex.Domain.Enums;
+using Comex.Domain.Interfaces;
+using Comex.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Infrastructure.Repositories;
+namespace Comex.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for managing inventory transaction data access operations.
