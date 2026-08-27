@@ -1,7 +1,7 @@
-using ECommerce.Infrastructure.Persistence;
+using Comex.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Tests.TestFixtures;
+namespace Comex.Tests.TestFixtures;
 
 /// <summary>
 /// Base test fixture providing common setup and teardown for tests
