@@ -1,4 +1,4 @@
-namespace ECommerce.Application.Interfaces;
+namespace Comex.Application.Interfaces;
 
 /// <summary>
 /// Records and queries security-relevant events (login failures, account lockouts,
