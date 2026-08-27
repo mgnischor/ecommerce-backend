@@ -1,6 +1,6 @@
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Domain.Exceptions;
+namespace Comex.Domain.Exceptions;
 
 /// <summary>
 /// Exception thrown when an invalid order status transition is attempted
