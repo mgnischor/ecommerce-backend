@@ -4,19 +4,19 @@ $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot\..
 
 # Resolve the backend project directory so this script works from either
-# repository of the stack (ecommerce-backend or ecommerce-frontend).
-if (-not (Test-Path "ECommerce.Backend.csproj")) {
-    $backendSibling = Join-Path (Get-Location).Path "ecommerce-backend"
-    if (Test-Path (Join-Path $backendSibling "ECommerce.Backend.csproj")) {
+# repository of the stack (comex-backend or comex-frontend).
+if (-not (Test-Path "Comex.Backend.csproj")) {
+    $backendSibling = Join-Path (Get-Location).Path "comex-backend"
+    if (Test-Path (Join-Path $backendSibling "Comex.Backend.csproj")) {
         Set-Location $backendSibling
     } else {
-        Write-Host "ERROR: ECommerce.Backend.csproj not found in this repository or in ..\ecommerce-backend" -ForegroundColor Red
+        Write-Host "ERROR: Comex.Backend.csproj not found in this repository or in ..\comex-backend" -ForegroundColor Red
         exit 1
     }
 }
 
 Write-Host "====================================" -ForegroundColor Cyan
-Write-Host " Ecommerce Backend Build Script" -ForegroundColor Cyan
+Write-Host " Comex Backend Build Script" -ForegroundColor Cyan
 Write-Host " (Uses LOCAL PostgreSQL)" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host ""
@@ -44,7 +44,7 @@ $newVersion | Out-File -FilePath $versionFile -Encoding utf8 -NoNewline
 Write-Host "New version: $newVersion" -ForegroundColor Green
 
 Write-Host "Updating .csproj file..." -ForegroundColor Cyan
-& "$PSScriptRoot\update-version.ps1" -VersionFile $versionFile -CsprojFile "ECommerce.Backend.csproj"
+& "$PSScriptRoot\update-version.ps1" -VersionFile $versionFile -CsprojFile "Comex.Backend.csproj"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Failed to update .csproj file" -ForegroundColor Red
     $version | Out-File -FilePath $versionFile -Encoding utf8 -NoNewline
@@ -79,7 +79,7 @@ Write-Host "Migration name: $migrationName" -ForegroundColor Green
 
 try {
     dotnet ef migrations add $migrationName `
-        --project ECommerce.Backend.csproj `
+        --project Comex.Backend.csproj `
         --output-dir src\Infrastructure\Migrations `
         --context PostgresqlContext
 
@@ -97,14 +97,14 @@ Write-Host ""
 
 Write-Host "[5/8] Building project..." -ForegroundColor Yellow
 Write-Host "Building Release configuration..." -ForegroundColor Cyan
-dotnet build ECommerce.Backend.csproj -c Release --no-incremental
+dotnet build Comex.Backend.csproj -c Release --no-incremental
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Release build failed" -ForegroundColor Red
     exit 1
 }
 
 Write-Host "Building Debug configuration..." -ForegroundColor Cyan
-dotnet build ECommerce.Backend.csproj -c Debug --no-incremental
+dotnet build Comex.Backend.csproj -c Debug --no-incremental
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Debug build failed" -ForegroundColor Red
     exit 1
@@ -113,14 +113,14 @@ Write-Host ""
 
 Write-Host "[6/8] Publishing project..." -ForegroundColor Yellow
 Write-Host "Publishing Release configuration..." -ForegroundColor Cyan
-dotnet publish ECommerce.Backend.csproj -c Release --no-build
+dotnet publish Comex.Backend.csproj -c Release --no-build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Release publish failed" -ForegroundColor Red
     exit 1
 }
 
 Write-Host "Publishing Debug configuration..." -ForegroundColor Cyan
-dotnet publish ECommerce.Backend.csproj -c Debug --no-build
+dotnet publish Comex.Backend.csproj -c Debug --no-build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Debug publish failed" -ForegroundColor Red
     exit 1
@@ -147,7 +147,7 @@ Write-Host ""
 Write-Host "[8/8] Applying database migrations..." -ForegroundColor Yellow
 Write-Host "Updating database with latest migrations..." -ForegroundColor Cyan
 dotnet ef database update `
-    --project ECommerce.Backend.csproj `
+    --project Comex.Backend.csproj `
     --context PostgresqlContext
 
 if ($LASTEXITCODE -ne 0) {
