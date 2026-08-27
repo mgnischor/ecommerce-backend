@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Entities;
+namespace Comex.Domain.Entities;
 
 /// <summary>
 /// Represents a supplier in the e-commerce system.
