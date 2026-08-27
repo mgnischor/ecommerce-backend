@@ -1,9 +1,9 @@
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Interfaces;
-using ECommerce.Infrastructure.Persistence;
+using Comex.Domain.Entities;
+using Comex.Domain.Interfaces;
+using Comex.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Infrastructure.Repositories;
+namespace Comex.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for managing financial transaction data access operations.
