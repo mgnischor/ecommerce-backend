@@ -1,8 +1,8 @@
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ECommerce.Infrastructure.Configurations;
+namespace Comex.Infrastructure.Configurations;
 
 /// <summary>
 /// Configuration for the PromotionEntity.
@@ -43,7 +43,7 @@ internal sealed class PromotionEntityConfiguration : IEntityTypeConfiguration<Pr
             .HasColumnName("type")
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(ECommerce.Domain.Enums.PromotionType.PercentageDiscount);
+            .HasDefaultValue(Comex.Domain.Enums.PromotionType.PercentageDiscount);
 
         builder.Property(p => p.Code).HasColumnName("code").HasMaxLength(50).IsUnicode(false);
 
