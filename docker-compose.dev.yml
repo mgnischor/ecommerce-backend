@@ -1,30 +1,30 @@
-# Unified E-Commerce Docker Compose stack (DEVELOPMENT).
-# This file is intentionally IDENTICAL in the ecommerce-backend and
-# ecommerce-frontend repositories (services are built from the two sibling
+# Unified Comex Docker Compose stack (DEVELOPMENT).
+# This file is intentionally IDENTICAL in the Comex.Backend and
+# comex-frontend repositories (services are built from the two sibling
 # repositories via relative contexts).
 #
 #   Frontend: http://localhost:8080   (nginx reverse-proxies /api/* to the backend)
 #   Backend:  http://localhost:5049   (direct API access / debugging)
 #   Jaeger:   http://localhost:16686
-name: ecommerce-dev
+name: comex-dev
 
 services:
     # ── PostgreSQL Database ────────────────────────────────────────────────────
     postgres:
-        image: postgres:18-alpine
-        container_name: ecommerce-postgres-dev
+        image: postgres:18.6-trixie
+        container_name: comex-postgres-dev
         environment:
-            POSTGRES_USER: ecommerce
-            POSTGRES_PASSWORD: ecommerce
-            POSTGRES_DB: ecommerce
+            POSTGRES_USER: comex
+            POSTGRES_PASSWORD: comex
+            POSTGRES_DB: comex
         ports:
             - "5432:5432"
         volumes:
             - postgres-dev-data:/var/lib/postgresql
         networks:
-            - ecommerce-network-dev
+            - comex-network-dev
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U ecommerce"]
+            test: ["CMD-SHELL", "pg_isready -U comex"]
             interval: 10s
             timeout: 5s
             retries: 5
@@ -32,45 +32,45 @@ services:
 
     # ── Jaeger - Distributed Tracing ───────────────────────────────────────────
     jaeger:
-        image: jaegertracing/all-in-one:latest
-        container_name: ecommerce-jaeger-dev
+        image: jaegertracing/all-in-one:1.76.0
+        container_name: comex-jaeger-dev
         environment:
             - COLLECTOR_OTLP_ENABLED=true
             - LOG_LEVEL=debug
         ports:
             - "16686:16686" # Jaeger UI
-            - "4317:4317"   # OTLP gRPC
-            - "4318:4318"   # OTLP HTTP
+            - "4317:4317" # OTLP gRPC
+            - "4318:4318" # OTLP HTTP
             - "14250:14250" # Jaeger gRPC
             - "14268:14268" # Jaeger HTTP
         networks:
-            - ecommerce-network-dev
+            - comex-network-dev
         restart: unless-stopped
 
     # ── Backend (.NET API) - Development image (SDK + EF tools) ────────────────
-    ecommerce-backend-dev:
+    comex-backend-dev:
         build:
-            context: ../ecommerce-backend
+            context: ../Comex.Backend
             dockerfile: Dockerfile
             target: development
             args:
                 BUILD_DEVELOPMENT: 1
-        container_name: ecommerce-backend-dev
+        container_name: comex-backend-dev
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
             - ASPNETCORE_URLS=http://+:5049
             - ASPNETCORE_HTTP_PORTS=5049
-            - ConnectionStrings__DefaultConnection=Host=postgres;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432
+            - ConnectionStrings__DefaultConnection=Host=postgres;Database=comex;Username=comex;Password=comex;Port=5432
             # JWT signing key (override JWT_SECRET_KEY env var if desired)
             - Jwt__SecretKey=${JWT_SECRET_KEY:-dev-only-secret-key-not-for-production-use-please-rotate-32chars-min}
-            - Jwt__Issuer=ECommerceBackend
-            - Jwt__Audience=ECommerceClient
+            - Jwt__Issuer=ComexBackend
+            - Jwt__Audience=ComexClient
             - Cors__AllowedOrigins=http://localhost:8080,http://localhost:4200,http://localhost:5049
             - Database__AutoMigrate=true
             - Admin__SeedEnabled=true
-            - Admin__Email=${ADMIN_EMAIL:-admin@ecommerce.local}
+            - Admin__Email=${ADMIN_EMAIL:-admin@comex.local}
             - Admin__Password=${ADMIN_PASSWORD:-ChangeMe!Dev#2026}
-            - OpenTelemetry__ServiceName=ECommerce.Backend.Dev
+            - OpenTelemetry__ServiceName=Comex.Backend.Dev
             - OpenTelemetry__ServiceVersion=0.1.25
             - OpenTelemetry__EnableConsoleExporter=true
             - OpenTelemetry__OtlpEndpoint=http://jaeger:4317
@@ -82,32 +82,32 @@ services:
             jaeger:
                 condition: service_started
         networks:
-            - ecommerce-network-dev
+            - comex-network-dev
         restart: unless-stopped
 
     # ── Frontend (Angular + nginx) ─────────────────────────────────────────────
-    ecommerce-frontend-dev:
+    comex-frontend-dev:
         build:
-            context: ../ecommerce-frontend
+            context: ../Comex.Frontend
             dockerfile: Dockerfile
-        container_name: ecommerce-frontend-dev
+        container_name: comex-frontend-dev
         environment:
-            - BACKEND_HOST=ecommerce-backend-dev
+            - BACKEND_HOST=comex-backend-dev
             - BACKEND_PORT=5049
         ports:
             - "8080:80"
         depends_on:
-            ecommerce-backend-dev:
+            comex-backend-dev:
                 condition: service_started
         networks:
-            - ecommerce-network-dev
+            - comex-network-dev
         restart: unless-stopped
 
 volumes:
     postgres-dev-data:
-        name: ecommerce-postgres-dev-data
+        name: comex-postgres-dev-data
 
 networks:
-    ecommerce-network-dev:
-        name: ecommerce-network-dev
+    comex-network-dev:
+        name: comex-network-dev
         driver: bridge
