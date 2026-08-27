@@ -1,7 +1,7 @@
-using ECommerce.Application.Interfaces;
+using Comex.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace ECommerce.Application.Services;
+namespace Comex.Application.Services;
 
 /// <summary>
 /// Non-generic logging service implementation
@@ -14,7 +14,7 @@ public sealed class LoggingService : ILoggingService
     public LoggingService(ILoggerFactory loggerFactory)
     {
         _logger =
-            loggerFactory?.CreateLogger("ECommerce.Application")
+            loggerFactory?.CreateLogger("Comex.Application")
             ?? throw new ArgumentNullException(nameof(loggerFactory));
     }
 
