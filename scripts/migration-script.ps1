@@ -4,13 +4,13 @@ $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot\..
 
 # Resolve the backend project directory so this script works from either
-# repository of the stack (ecommerce-backend or ecommerce-frontend).
-if (-not (Test-Path "ECommerce.Backend.csproj")) {
-    $backendSibling = Join-Path (Get-Location).Path "ecommerce-backend"
-    if (Test-Path (Join-Path $backendSibling "ECommerce.Backend.csproj")) {
+# repository of the stack (comex-backend or comex-frontend).
+if (-not (Test-Path "Comex.Backend.csproj")) {
+    $backendSibling = Join-Path (Get-Location).Path "comex-backend"
+    if (Test-Path (Join-Path $backendSibling "Comex.Backend.csproj")) {
         Set-Location $backendSibling
     } else {
-        Write-Host "ERROR: ECommerce.Backend.csproj not found in this repository or in ..\ecommerce-backend" -ForegroundColor Red
+        Write-Host "ERROR: Comex.Backend.csproj not found in this repository or in ..\comex-backend" -ForegroundColor Red
         exit 1
     }
 }
@@ -55,7 +55,7 @@ Write-Host ""
 # Generate complete migration script (all migrations, idempotent)
 Write-Host "Generating complete idempotent migration script..." -ForegroundColor Cyan
 $completeScript = "$sqlDir\00_complete_migration.sql"
-dotnet ef migrations script --idempotent --output $completeScript --project ECommerce.Backend.csproj --context PostgresqlContext
+dotnet ef migrations script --idempotent --output $completeScript --project Comex.Backend.csproj --context PostgresqlContext
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "✓ Created: $completeScript" -ForegroundColor Green
@@ -67,7 +67,7 @@ Write-Host ""
 
 # Get list of migrations
 Write-Host "Retrieving migration list..." -ForegroundColor Cyan
-$migrationsOutput = dotnet ef migrations list --project ECommerce.Backend.csproj --context PostgresqlContext --no-connect 2>&1
+$migrationsOutput = dotnet ef migrations list --project Comex.Backend.csproj --context PostgresqlContext --no-connect 2>&1
 $migrations = @()
 
 foreach ($line in $migrationsOutput) {
@@ -107,10 +107,10 @@ foreach ($migration in $migrations) {
     # Generate SQL script from previous migration to current
     if ($previousMigration) {
         # Generate incremental script (only changes for this migration)
-        dotnet ef migrations script $previousMigration $migration --output $outputFile --project ECommerce.Backend.csproj --context PostgresqlContext
+        dotnet ef migrations script $previousMigration $migration --output $outputFile --project Comex.Backend.csproj --context PostgresqlContext
     } else {
         # First migration - generate from beginning
-        dotnet ef migrations script 0 $migration --output $outputFile --project ECommerce.Backend.csproj --context PostgresqlContext
+        dotnet ef migrations script 0 $migration --output $outputFile --project Comex.Backend.csproj --context PostgresqlContext
     }
 
     if ($LASTEXITCODE -eq 0) {
