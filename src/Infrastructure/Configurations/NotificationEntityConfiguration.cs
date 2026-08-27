@@ -1,8 +1,8 @@
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ECommerce.Infrastructure.Configurations;
+namespace Comex.Infrastructure.Configurations;
 
 /// <summary>
 /// Configuration for the NotificationEntity.
@@ -29,7 +29,7 @@ internal sealed class NotificationEntityConfiguration : IEntityTypeConfiguration
             .HasColumnName("type")
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(ECommerce.Domain.Enums.NotificationType.System);
+            .HasDefaultValue(Comex.Domain.Enums.NotificationType.System);
 
         builder
             .Property(n => n.Title)
