@@ -28,8 +28,8 @@ The seeding includes 37+ predefined accounts organized by:
 Services are already registered in `Program.cs`:
 
 ```csharp
-using ECommerce.Application.Services;
-using ECommerce.Domain.Interfaces;
+using Comex.Application.Services;
+using Comex.Domain.Interfaces;
 
 // Accounting services are already registered
 builder.Services.AddScoped<IAccountingService, AccountingService>();
