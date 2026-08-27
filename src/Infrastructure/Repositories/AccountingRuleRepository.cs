@@ -1,10 +1,10 @@
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Enums;
-using ECommerce.Domain.Interfaces;
+using Comex.Application.Interfaces;
+using Comex.Domain.Entities;
+using Comex.Domain.Enums;
+using Comex.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Infrastructure.Repositories;
+namespace Comex.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for managing accounting rule data access operations.
