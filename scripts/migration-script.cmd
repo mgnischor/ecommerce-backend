@@ -9,12 +9,12 @@ echo.
 cd /d "%~dp0\.."
 
 REM Resolve the backend project directory so this script works from either
-REM repository of the stack (ecommerce-backend or ecommerce-frontend).
-if not exist "%CD%\ECommerce.Backend.csproj" (
-    if exist "%CD%\..\ecommerce-backend\ECommerce.Backend.csproj" (
-        cd /d "%CD%\..\ecommerce-backend"
+REM repository of the stack (comex-backend or comex-frontend).
+if not exist "%CD%\Comex.Backend.csproj" (
+    if exist "%CD%\..\comex-backend\Comex.Backend.csproj" (
+        cd /d "%CD%\..\comex-backend"
     ) else (
-        echo ERROR: ECommerce.Backend.csproj not found in this repository or in ..\ecommerce-backend
+        echo ERROR: Comex.Backend.csproj not found in this repository or in ..\comex-backend
         exit /b 1
     )
 )
@@ -47,7 +47,7 @@ echo.
 
 REM Generate complete migration script (all migrations)
 echo Generating complete migration script...
-dotnet ef migrations script --idempotent --output "src\Infrastructure\SQL\00_complete_migration.sql" --project ECommerce.Backend.csproj --context PostgresqlContext
+dotnet ef migrations script --idempotent --output "src\Infrastructure\SQL\00_complete_migration.sql" --project Comex.Backend.csproj --context PostgresqlContext
 if errorlevel 1 (
     echo ERROR: Failed to generate complete migration script
     exit /b 1
@@ -59,7 +59,7 @@ REM Generate individual migration scripts
 echo Generating individual migration scripts...
 
 REM First, get the list and save migration names to an array
-dotnet ef migrations list --project ECommerce.Backend.csproj --context PostgresqlContext --no-connect > temp_migrations.txt 2>&1
+dotnet ef migrations list --project Comex.Backend.csproj --context PostgresqlContext --no-connect > temp_migrations.txt 2>&1
 
 REM Count migrations and store them
 set migration_count=0
@@ -87,12 +87,12 @@ echo [!counter!/!migration_count!] Processing: !current_migration!
 REM Generate SQL script
 if !counter! EQU 1 (
     REM First migration - from start
-    dotnet ef migrations script 0 "!current_migration!" --output "src\Infrastructure\SQL\!counter!_!current_migration!.sql" --project ECommerce.Backend.csproj --context PostgresqlContext
+    dotnet ef migrations script 0 "!current_migration!" --output "src\Infrastructure\SQL\!counter!_!current_migration!.sql" --project Comex.Backend.csproj --context PostgresqlContext
 ) else (
     REM Subsequent migrations - from previous to current
     set /a prev_index=!counter!-1
     set "previous_migration=!migration_%prev_index%!"
-    dotnet ef migrations script "!previous_migration!" "!current_migration!" --output "src\Infrastructure\SQL\!counter!_!current_migration!.sql" --project ECommerce.Backend.csproj --context PostgresqlContext
+    dotnet ef migrations script "!previous_migration!" "!current_migration!" --output "src\Infrastructure\SQL\!counter!_!current_migration!.sql" --project Comex.Backend.csproj --context PostgresqlContext
 )
 
 if errorlevel 1 (
