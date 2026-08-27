@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
-using ECommerce.Application.Interfaces;
+using Comex.Application.Interfaces;
 
-namespace ECommerce.Application.Services;
+namespace Comex.Application.Services;
 
 /// <summary>
 /// Service for password hashing and verification using PBKDF2
