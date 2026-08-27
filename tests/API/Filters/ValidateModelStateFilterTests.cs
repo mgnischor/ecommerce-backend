@@ -1,4 +1,4 @@
-using ECommerce.API.Filters;
+using Comex.API.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 
-namespace ECommerce.Tests.API.Filters;
+namespace Comex.Tests.API.Filters;
 
 /// <summary>
 /// Tests for ValidateModelStateFilter
