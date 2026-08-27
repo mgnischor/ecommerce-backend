@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ECommerce.API.DTOs;
+namespace Comex.API.DTOs;
 
 /// <summary>
 /// Response returned for a database backup file.
