@@ -1,9 +1,9 @@
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Enums;
+using Comex.Domain.Entities;
+using Comex.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ECommerce.Infrastructure.Configurations;
+namespace Comex.Infrastructure.Configurations;
 
 /// <summary>
 /// Entity Framework Core configuration for FinancialTransactionEntity
