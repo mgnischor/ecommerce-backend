@@ -1,4 +1,4 @@
-# E-Commerce Backend API
+# Comex Backend API
 
 <div align="center">
 
@@ -40,7 +40,7 @@ A production-ready, enterprise-grade e-commerce backend API built with ASP.NET C
 
 ## 🎯 Overview
 
-The **E-Commerce Backend API** is a robust, scalable solution designed for modern e-commerce platforms. Built with clean architecture principles, it provides a solid foundation for managing products, orders, inventory, and customer data while maintaining full accounting traceability through double-entry bookkeeping.
+The **Comex Backend API** is a robust, scalable solution designed for modern e-commerce platforms. Built with clean architecture principles, it provides a solid foundation for managing products, orders, inventory, and customer data while maintaining full accounting traceability through double-entry bookkeeping.
 
 ### Key Highlights
 
@@ -346,9 +346,9 @@ cd scripts
 
 **Containers created:**
 
-- `ecommerce-postgres` - PostgreSQL 18 Alpine
-- `ecommerce-backend-dev` - Development mode
-- `ecommerce-backend-prod` - Production mode
+- `comex-postgres` - PostgreSQL 18 Alpine
+- `comex-backend-dev` - Development mode
+- `comex-backend-prod` - Production mode
 
 **Cleanup Docker containers:**
 
@@ -363,8 +363,8 @@ cleanup-docker.cmd    # CMD
 #### 1. Clone the Repository
 
 ```powershell
-git clone https://github.com/mgnischor/ecommerce-backend.git
-cd ecommerce-backend
+git clone https://github.com/mgnischor/Comex.Backend.git
+cd Comex.Backend
 ```
 
 #### 2. Choose Your Approach
@@ -404,7 +404,7 @@ cd scripts
 
 The admin user is seeded on startup only when `Admin:SeedEnabled` is `true`, using credentials from configuration:
 
-- **Email**: `admin@ecommerce.local`
+- **Email**: `admin@comex.local`
 - **Password**: `ChangeMe!Dev#2026` (development only — change immediately in production!)
 
 > ⚠️ **Important**: Configure `Admin:Email` and `Admin:Password` via environment variables and change these credentials immediately in production!
@@ -468,7 +468,7 @@ Configuration is managed through `appsettings.json` and `appsettings.Development
 ```json
 {
     "ConnectionStrings": {
-        "DefaultConnection": "Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432"
+        "DefaultConnection": "Host=localhost;Database=comex;Username=comex;Password=comex;Port=5432"
     }
 }
 ```
@@ -476,7 +476,7 @@ Configuration is managed through `appsettings.json` and `appsettings.Development
 **Environment Variable:**
 
 ```powershell
-$env:ConnectionStrings__DefaultConnection = "Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432"
+$env:ConnectionStrings__DefaultConnection = "Host=localhost;Database=comex;Username=comex;Password=comex;Port=5432"
 ```
 
 #### JWT Configuration
@@ -485,8 +485,8 @@ $env:ConnectionStrings__DefaultConnection = "Host=localhost;Database=ecommerce;U
 {
     "Jwt": {
         "SecretKey": "your-secret-key-min-32-chars",
-        "Issuer": "ECommerceBackend",
-        "Audience": "ECommerceClient",
+        "Issuer": "ComexBackend",
+        "Audience": "ComexClient",
         "ExpirationMinutes": "60"
     }
 }
@@ -496,8 +496,8 @@ $env:ConnectionStrings__DefaultConnection = "Host=localhost;Database=ecommerce;U
 
 ```powershell
 $env:Jwt__SecretKey = "your-strong-secret-key-here"
-$env:Jwt__Issuer = "ECommerceBackend"
-$env:Jwt__Audience = "ECommerceClient"
+$env:Jwt__Issuer = "ComexBackend"
+$env:Jwt__Audience = "ComexClient"
 $env:Jwt__ExpirationMinutes = "60"
 ```
 
@@ -527,7 +527,7 @@ The admin user is seeded on startup when enabled. Credentials are read from conf
 {
     "Admin": {
         "SeedEnabled": true,
-        "Email": "admin@ecommerce.local",
+        "Email": "admin@comex.local",
         "Password": "your-strong-password"
     }
 }
@@ -555,7 +555,7 @@ The rate limiter is configured with two policies:
 ```json
 {
     "OpenTelemetry": {
-        "ServiceName": "ECommerce.Backend",
+        "ServiceName": "Comex.Backend",
         "ServiceVersion": "0.1.25",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": ""
@@ -566,7 +566,7 @@ The rate limiter is configured with two policies:
 **Environment Variables:**
 
 ```powershell
-$env:OpenTelemetry__ServiceName = "ECommerce.Backend"
+$env:OpenTelemetry__ServiceName = "Comex.Backend"
 $env:OpenTelemetry__ServiceVersion = "0.1.25"
 $env:OpenTelemetry__EnableConsoleExporter = "true"
 $env:OpenTelemetry__OtlpEndpoint = "http://localhost:4317"
@@ -623,7 +623,7 @@ dotnet ef migrations remove
 The application seeds the database on startup when `Admin:SeedEnabled` is enabled:
 
 1. **Admin User**
-    - Email: `admin@ecommerce.local`
+    - Email: `admin@comex.local`
     - Password: `ChangeMe!Dev#2026`
     - Role: Admin
 
@@ -663,9 +663,9 @@ POST /api/v1/login
 Content-Type: application/json
 
 {
-  "email": "admin@ecommerce.local",
+  "email": "admin@comex.local",
   "password": "ChangeMe!Dev#2026"
-  "email": "admin@ecommerce.local",
+  "email": "admin@comex.local",
   "password": "ChangeMe!Dev#2026"
 }
 ```
@@ -678,7 +678,7 @@ Content-Type: application/json
     "expiresIn": 3600,
     "tokenType": "Bearer",
     "userId": "...",
-    "email": "admin@ecommerce.local",
+    "email": "admin@comex.local",
     "accessLevel": "Admin"
 }
 ```
@@ -992,7 +992,7 @@ When running with Docker Compose, Jaeger is available at:
 Add custom spans to your code:
 
 ```csharp
-using ECommerce.API.Extensions;
+using Comex.API.Extensions;
 
 public async Task<Order> ProcessOrderAsync(Guid orderId)
 {
@@ -1266,7 +1266,7 @@ See the [LICENSE.md](LICENSE.md) file for full license text.
 **Miguel Nischor**
 
 - GitHub: [@mgnischor](https://github.com/mgnischor)
-- Repository: [ecommerce-backend](https://github.com/mgnischor/ecommerce-backend)
+- Repository: [Comex.Backend](https://github.com/mgnischor/Comex.Backend)
 
 ---
 
