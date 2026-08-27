@@ -1,8 +1,8 @@
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ECommerce.Infrastructure.Configurations;
+namespace Comex.Infrastructure.Configurations;
 
 /// <summary>
 /// EF Core configuration for Chart of Accounts
