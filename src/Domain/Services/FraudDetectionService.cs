@@ -1,6 +1,6 @@
-using ECommerce.Domain.Entities;
+using Comex.Domain.Entities;
 
-namespace ECommerce.Domain.Services;
+namespace Comex.Domain.Services;
 
 /// <summary>
 /// Domain service for fraud detection and risk assessment
