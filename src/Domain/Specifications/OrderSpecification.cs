@@ -1,6 +1,6 @@
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Domain.Specifications;
+namespace Comex.Domain.Specifications;
 
 /// <summary>
 /// Specification for filtering orders based on various criteria
