@@ -1,10 +1,10 @@
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Enums;
-using ECommerce.Infrastructure.Persistence;
+using Comex.Application.Interfaces;
+using Comex.Domain.Entities;
+using Comex.Domain.Enums;
+using Comex.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Infrastructure.Persistence;
+namespace Comex.Infrastructure.Persistence;
 
 /// <summary>
 /// Seeds initial data into the database
