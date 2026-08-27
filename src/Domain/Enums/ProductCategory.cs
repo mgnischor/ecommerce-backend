@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Enums;
+namespace Comex.Domain.Enums;
 
 /// <summary>
 /// Defines various product categories within the e-commerce system.
