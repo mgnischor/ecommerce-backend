@@ -1,4 +1,4 @@
-namespace ECommerce.Domain.Events;
+namespace Comex.Domain.Events;
 
 /// <summary>
 /// Base class for all domain events
