@@ -1,6 +1,6 @@
 # Running with OpenTelemetry and Jaeger
 
-This guide shows how to run the E-Commerce Backend with full observability using OpenTelemetry and Jaeger for distributed tracing.
+This guide shows how to run the Comex Backend with full observability using OpenTelemetry and Jaeger for distributed tracing.
 
 ## Quick Start with Docker Compose
 
@@ -16,7 +16,7 @@ This will start:
 
 - **PostgreSQL**: Database on port 5432
 - **Jaeger**: Distributed tracing on port 16686 (UI) and 4317 (OTLP)
-- **E-Commerce Backend**: API on port 80 (production mode)
+- **Comex Backend**: API on port 80 (production mode)
 
 #### 2. Access the services
 
@@ -34,9 +34,9 @@ docker-compose -f docker-compose.dev.yml up -d
 
 This will start:
 
-- **PostgreSQL**: Database on port 5432 (with `ecommerce` database)
+- **PostgreSQL**: Database on port 5432 (with `comex` database)
 - **Jaeger**: Distributed tracing on port 16686 (UI) and 4317 (OTLP)
-- **E-Commerce Backend**: API on port 5049 (development mode with console exporter)
+- **Comex Backend**: API on port 5049 (development mode with console exporter)
 
 #### 2. Access the services
 
@@ -49,7 +49,7 @@ This will start:
 ### 3. View traces in Jaeger
 
 1. Open http://localhost:16686
-2. Select **ECommerce.Backend** (or **ECommerce.Backend.Dev** in development mode) from the Service dropdown
+2. Select **Comex.Backend** (or **Comex.Backend.Dev** in development mode) from the Service dropdown
 3. Click **Find Traces**
 4. Click on any trace to see detailed spans
 
@@ -94,10 +94,10 @@ Ensure the configuration points to localhost:
 ```json
 {
     "ConnectionStrings": {
-        "DefaultConnection": "Host=localhost;Database=ecommerce;Username=ecommerce;Password=ecommerce;Port=5432"
+        "DefaultConnection": "Host=localhost;Database=comex;Username=comex;Password=comex;Port=5432"
     },
     "OpenTelemetry": {
-        "ServiceName": "ECommerce.Backend.Dev",
+        "ServiceName": "Comex.Backend.Dev",
         "ServiceVersion": "0.1.25",
         "EnableConsoleExporter": true,
         "OtlpEndpoint": "http://localhost:4317"
@@ -159,7 +159,7 @@ For production, configure your OTLP endpoint to point to your observability back
 ```json
 {
     "OpenTelemetry": {
-        "ServiceName": "ECommerce.Backend",
+        "ServiceName": "Comex.Backend",
         "ServiceVersion": "0.1.25",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": "https://otlp-gateway-prod-us-central-0.grafana.net/otlp"
@@ -172,7 +172,7 @@ For production, configure your OTLP endpoint to point to your observability back
 ```json
 {
     "OpenTelemetry": {
-        "ServiceName": "ECommerce.Backend",
+        "ServiceName": "Comex.Backend",
         "ServiceVersion": "0.1.25",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": "https://api.honeycomb.io:443"
@@ -185,7 +185,7 @@ For production, configure your OTLP endpoint to point to your observability back
 ```json
 {
     "OpenTelemetry": {
-        "ServiceName": "ECommerce.Backend",
+        "ServiceName": "Comex.Backend",
         "ServiceVersion": "0.1.25",
         "EnableConsoleExporter": false,
         "OtlpEndpoint": "http://jaeger-collector:4317"
@@ -198,7 +198,7 @@ For production, configure your OTLP endpoint to point to your observability back
 You can also configure OpenTelemetry via environment variables:
 
 ```powershell
-$env:OpenTelemetry__ServiceName="ECommerce.Backend"
+$env:OpenTelemetry__ServiceName="Comex.Backend"
 $env:OpenTelemetry__ServiceVersion="0.1.25"
 $env:OpenTelemetry__EnableConsoleExporter="true"
 $env:OpenTelemetry__OtlpEndpoint="http://localhost:4317"
@@ -219,7 +219,7 @@ dotnet run
 2. Check Jaeger logs:
 
     ```powershell
-    docker logs ecommerce-jaeger
+    docker logs comex-jaeger
     ```
 
 3. Verify OTLP endpoint is correct in configuration
@@ -238,7 +238,7 @@ dotnet run
 
 3. Check PostgreSQL logs:
     ```powershell
-    docker logs ecommerce-postgres
+    docker logs comex-postgres
     ```
 
 ### Port conflicts
