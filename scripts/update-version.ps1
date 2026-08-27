@@ -2,16 +2,16 @@
 
 param(
     [string]$VersionFile = "version.txt",
-    [string]$CsprojFile = "ECommerce.Backend.csproj"
+    [string]$CsprojFile = "Comex.Backend.csproj"
 )
 
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot\..
 
 # Resolve the backend project directory so this script works from either
-# repository of the stack (ecommerce-backend or ecommerce-frontend).
+# repository of the stack (comex-backend or comex-frontend).
 if (-not (Test-Path $CsprojFile)) {
-    $backendSibling = Join-Path (Get-Location).Path "ecommerce-backend"
+    $backendSibling = Join-Path (Get-Location).Path "comex-backend"
     if (Test-Path (Join-Path $backendSibling $CsprojFile)) {
         Set-Location $backendSibling
     }
