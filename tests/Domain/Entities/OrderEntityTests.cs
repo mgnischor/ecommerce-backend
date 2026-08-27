@@ -1,6 +1,6 @@
-using ECommerce.Domain.Enums;
+using Comex.Domain.Enums;
 
-namespace ECommerce.Tests.Domain.Entities;
+namespace Comex.Tests.Domain.Entities;
 
 /// <summary>
 /// Tests for OrderEntity
