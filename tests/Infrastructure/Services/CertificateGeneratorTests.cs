@@ -1,9 +1,9 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using ECommerce.Infrastructure.Services;
+using Comex.Infrastructure.Services;
 
-namespace ECommerce.Tests.Infrastructure.Services;
+namespace Comex.Tests.Infrastructure.Services;
 
 /// <summary>
 /// Tests for CertificateGenerator
