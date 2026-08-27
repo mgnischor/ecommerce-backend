@@ -1,7 +1,7 @@
-using ECommerce.Application.Interfaces;
+using Comex.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace ECommerce.Application.Services;
+namespace Comex.Application.Services;
 
 /// <summary>
 /// Service for centralized logging across the application
