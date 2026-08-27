@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
-using ECommerce.Application.Interfaces;
+using Comex.Application.Interfaces;
 
-namespace ECommerce.Application.Services;
+namespace Comex.Application.Services;
 
 /// <summary>
 /// In-memory security audit service that logs events and retains them in a bounded buffer.
