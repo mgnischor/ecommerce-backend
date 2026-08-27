@@ -1,9 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 WORKDIR /src
-COPY ["ECommerce.Backend.csproj", "./"]
-RUN dotnet restore "ECommerce.Backend.csproj"
+COPY ["Comex.Backend.csproj", "./"]
+RUN dotnet restore "Comex.Backend.csproj"
 COPY . .
-RUN dotnet publish "ECommerce.Backend.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Comex.Backend.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
 ARG BUILD_DEVELOPMENT=1
@@ -16,13 +16,13 @@ RUN if [ "$BUILD_DEVELOPMENT" = "1" ]; then \
         echo 'export ASPNETCORE_ENVIRONMENT=Development' >> /app/entrypoint.sh && \
         echo 'export ASPNETCORE_URLS=http://+:5049' >> /app/entrypoint.sh && \
         echo 'export ASPNETCORE_HTTP_PORTS=5049' >> /app/entrypoint.sh && \
-        echo 'exec dotnet ECommerce.Backend.dll' >> /app/entrypoint.sh; \
+        echo 'exec dotnet Comex.Backend.dll' >> /app/entrypoint.sh; \
     else \
         echo '#!/bin/sh' > /app/entrypoint.sh && \
         echo 'export ASPNETCORE_ENVIRONMENT=Production' >> /app/entrypoint.sh && \
         echo 'export ASPNETCORE_URLS=http://+:80' >> /app/entrypoint.sh && \
         echo 'export ASPNETCORE_HTTP_PORTS=80' >> /app/entrypoint.sh && \
-        echo 'exec dotnet ECommerce.Backend.dll' >> /app/entrypoint.sh; \
+        echo 'exec dotnet Comex.Backend.dll' >> /app/entrypoint.sh; \
     fi && \
     chmod +x /app/entrypoint.sh
 RUN addgroup -g 1000 appgroup && \
@@ -58,7 +58,7 @@ RUN echo '#!/bin/sh' > /app/entrypoint.sh && \
     echo 'export ASPNETCORE_ENVIRONMENT=Development' >> /app/entrypoint.sh && \
     echo 'export ASPNETCORE_URLS=http://+:5049' >> /app/entrypoint.sh && \
     echo 'export ASPNETCORE_HTTP_PORTS=5049' >> /app/entrypoint.sh && \
-    echo 'exec dotnet ECommerce.Backend.dll' >> /app/entrypoint.sh && \
+    echo 'exec dotnet Comex.Backend.dll' >> /app/entrypoint.sh && \
     chmod +x /app/entrypoint.sh
 
 EXPOSE 5049
