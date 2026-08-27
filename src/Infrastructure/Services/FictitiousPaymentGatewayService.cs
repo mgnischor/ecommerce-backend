@@ -1,9 +1,9 @@
 using System.Text.Json;
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Enums;
-using ECommerce.Domain.Interfaces;
+using Comex.Application.Interfaces;
+using Comex.Domain.Enums;
+using Comex.Domain.Interfaces;
 
-namespace ECommerce.Infrastructure.Services;
+namespace Comex.Infrastructure.Services;
 
 /// <summary>
 /// A fictitious payment gateway that simulates real-world payment processing latency and outcomes.
