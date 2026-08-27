@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ECommerce.API.DTOs;
+namespace Comex.API.DTOs;
 
 /// <summary>
 /// Data Transfer Object (DTO) for user authentication login requests
