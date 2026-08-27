@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ECommerce.src.Infrastructure.Migrations
+namespace Comex.src.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class Migration_v0_2_1 : Migration
