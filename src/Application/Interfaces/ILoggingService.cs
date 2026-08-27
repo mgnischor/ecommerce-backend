@@ -1,4 +1,4 @@
-namespace ECommerce.Application.Interfaces;
+namespace Comex.Application.Interfaces;
 
 /// <summary>
 /// Interface for logging service to track errors, warnings, and information across the application
