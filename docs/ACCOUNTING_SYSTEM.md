@@ -1,4 +1,4 @@
-# Inventory Accounting System - E-Commerce Backend
+# Inventory Accounting System - Comex Backend
 
 ## Overview
 
@@ -16,9 +16,9 @@ Transactions are recorded when they occur, regardless of payment or receipt.
 
 ### 3. NBC TG 16 - Inventories
 
--   Inventories are assets held for sale
--   Measured at the lower of cost and net realizable value
--   Cost includes acquisition costs and other costs to bring inventory to saleable condition
+- Inventories are assets held for sale
+- Measured at the lower of cost and net realizable value
+- Cost includes acquisition costs and other costs to bring inventory to saleable condition
 
 ## Chart of Accounts Structure
 
@@ -176,45 +176,45 @@ Credit: Merchandise Inventory (Asset)        $ XXX.XX
 
 Defines the chart of accounts:
 
--   Account code (hierarchical structure)
--   Name and description
--   Account type (Asset, Liability, Equity, Revenue, Expense)
--   Current balance
--   Analytic account and active status indicators
+- Account code (hierarchical structure)
+- Name and description
+- Account type (Asset, Liability, Equity, Revenue, Expense)
+- Current balance
+- Analytic account and active status indicators
 
 ### JournalEntryEntity
 
 Represents a complete accounting entry:
 
--   Unique sequential number
--   Entry date
--   Document type and number
--   Descriptive history
--   Total amount
--   References (order, product, inventory transaction)
--   Posted status
+- Unique sequential number
+- Entry date
+- Document type and number
+- Descriptive history
+- Total amount
+- References (order, product, inventory transaction)
+- Posted status
 
 ### AccountingEntryEntity
 
 Individual entry (debit or credit):
 
--   Reference to journal entry
--   Debited/credited account
--   Entry type (Debit/Credit)
--   Amount
--   Complementary description
--   Cost center (optional)
+- Reference to journal entry
+- Debited/credited account
+- Entry type (Debit/Credit)
+- Amount
+- Complementary description
+- Cost center (optional)
 
 ### InventoryTransactionEntity
 
 Inventory movement record:
 
--   Sequential transaction number
--   Movement type
--   Product, location, quantity
--   Unit and total costs
--   References to order and fiscal document
--   Link to generated journal entry
+- Sequential transaction number
+- Movement type
+- Product, location, quantity
+- Unit and total costs
+- References to order and fiscal document
+- Link to generated journal entry
 
 ## Implemented Services
 
@@ -222,21 +222,21 @@ Inventory movement record:
 
 Interface for accounting operations:
 
--   `RecordPurchaseAsync()` - Records purchases
--   `RecordSaleAsync()` - Records sales COGS
--   `RecordSaleReturnAsync()` - Records sales returns
--   `RecordPurchaseReturnAsync()` - Records purchase returns
--   `RecordAdjustmentAsync()` - Records inventory adjustments
--   `RecordLossAsync()` - Records losses/shrinkage
--   `GetOrCreateAccountAsync()` - Manages chart of accounts
+- `RecordPurchaseAsync()` - Records purchases
+- `RecordSaleAsync()` - Records sales COGS
+- `RecordSaleReturnAsync()` - Records sales returns
+- `RecordPurchaseReturnAsync()` - Records purchase returns
+- `RecordAdjustmentAsync()` - Records inventory adjustments
+- `RecordLossAsync()` - Records losses/shrinkage
+- `GetOrCreateAccountAsync()` - Manages chart of accounts
 
 ### IInventoryTransactionService
 
 Interface for inventory transactions:
 
--   `RecordTransactionAsync()` - Records transaction and generates accounting entry
--   `GetProductTransactionsAsync()` - Queries history by product
--   `GetTransactionsByPeriodAsync()` - Queries by period
+- `RecordTransactionAsync()` - Records transaction and generates accounting entry
+- `GetProductTransactionsAsync()` - Queries history by product
+- `GetTransactionsByPeriodAsync()` - Queries by period
 
 ## Operation Flow
 
@@ -264,20 +264,20 @@ Interface for inventory transactions:
 
 Each movement has:
 
--   Unique sequential number
--   Exact date and time
--   Responsible user
--   Source document
--   Notes
--   Link to corresponding accounting entry
+- Unique sequential number
+- Exact date and time
+- Responsible user
+- Source document
+- Notes
+- Link to corresponding accounting entry
 
 This enables:
 
--   Complete operation audit
--   Accounting reconciliation
--   Cost analysis by product
--   Management and fiscal reports
--   Discrepancy tracking
+- Complete operation audit
+- Accounting reconciliation
+- Cost analysis by product
+- Management and fiscal reports
+- Discrepancy tracking
 
 ## Possible Accounting Reports
 
@@ -313,11 +313,11 @@ Cost of goods sold during the period
 
 The system meets the requirements of:
 
--   **NBC TG 16 (CPC 16)** - Inventories
--   **NBC TG 26 (CPC 26)** - Presentation of Financial Statements
--   **Law 6.404/76** - Brazilian Corporate Law
--   **Civil Code** - Accounting bookkeeping
--   **Fundamental Accounting Principles**
+- **NBC TG 16 (CPC 16)** - Inventories
+- **NBC TG 26 (CPC 26)** - Presentation of Financial Statements
+- **Law 6.404/76** - Brazilian Corporate Law
+- **Civil Code** - Accounting bookkeeping
+- **Fundamental Accounting Principles**
 
 ## Next Steps
 
