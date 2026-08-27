@@ -1,4 +1,4 @@
-namespace ECommerce.Tests.Domain.Entities;
+namespace Comex.Tests.Domain.Entities;
 
 [TestFixture]
 public class CategoryEntitySimpleTests
