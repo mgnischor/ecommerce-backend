@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace ECommerce.API.Extensions;
+namespace Comex.API.Extensions;
 
 /// <summary>
 /// Helper class for creating custom OpenTelemetry spans and enriching them with tags.
