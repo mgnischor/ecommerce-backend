@@ -1,6 +1,6 @@
-using ECommerce.API.DTOs;
+using Comex.API.DTOs;
 
-namespace ECommerce.API.Services;
+namespace Comex.API.Services;
 
 /// <summary>
 /// Defines read-only accounting query operations for controllers.
