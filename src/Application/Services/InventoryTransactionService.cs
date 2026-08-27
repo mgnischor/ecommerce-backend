@@ -1,10 +1,10 @@
-using ECommerce.Application.Interfaces;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Enums;
-using ECommerce.Domain.Interfaces;
-using AppInterfaces = ECommerce.Application.Interfaces;
+using Comex.Application.Interfaces;
+using Comex.Domain.Entities;
+using Comex.Domain.Enums;
+using Comex.Domain.Interfaces;
+using AppInterfaces = Comex.Application.Interfaces;
 
-namespace ECommerce.Application.Services;
+namespace Comex.Application.Services;
 
 /// <summary>
 /// Service for managing inventory transactions with accounting and financial integration
